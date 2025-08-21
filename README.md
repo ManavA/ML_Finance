@@ -2,10 +2,10 @@
 
 A comprehensive machine learning system for cryptocurrency and stock trading, featuring advanced models, real-time data collection, and both CLI and notebook interfaces.
 
-## 📊 Results & Analysis
+## Results & Analysis
 **[View Jupyter Notebook Results](https://github.com/ManavA/ML_Finance/tree/main/Jupyter%20Notebooks%2C%20Results%2C%20Analysis%20-%20Final)** - Comprehensive analysis including performance metrics, visualizations, and model comparisons
 
-## Features
+## Overview
 
 ### Data Collection
 - **Multiple Data Sources**: Polygon.io, CoinMarketCap, Yahoo Finance, S3
