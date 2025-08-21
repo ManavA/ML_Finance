@@ -1,0 +1,244 @@
+# ML Finance Trading System Configuration
+
+# Data Configuration
+data:
+  sources:
+    priority: ['polygon', 'cmc', 's3', 'yfinance']
+    polygon:
+      api_key: ${POLYGON_API_KEY}
+      base_url: https://api.polygon.io
+      rate_limit: 5  # requests per second
+    coinmarketcap:
+      api_key: ${CMC_API_KEY}
+      base_url: https://pro-api.coinmarketcap.com
+    s3:
+      bucket: crypto-ml-data
+      region: us-east-1
+      access_key: ${AWS_ACCESS_KEY_ID}
+      secret_key: ${AWS_SECRET_ACCESS_KEY}
+  cache:
+    enabled: true
+    directory: data/cache
+    ttl: 86400  # 24 hours in seconds
+    max_size_gb: 10
+
+# Model Configuration
+models:
+  default: xgboost
+  ensemble:
+    enabled: true
+    models: ['xgboost', 'lightgbm', 'catboost']
+    voting: soft
+  hyperparameters:
+    xgboost:
+      n_estimators: 100
+      max_depth: 6
+      learning_rate: 0.01
+      objective: reg:squarederror
+    lightgbm:
+      n_estimators: 100
+      num_leaves: 31
+      learning_rate: 0.01
+      objective: regression
+    catboost:
+      iterations: 100
+      depth: 6
+      learning_rate: 0.01
+      loss_function: RMSE
+    lstm:
+      hidden_size: 128
+      num_layers: 2
+      dropout: 0.2
+      sequence_length: 60
+      batch_size: 32
+      epochs: 100
+    gru:
+      hidden_size: 128
+      num_layers: 2
+      dropout: 0.2
+      sequence_length: 60
+      batch_size: 32
+      epochs: 100
+    transformer:
+      d_model: 128
+      nhead: 8
+      num_layers: 4
+      dropout: 0.1
+      sequence_length: 60
+      batch_size: 32
+      epochs: 100
+
+# Feature Engineering
+features:
+  technical_indicators:
+    enabled: true
+    indicators:
+      - rsi
+      - macd
+      - bollinger_bands
+      - sma
+      - ema
+      - atr
+      - obv
+      - mfi
+  price_features:
+    enabled: true
+    features:
+      - returns
+      - log_returns
+      - volatility
+      - high_low_ratio
+      - close_open_ratio
+  volume_features:
+    enabled: true
+    features:
+      - volume_ma
+      - volume_ratio
+      - vwap
+  market_features:
+    enabled: true
+    features:
+      - market_cap
+      - dominance
+      - correlation
+  time_features:
+    enabled: true
+    features:
+      - hour
+      - day_of_week
+      - month
+      - quarter
+
+# Trading Configuration
+trading:
+  initial_capital: 10000
+  position_sizing:
+    method: fixed  # fixed, kelly, risk_parity
+    fixed_size: 0.1
+    max_position: 0.3
+  risk_management:
+    stop_loss: 0.02
+    take_profit: 0.05
+    trailing_stop: 0.015
+    max_drawdown: 0.15
+  commission:
+    maker: 0.001
+    taker: 0.001
+    slippage: 0.0005
+  symbols:
+    crypto: ['BTC', 'ETH', 'SOL', 'ADA', 'DOT']
+    stocks: ['SPY', 'QQQ', 'IWM', 'DIA', 'VTI']
+
+# Backtesting Configuration
+backtesting:
+  initial_capital: 10000
+  commission: 0.001
+  slippage: 0.0005
+  data_split:
+    train: 0.7
+    validation: 0.15
+    test: 0.15
+  walk_forward:
+    enabled: true
+    train_periods: 252  # Trading days
+    test_periods: 63
+    step_periods: 21
+  metrics:
+    - total_return
+    - sharpe_ratio
+    - sortino_ratio
+    - max_drawdown
+    - win_rate
+    - profit_factor
+    - calmar_ratio
+
+# Strategy Configuration
+strategies:
+  baseline:
+    ma_crossover:
+      fast_period: 10
+      slow_period: 30
+    rsi:
+      period: 14
+      oversold: 30
+      overbought: 70
+    bollinger:
+      period: 20
+      num_std: 2
+    macd:
+      fast: 12
+      slow: 26
+      signal: 9
+  advanced:
+    momentum:
+      lookback: 20
+      threshold: 0.02
+    mean_reversion:
+      lookback: 20
+      z_score_threshold: 2
+    pairs_trading:
+      lookback: 60
+      z_score_entry: 2
+      z_score_exit: 0
+
+# Logging Configuration
+logging:
+  level: INFO
+  file: logs/trading.log
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  rotation:
+    enabled: true
+    max_bytes: 10485760  # 10MB
+    backup_count: 5
+
+# Database Configuration (optional)
+database:
+  enabled: false
+  type: postgresql
+  host: localhost
+  port: 5432
+  name: ml_trading
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+
+# API Configuration (optional)
+api:
+  enabled: false
+  host: 0.0.0.0
+  port: 8000
+  workers: 4
+  cors:
+    enabled: true
+    origins: ['http://localhost:3000']
+
+# Notification Configuration (optional)
+notifications:
+  enabled: false
+  email:
+    smtp_host: smtp.gmail.com
+    smtp_port: 587
+    username: ${EMAIL_USER}
+    password: ${EMAIL_PASSWORD}
+    recipients: []
+  slack:
+    webhook_url: ${SLACK_WEBHOOK_URL}
+  telegram:
+    bot_token: ${TELEGRAM_BOT_TOKEN}
+    chat_id: ${TELEGRAM_CHAT_ID}
+
+# Performance Optimization
+optimization:
+  parallel_processing:
+    enabled: true
+    n_jobs: -1  # Use all available cores
+  gpu:
+    enabled: false
+    device: cuda:0
+  caching:
+    enabled: true
+    redis:
+      host: localhost
+      port: 6379
+
+# Environment
+environment: development  # development, staging, production
