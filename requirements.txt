@@ -1,0 +1,85 @@
+# ML Finance Trading System - Requirements
+
+# Core Dependencies
+pandas>=1.3.0
+numpy>=1.20.0
+scikit-learn>=1.0.0
+matplotlib>=3.4.0
+seaborn>=0.11.0
+plotly>=5.3.0
+
+# Data Collection
+requests>=2.26.0
+python-dotenv>=0.19.0
+boto3>=1.18.0  # For S3 access
+ccxt>=2.5.0  # Cryptocurrency exchange library
+yfinance>=0.1.70
+pyarrow>=5.0.0  # For parquet files
+
+# Machine Learning
+xgboost>=1.5.0
+lightgbm>=3.3.0
+catboost>=1.0.0
+
+# Deep Learning
+torch>=1.10.0
+tensorflow>=2.8.0
+
+# Time Series
+statsmodels>=0.13.0
+prophet>=1.0.0
+
+# Technical Analysis (optional but recommended)
+ta-lib>=0.4.0  # May require separate installation
+pandas-ta>=0.3.0  # Alternative to ta-lib
+
+# Reinforcement Learning
+stable-baselines3>=1.5.0
+gymnasium>=0.26.0
+
+# CLI Framework
+click>=8.0.0
+rich>=10.0.0  # For better terminal output
+tabulate>=0.8.9
+
+# Configuration
+pyyaml>=5.4.0
+hydra-core>=1.1.0
+omegaconf>=2.1.0
+
+# Utilities
+tqdm>=4.62.0
+joblib>=1.1.0
+scipy>=1.7.0
+
+# API Clients
+polygon-api-client>=1.1.0
+alpaca-trade-api>=2.0.0
+
+# Hyperparameter Optimization (optional)
+optuna>=2.10.0
+
+# Backtesting
+backtrader>=1.9.0
+quantlib>=1.25
+
+# Web Framework (optional for API)
+fastapi>=0.68.0
+uvicorn>=0.15.0
+
+# Database (optional)
+sqlalchemy>=1.4.0
+psycopg2-binary>=2.9.0
+
+# Development & Testing
+pytest>=6.2.0
+pytest-cov>=2.12.0
+black>=21.9b0
+flake8>=3.9.0
+mypy>=0.910
+jupyter>=1.0.0
+jupyterlab>=3.0.0
+
+# Logging & Monitoring
+loguru>=0.5.3
+colorama>=0.4.4

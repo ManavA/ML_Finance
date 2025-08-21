@@ -1,0 +1,30 @@
+# CLI Dependencies for Crypto ML Trading System
+
+# Core CLI framework
+click>=8.0.0
+
+# Data manipulation
+pandas>=1.5.0
+numpy>=1.20.0
+
+# Machine Learning
+scikit-learn>=1.0.0
+xgboost>=1.6.0
+lightgbm>=3.3.0
+catboost>=1.0.0
+
+# Deep Learning
+torch>=1.12.0
+
+# Configuration
+pyyaml>=6.0
+
+# Progress bars and utilities
+tqdm>=4.64.0
+
+# Optimization (for ensemble weight optimization)
+scipy>=1.9.0
+
+# Optional: Plotting for reports
+matplotlib>=3.5.0
+seaborn>=0.11.0
