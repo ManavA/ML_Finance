@@ -16,10 +16,10 @@ def read_requirements(filename="requirements.txt"):
         return [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
 setup(
-    name="ml-finance-trading",
+    name="ml-crypto-trading",
     version="1.0.0",
-    author="ML Finance Team",
-    author_email="team@mlfinance.com",
+    author="Manav Agarwal",
+    author_email="manava AT gmail",
     description="A comprehensive machine learning system for cryptocurrency and stock trading",
     long_description=read_long_description() if os.path.exists("README.md") else "",
     long_description_content_type="text/markdown",
@@ -27,14 +27,6 @@ setup(
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
-        "Intended Audience :: Financial and Insurance Industry",
-        "Topic :: Office/Business :: Financial :: Investment",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
     ],
     python_requires=">=3.8",
     install_requires=[
