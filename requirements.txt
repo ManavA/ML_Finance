@@ -1,4 +1,4 @@
-# ML Finance Trading System - Requirements
+# Requirements
 
 # Core Dependencies
 pandas>=1.3.0
