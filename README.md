@@ -1,4 +1,4 @@
-# ML Finance Trading System
+# CrypotoML
 
 A comprehensive machine learning system for cryptocurrency and stock trading, featuring advanced models, real-time data collection, and both CLI and notebook interfaces.
 
@@ -239,19 +239,9 @@ pip install ta-lib
 4. Push to branch (`git push origin feature/amazing`)
 5. Open Pull Request
 
-## License
-
-MIT License - see LICENSE file for details
-
 ## Disclaimer
 
 This software is for educational and research purposes only. Do not use for actual trading without understanding the risks. Cryptocurrency and stock trading involves substantial risk of loss.
-
-## Support
-
-- Documentation: [docs/](docs/)
-- Issues: [GitHub Issues](https://github.com/yourusername/ML_Finance/issues)
-- Discussions: [GitHub Discussions](https://github.com/yourusername/ML_Finance/discussions)
 
 ## Acknowledgments
 
@@ -261,11 +251,6 @@ This software is for educational and research purposes only. Do not use for actu
 - Inspired by quantitative finance research
 
 ## References & Resources
-
-### Academic Foundations
-- **Walk-Forward Optimization**: Based on Pardo (1992), enhanced with modern ML techniques
-- **Diebold-Mariano Test**: Statistical test for forecast comparison (Diebold & Mariano, 1995)
-- **Time Series Cross-Validation**: Bergmeir & Benitez (2012) methodology
 
 ### Data Sources & APIs
 - **Polygon.io**: [Documentation](https://polygon.io/docs/) - Primary historical data provider
