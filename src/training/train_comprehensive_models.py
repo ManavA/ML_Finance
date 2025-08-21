@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """
 COMPREHENSIVE MODEL TRAINING
-Train all models with proper data volumes and sufficient iterations
 """
 
 import sys
 import os
-sys.path.append('src')
-os.chdir('C:/Users/manav/claude')
 
 import numpy as np
 import pandas as pd
@@ -24,15 +21,11 @@ from sklearn.metrics import mean_squared_error
 import xgboost as xgb
 import lightgbm as lgb
 
-# RL imports - use simpler implementation first
-# from models.dqn_rl_models import CryptoTradingEnv, DQNAgent, train_dqn
-
 print("=" * 60)
 print("COMPREHENSIVE MODEL TRAINING")
 print("=" * 60)
 
 def load_full_dataset():
-    """Load the complete dataset (all cached files)"""
     print("\nLoading FULL dataset...")
     
     files = glob.glob('data/s3_cache/crypto_*.parquet')
@@ -113,7 +106,6 @@ def load_full_dataset():
         return load_full_dataset()  # Fallback to synthetic
 
 def engineer_comprehensive_features(df):
-    """Create comprehensive technical indicators"""
     print("\nEngineering comprehensive features...")
     
     df = df.copy().sort_values('timestamp')
@@ -212,7 +204,6 @@ def engineer_comprehensive_features(df):
     return df
 
 def train_advanced_ml_models(X_train, y_train, X_val, y_val):
-    """Train ML models with proper hyperparameters and sufficient iterations"""
     print("\nTraining ML models with comprehensive parameters...")
     
     models = {}
@@ -275,7 +266,6 @@ def train_advanced_ml_models(X_train, y_train, X_val, y_val):
     return models
 
 def train_advanced_rl_agents(data):
-    """Train RL agents with sufficient episodes and proper data - simplified implementation"""
     print("\nRL agents deferred - focusing on ML models with comprehensive training first")
     print("(RL implementation requires additional setup)")
     
@@ -284,7 +274,6 @@ def train_advanced_rl_agents(data):
     return agents
 
 def comprehensive_evaluation(models, rl_agents, X_test, y_test, test_data):
-    """Comprehensive evaluation of all models"""
     print("\n" + "="*60)
     print("COMPREHENSIVE MODEL EVALUATION")
     print("="*60)

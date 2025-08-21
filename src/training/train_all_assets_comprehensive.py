@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """
-COMPREHENSIVE TRAINING - ALL ASSETS
-Includes all cryptocurrencies and equity indices with consistent grouping
-Walk-forward validation 2023-2025 with regime testing
+COMPREHENSIVE TRAINING
 """
 
 import sys
 import os
 sys.path.append('src')
-os.chdir('C:/Users/manav/claude')
 
 import pandas as pd
 import numpy as np
@@ -32,10 +29,6 @@ print("="*80)
 print("COMPREHENSIVE WALK-FORWARD TRAINING - ALL ASSETS")
 print("="*80)
 print(f"Device: {device}")
-
-# ============================================================================
-# CONSISTENT COLOR SCHEME
-# ============================================================================
 
 ASSET_COLORS = {
     # Cryptocurrencies - Orange/Red spectrum
@@ -83,16 +76,11 @@ print(f"  Training: {WALK_FORWARD_CONFIG['start_date']} to {WALK_FORWARD_CONFIG[
 print(f"  Walk-Forward: {WALK_FORWARD_CONFIG['train_window']}mo train, {WALK_FORWARD_CONFIG['test_window']}mo test")
 print(f"  Regime Test: {WALK_FORWARD_CONFIG['regime_test_start']}+")
 
-# ============================================================================
-# 1. DATA COLLECTION - ALL ASSETS
-# ============================================================================
-
 print("\n" + "="*60)
 print("1. COMPREHENSIVE DATA COLLECTION")
 print("="*60)
 
 def collect_all_assets():
-    """Collect ALL crypto and equity assets"""
     
     start_date = '2023-01-01'
     end_date = datetime.now()
@@ -149,16 +137,12 @@ print(f"\nTotal assets collected: {len(all_data)}")
 print(f"  Cryptocurrencies: {sum(1 for s in all_data.keys() if 'USD' in s)}")
 print(f"  Equity Indices: {sum(1 for s in all_data.keys() if 'USD' not in s)}")
 
-# ============================================================================
-# 2. FEATURE ENGINEERING
-# ============================================================================
 
 print("\n" + "="*60)
 print("2. FEATURE ENGINEERING")
 print("="*60)
 
 def create_features(df):
-    """Create comprehensive features"""
     
     # Handle multi-index columns
     if isinstance(df.columns, pd.MultiIndex):
@@ -222,16 +206,11 @@ for symbol, df in all_data.items():
     processed_data[symbol] = create_features(df)
     print(f"  {symbol:10}: {len(processed_data[symbol]):5} samples")
 
-# ============================================================================
-# 3. WALK-FORWARD SPLITS
-# ============================================================================
-
 print("\n" + "="*60)
 print("3. GENERATING WALK-FORWARD SPLITS")
 print("="*60)
 
 def generate_walk_forward_splits(data, config):
-    """Generate walk-forward train/test splits"""
     
     splits = []
     current_date = pd.to_datetime(config['start_date'])
@@ -271,10 +250,6 @@ for symbol in processed_data.keys():
         walk_forward_splits[symbol] = splits
         print(f"  {symbol:10}: {len(splits)} folds")
 
-# ============================================================================
-# 4. XGBOOST TRAINING - ALL ASSETS
-# ============================================================================
-
 print("\n" + "="*60)
 print("4. XGBOOST TRAINING - ALL ASSETS")
 print("="*60)
@@ -284,7 +259,6 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, recall_score
 
 def train_xgboost_walk_forward(symbol, splits):
-    """Train XGBoost with walk-forward validation"""
     
     fold_results = []
     
@@ -354,16 +328,11 @@ for symbol in walk_forward_splits.keys():
     
     print(f"  {symbol:10} ({asset_type:6}): {mean_acc:.1%} ± {std_acc:.1%}")
 
-# ============================================================================
-# 5. AGGREGATE RESULTS BY GROUP
-# ============================================================================
-
 print("\n" + "="*60)
 print("5. AGGREGATED RESULTS BY GROUP")
 print("="*60)
 
 def aggregate_results_by_group():
-    """Aggregate results by asset groups"""
     
     group_results = {}
     
@@ -404,10 +373,6 @@ print(f"\nOverall Performance:")
 print(f"  All Crypto: {np.mean(crypto_accs):.1%} ± {np.std(crypto_accs):.1%}")
 print(f"  All Equity: {np.mean(equity_accs):.1%} ± {np.std(equity_accs):.1%}")
 print(f"  Advantage: {(np.mean(crypto_accs) - np.mean(equity_accs))*100:+.1f}pp")
-
-# ============================================================================
-# 6. REGIME CHANGE TESTING (2025+)
-# ============================================================================
 
 print("\n" + "="*60)
 print("6. REGIME CHANGE TESTING (2025+)")
@@ -462,9 +427,6 @@ for symbol in xgb_results.keys():
             detected = "DETECTED" if result['regime_change_detected'] else "stable"
             print(f"  {symbol:10}: 2025 acc={result['accuracy_2025']:.1%}, shift={shift:+.1f}pp ({detected})")
 
-# ============================================================================
-# 7. SAVE COMPREHENSIVE RESULTS
-# ============================================================================
 
 print("\n" + "="*60)
 print("7. SAVING RESULTS")
@@ -490,9 +452,6 @@ with open('models/comprehensive_results.pkl', 'wb') as f:
 
 print("  Saved: models/comprehensive_results.pkl")
 
-# ============================================================================
-# FINAL SUMMARY
-# ============================================================================
 
 print("\n" + "="*80)
 print("COMPREHENSIVE TRAINING COMPLETE")

@@ -1,8 +1,5 @@
 """
-Model Validation and Testing Framework
-=======================================
-Comprehensive validation suite for ML models with proper walk-forward
-validation, statistical tests, and performance metrics.
+Model Validation and Testing
 """
 
 import numpy as np
@@ -18,7 +15,6 @@ warnings.filterwarnings('ignore')
 class WalkForwardValidator:
     """
     Implements proper walk-forward validation for time series
-    Based on 2024 best practices for cryptocurrency ML
     """
     
     def __init__(self, 
@@ -26,27 +22,12 @@ class WalkForwardValidator:
                  train_size: int = 252*2,  # 2 years of daily data
                  test_size: int = 63,       # 3 months
                  gap: int = 5):             # 5 days gap to prevent lookahead
-        """
-        Initialize walk-forward validator
-        
-        Args:
-            n_splits: Number of walk-forward folds
-            train_size: Training window size (days)
-            test_size: Test window size (days)
-            gap: Gap between train and test to prevent information leakage
-        """
         self.n_splits = n_splits
         self.train_size = train_size
         self.test_size = test_size
         self.gap = gap
         
     def split(self, X: pd.DataFrame, y: pd.Series) -> List[Tuple]:
-        """
-        Generate train/test indices for walk-forward validation
-        
-        Returns:
-            List of (train_indices, test_indices) tuples
-        """
         splits = []
         n_samples = len(X)
         
@@ -115,9 +96,7 @@ class WalkForwardValidator:
         
         return results
     
-    def calculate_metrics(self, y_true: np.ndarray, y_pred: np.ndarray) -> Dict:
-        """Calculate comprehensive performance metrics"""
-        
+    def calculate_metrics(self, y_true: np.ndarray, y_pred: np.ndarray) -> Dict:        
         metrics = {}
         
         # Regression metrics
@@ -150,10 +129,6 @@ class WalkForwardValidator:
 
 
 class StatisticalValidator:
-    """
-    Statistical validation tests for model predictions
-    Based on 2024 research best practices
-    """
     
     def __init__(self):
         self.test_results = {}
@@ -164,14 +139,6 @@ class StatisticalValidator:
                              h: int = 1) -> Dict:
         """
         Diebold-Mariano test for comparing forecast accuracy
-        
-        Args:
-            errors1: Forecast errors from model 1
-            errors2: Forecast errors from model 2
-            h: Forecast horizon
-            
-        Returns:
-            Test statistics and p-value
         """
         d = errors1**2 - errors2**2  # Using squared loss
         
@@ -199,7 +166,6 @@ class StatisticalValidator:
     def white_reality_check(self, returns: np.ndarray, n_bootstrap: int = 1000) -> Dict:
         """
         White's Reality Check for data snooping bias
-        Tests if best strategy is genuinely good or just lucky
         """
         n = len(returns)
         
@@ -238,7 +204,6 @@ class StatisticalValidator:
     def variance_ratio_test(self, returns: pd.Series, lags: List[int] = [2, 4, 8, 16]) -> Dict:
         """
         Variance ratio test for market efficiency
-        Tests if returns follow random walk
         """
         results = {}
         
@@ -268,15 +233,11 @@ class StatisticalValidator:
 
 
 class HyperparameterValidator:
-    """
-    Validates hyperparameter choices based on 2024 best practices
-    """
-    
+
     @staticmethod
     def get_xgboost_params(data_size: int, task: str = 'regression') -> Dict:
         """
         Get recommended XGBoost parameters based on data size
-        Based on 2024 cryptocurrency prediction research
         """
         if data_size < 10000:
             # Small dataset - prevent overfitting
@@ -328,7 +289,6 @@ class HyperparameterValidator:
     def get_lightgbm_params(data_size: int, task: str = 'regression') -> Dict:
         """
         Get recommended LightGBM parameters based on data size
-        Based on 2024 research showing LightGBM efficiency
         """
         if data_size < 10000:
             # Small dataset
@@ -385,9 +345,6 @@ class HyperparameterValidator:
     @staticmethod
     def validate_train_test_split(train_size: int, test_size: int, 
                                  total_size: int) -> Dict:
-        """
-        Validate train/test split based on 2024 best practices
-        """
         train_ratio = train_size / total_size
         test_ratio = test_size / total_size
         
@@ -426,10 +383,6 @@ class HyperparameterValidator:
 
 
 class ModelDiagnostics:
-    """
-    Comprehensive model diagnostics and health checks
-    """
-    
     def __init__(self, model, X_train, y_train, X_test, y_test):
         self.model = model
         self.X_train = X_train
@@ -438,7 +391,6 @@ class ModelDiagnostics:
         self.y_test = y_test
         
     def check_overfitting(self) -> Dict:
-        """Check for overfitting by comparing train and test performance"""
         
         # Get predictions
         train_pred = self.model.predict(self.X_train)
@@ -478,7 +430,6 @@ class ModelDiagnostics:
         }
     
     def residual_analysis(self, predictions: np.ndarray, actuals: np.ndarray) -> Dict:
-        """Analyze prediction residuals for patterns"""
         
         residuals = actuals - predictions
         

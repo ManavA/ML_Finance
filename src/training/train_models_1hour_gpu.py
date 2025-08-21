@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 """
-OPTIMIZED MODEL TRAINING FOR 1-HOUR GPU CONSTRAINT
-Includes Solana and other major cryptocurrencies
-Conservative training parameters for realistic time constraints
+OPTIMIZED MODEL TRAINING FOR 1-HOUR
 """
 
 import sys
 import os
-sys.path.append('src')
-os.chdir('C:/Users/manav/claude')
 
 import pandas as pd
 import numpy as np
@@ -42,10 +38,6 @@ print(f"GPU Name: {gpu_name}")
 print("\nTime Budget: 1 hour total")
 print("Strategy: Conservative parameters for practical training")
 
-# ============================================================================
-# TRAINING TIME ALLOCATION (1 HOUR TOTAL)
-# ============================================================================
-
 TIME_BUDGET = {
     'data_loading': 2,      # 2 minutes
     'feature_engineering': 3,  # 3 minutes
@@ -64,9 +56,6 @@ for task, minutes in TIME_BUDGET.items():
         print(f"  {task}: {minutes} minutes")
 print(f"  TOTAL: {TIME_BUDGET['total']} minutes")
 
-# ============================================================================
-# 1. DATA COLLECTION (INCLUDING SOLANA)
-# ============================================================================
 
 print("\n" + "="*60)
 print("1. DATA COLLECTION (2 minutes)")
@@ -143,16 +132,11 @@ else:
 elapsed = time.time() - start_time
 print(f"\nData collection completed in {elapsed:.1f} seconds")
 
-# ============================================================================
-# 2. FEATURE ENGINEERING (OPTIMIZED)
-# ============================================================================
-
 print("\n" + "="*60)
 print("2. FEATURE ENGINEERING (3 minutes)")
 print("="*60)
 
 def create_ml_features(df, symbol_name):
-    """Create essential features quickly"""
     
     features = pd.DataFrame(index=df.index)
     
@@ -224,10 +208,6 @@ equity_data = {k: v for k, v in processed_data.items() if 'USD' not in k}
 
 print(f"\nProcessed {len(crypto_data)} crypto assets and {len(equity_data)} equity assets")
 
-# ============================================================================
-# 3. XGBOOST TRAINING (CONSERVATIVE PARAMETERS)
-# ============================================================================
-
 print("\n" + "="*60)
 print("3. XGBOOST TRAINING (10 minutes)")
 print("="*60)
@@ -238,7 +218,6 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import accuracy_score, roc_auc_score
 
 def train_xgboost_conservative(data_dict, asset_type):
-    """Train XGBoost with conservative parameters for speed"""
     
     results = {}
     
@@ -312,10 +291,6 @@ xgb_equity_results = train_xgboost_conservative(
     'equity'
 )
 
-# ============================================================================
-# 4. LIGHTWEIGHT LSTM (GPU OPTIMIZED)
-# ============================================================================
-
 print("\n" + "="*60)
 print("4. LSTM TRAINING (15 minutes)")
 print("="*60)
@@ -327,7 +302,6 @@ if gpu_available:
     from torch.utils.data import DataLoader, TensorDataset
     
     class LightweightLSTM(nn.Module):
-        """Lightweight LSTM for faster training"""
         def __init__(self, input_size, hidden_size=64, num_layers=2):
             super().__init__()
             self.lstm = nn.LSTM(input_size, hidden_size, num_layers, 
@@ -339,7 +313,6 @@ if gpu_available:
             return torch.sigmoid(self.fc(out[:, -1, :]))
     
     def train_lstm_conservative(data_dict, asset_type, epochs=50):
-        """Train LSTM with conservative parameters"""
         
         results = {}
         
@@ -436,10 +409,6 @@ else:
     lstm_crypto_results = {}
     lstm_equity_results = {}
 
-# ============================================================================
-# 5. QUICK DQN (REINFORCEMENT LEARNING)
-# ============================================================================
-
 print("\n" + "="*60)
 print("5. DQN TRAINING (10 minutes)")
 print("="*60)
@@ -492,14 +461,6 @@ class SimpleTradingEnv:
             self.done = True
         
         return self._get_state(), reward, self.done
-
-# Skip DQN for now to save time
-print("  Skipping DQN to stay within 1-hour budget")
-print("  (Would require 10+ minutes for meaningful training)")
-
-# ============================================================================
-# 6. RESULTS COMPARISON
-# ============================================================================
 
 print("\n" + "="*80)
 print("RESULTS SUMMARY")
@@ -555,9 +516,6 @@ if crypto_accuracies and equity_accuracies:
         print(f"  ML models show {advantage*100:.1f}pp better accuracy on crypto")
         print(f"  This includes Solana which performed well")
 
-# ============================================================================
-# 7. SAVE FINAL RESULTS
-# ============================================================================
 
 print("\n" + "="*60)
 print("SAVING RESULTS")
@@ -586,11 +544,7 @@ results_summary = {
 with open('models/training_results_1hour.pkl', 'wb') as f:
     pickle.dump(results_summary, f)
 
-print(f"\n✓ Results saved to models/training_results_1hour.pkl")
-
-# ============================================================================
-# FINAL REPORT
-# ============================================================================
+print(f"\n Results saved to models/training_results_1hour.pkl")
 
 total_time = time.time() - start_time
 

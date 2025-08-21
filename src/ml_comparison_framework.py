@@ -27,21 +27,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class MLComparisonFramework:
-    """
-    Main framework for comparing ML models vs traditional strategies
-    across crypto and equity markets
-    """
+
     
     def __init__(self, 
                  cache_dir: str = 'data/ml_comparison_cache',
                  results_dir: str = 'results/ml_comparison'):
-        """
-        Initialize comparison framework
-        
-        Args:
-            cache_dir: Directory with cached data
-            results_dir: Directory for saving results
-        """
+
         self.cache_dir = Path(cache_dir)
         self.results_dir = Path(results_dir)
         self.results_dir.mkdir(parents=True, exist_ok=True)
@@ -60,15 +51,7 @@ class MLComparisonFramework:
         self.comparison_metrics = {}
         
     def load_and_prepare_data(self, symbol: str) -> Optional[pd.DataFrame]:
-        """
-        Load and prepare data for a symbol
-        
-        Args:
-            symbol: Asset symbol
-            
-        Returns:
-            Prepared DataFrame with features
-        """
+
         # Look for cached parquet files
         pattern = f"{symbol}_*.parquet"
         files = list(self.cache_dir.glob(pattern))
@@ -97,12 +80,7 @@ class MLComparisonFramework:
         return data
     
     def create_ml_model_functions(self) -> Dict:
-        """
-        Create model training functions for walk-forward testing
-        
-        Returns:
-            Dictionary of model_name -> training_function
-        """
+
         models = {}
         
         # Feature columns (exclude targets and metadata)
@@ -180,12 +158,7 @@ class MLComparisonFramework:
         return models
     
     def create_traditional_model_functions(self) -> Dict:
-        """
-        Create traditional strategy functions for walk-forward testing
-        
-        Returns:
-            Dictionary of strategy_name -> strategy_function
-        """
+
         strategies = create_strategy_suite()
         models = {}
         
@@ -203,12 +176,7 @@ class MLComparisonFramework:
         return models
     
     def run_comparison(self, symbols: Optional[List[str]] = None):
-        """
-        Run full comparison of ML vs traditional strategies
-        
-        Args:
-            symbols: List of symbols to test (default: all available)
-        """
+
         if symbols is None:
             # Default symbols
             symbols = ['BTCUSD', 'ETHUSD', 'SOLUSD', 'SPY', 'QQQ']
@@ -264,12 +232,7 @@ class MLComparisonFramework:
         self.analyze_results(results_by_market)
     
     def analyze_results(self, results_by_market: Dict):
-        """
-        Analyze and compare results between markets
-        
-        Args:
-            results_by_market: Dictionary of market_type -> results list
-        """
+
         logger.info("\n" + "="*60)
         logger.info("ANALYSIS RESULTS")
         logger.info("="*60)
@@ -335,9 +298,7 @@ class MLComparisonFramework:
         self.test_hypothesis()
     
     def test_hypothesis(self):
-        """
-        Test the main hypothesis: ML advantage is greater in crypto than equities
-        """
+
         logger.info("\n" + "="*60)
         logger.info("HYPOTHESIS TEST RESULTS")
         logger.info("="*60)
@@ -424,7 +385,6 @@ class MLComparisonFramework:
                         f.write("ML advantage is similar or greater in equity markets.\n")
 
 def main():
-    """Main execution function"""
     logger.info("Starting ML Comparison Framework")
     logger.info("="*60)
     

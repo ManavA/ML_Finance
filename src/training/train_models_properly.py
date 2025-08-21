@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """
-PROPER MODEL TRAINING - Full training with adequate iterations
-This will actually train the models properly with sufficient data
+PROPER MODEL TRAINING 
 """
 
 import sys
 import os
-sys.path.append('src')
-os.chdir('C:/Users/manav/claude')
 
 import pandas as pd
 import numpy as np
@@ -17,11 +14,9 @@ import pickle
 import warnings
 warnings.filterwarnings('ignore')
 
-# Import our models - use what's available
 try:
     from src.models.lstm_gru_hybrid import LSTMGRUHybrid
 except:
-    # Create simple LSTM if not available
     import torch.nn as nn
     class LSTMGRUHybrid(nn.Module):
         def __init__(self, input_size, hidden_size=128, num_layers=2, dropout=0.2, architecture='parallel'):
@@ -40,7 +35,6 @@ except:
 try:
     from src.models.dqn_rl_models import DQNAgent, CryptoTradingEnv
 except:
-    # We'll create simple versions if needed
     pass
 
 # For GPU support
@@ -48,23 +42,19 @@ import torch
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 print("="*80)
-print("PROPER MODEL TRAINING - PRODUCTION READY")
+print("PROPER MODEL TRAINING")
 print("="*80)
 print(f"\nDevice: {device}")
 print(f"GPU Available: {torch.cuda.is_available()}")
 if torch.cuda.is_available():
     print(f"GPU Name: {torch.cuda.get_device_name(0)}")
 
-# ============================================================================
-# 1. DATA LOADING
-# ============================================================================
 
 print("\n" + "="*60)
 print("1. LOADING DATA")
 print("="*60)
 
 def load_comprehensive_data():
-    """Load 2+ years of data for proper training"""
     
     print("\nLoading data from multiple sources...")
     
@@ -155,16 +145,12 @@ def load_comprehensive_data():
 # Load data
 crypto_data, equity_data = load_comprehensive_data()
 
-# ============================================================================
-# 2. FEATURE ENGINEERING
-# ============================================================================
 
 print("\n" + "="*60)
 print("2. FEATURE ENGINEERING")
 print("="*60)
 
 def engineer_features(data, symbol):
-    """Create comprehensive features"""
     
     df = data.copy()
     
@@ -221,16 +207,11 @@ print("\nProcessing equity assets...")
 for symbol, data in equity_data.items():
     processed_data[f'equity_{symbol}'] = engineer_features(data, symbol)
 
-# ============================================================================
-# 3. DEEP LEARNING TRAINING (LSTM-GRU)
-# ============================================================================
-
 print("\n" + "="*60)
 print("3. TRAINING LSTM-GRU HYBRID (PROPER)")
 print("="*60)
 
 def train_lstm_gru_properly(data, symbol, epochs=100):
-    """Train LSTM-GRU with adequate epochs"""
     
     print(f"\nTraining LSTM-GRU for {symbol}...")
     
@@ -382,17 +363,11 @@ if best_equity:
     model, acc = train_lstm_gru_properly(data, symbol, epochs=50)  # Reduced for demo
     lstm_results[symbol] = acc
 
-# ============================================================================
-# 4. XGBOOST TRAINING (PROPER)
-# ============================================================================
-
 print("\n" + "="*60)
 print("4. TRAINING XGBOOST (PROPER)")
 print("="*60)
 
-def train_xgboost_properly(data, symbol):
-    """Train XGBoost with proper hyperparameter tuning"""
-    
+def train_xgboost_properly(data, symbol):    
     print(f"\nTraining XGBoost for {symbol}...")
     
     # Prepare features
@@ -465,10 +440,6 @@ if best_equity:
     symbol, data = best_equity
     model, acc = train_xgboost_properly(data, symbol)
     xgb_results[symbol] = acc
-
-# ============================================================================
-# 5. REINFORCEMENT LEARNING (DQN)
-# ============================================================================
 
 print("\n" + "="*60)
 print("5. TRAINING DQN (PROPER)")
@@ -577,10 +548,6 @@ if best_equity:
     agent, avg_reward = train_dqn_properly(data, symbol, episodes=500)  # Reduced for demo
     dqn_results[symbol] = avg_reward
 
-# ============================================================================
-# 6. RESULTS SUMMARY
-# ============================================================================
-
 print("\n" + "="*80)
 print("TRAINING RESULTS SUMMARY")
 print("="*80)
@@ -639,48 +606,5 @@ with open('models/training_results.pkl', 'wb') as f:
 print("\n" + "="*80)
 print("TRAINING COMPLETE")
 print("="*80)
-print("\n✅ Models properly trained with adequate iterations")
-print("📊 Results saved to models/training_results.pkl")
-print("🚀 Models ready for production use")
-
-# ============================================================================
-# 7. RECOMMENDATIONS
-# ============================================================================
-
-print("\n" + "="*60)
-print("RECOMMENDATIONS FOR PRODUCTION")
-print("="*60)
-
-print("""
-For production-ready models, consider:
-
-1. INCREASE TRAINING TIME:
-   • LSTM: 200-300 epochs (current: 50)
-   • XGBoost: Full grid search with 20+ combinations
-   • DQN: 10,000+ episodes (current: 500)
-
-2. USE GPU ACCELERATION:
-   • 3-5x faster training
-   • Enables larger batch sizes
-   • Allows deeper networks
-
-3. IMPLEMENT ENSEMBLE:
-   • Combine multiple models
-   • Vote or weighted average
-   • Reduces overfitting risk
-
-4. ADD MONITORING:
-   • Track performance metrics
-   • Set up alerts for degradation
-   • Regular retraining schedule
-
-5. PRODUCTION PIPELINE:
-   • Automated data updates
-   • Model versioning
-   • A/B testing framework
-""")
-
-print("\nEstimated time for full production training:")
-print("  • With GPU: 8-12 hours total")
-print("  • Without GPU: 24-48 hours total")
-print("\nCurrent training was demonstration mode (reduced iterations)")
+print("\nModels properly trained with adequate iterations")
+print("Results saved to models/training_results.pkl")

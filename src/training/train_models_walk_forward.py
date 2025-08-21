@@ -7,8 +7,7 @@ Testing period: 2025+ for regime change detection
 
 import sys
 import os
-sys.path.append('src')
-os.chdir('C:/Users/manav/claude')
+
 
 import pandas as pd
 import numpy as np
@@ -33,10 +32,6 @@ print("WALK-FORWARD TRAINING WITH REGIME CHANGE TESTING")
 print("="*80)
 print(f"\nDevice: {device}")
 print(f"GPU Available: {gpu_available}")
-
-# ============================================================================
-# WALK-FORWARD CONFIGURATION
-# ============================================================================
 
 WALK_FORWARD_CONFIG = {
     'train_window': 12,  # 12 months training

@@ -22,23 +22,13 @@ plt.style.use('seaborn-v0_8-darkgrid')
 sns.set_palette("husl")
 
 class ResultsVisualizer:
-    """
-    Create visualizations for ML comparison results
-    """
     
     def __init__(self, results_dir: str = 'results/ml_comparison'):
-        """
-        Initialize visualizer
-        
-        Args:
-            results_dir: Directory containing results
-        """
         self.results_dir = Path(results_dir)
         self.figures_dir = self.results_dir / 'figures'
         self.figures_dir.mkdir(parents=True, exist_ok=True)
         
     def load_results(self) -> Tuple[Dict, List]:
-        """Load saved results"""
         # Load comparison metrics
         metrics_file = self.results_dir / 'comparison_metrics.json'
         if metrics_file.exists():
@@ -58,9 +48,6 @@ class ResultsVisualizer:
         return metrics, detailed
     
     def plot_ml_vs_traditional_comparison(self, metrics: Dict):
-        """
-        Create bar chart comparing ML vs traditional strategies
-        """
         if not metrics:
             print("No metrics to plot")
             return
@@ -109,9 +96,6 @@ class ResultsVisualizer:
         plt.show()
     
     def plot_hypothesis_test_results(self, metrics: Dict):
-        """
-        Visualize hypothesis test results
-        """
         if 'crypto' not in metrics or 'equity' not in metrics:
             print("Need both crypto and equity results for hypothesis test")
             return
@@ -171,9 +155,6 @@ class ResultsVisualizer:
         plt.show()
     
     def plot_model_performance_heatmap(self, detailed_results: List):
-        """
-        Create heatmap of model performance across assets
-        """
         if not detailed_results:
             print("No detailed results to plot")
             return
@@ -232,9 +213,6 @@ class ResultsVisualizer:
         plt.show()
     
     def create_interactive_dashboard(self, metrics: Dict, detailed_results: List):
-        """
-        Create interactive Plotly dashboard
-        """
         # Create subplots
         fig = make_subplots(
             rows=2, cols=2,
@@ -371,9 +349,6 @@ class ResultsVisualizer:
         print(f"Interactive dashboard saved to {self.figures_dir / 'interactive_dashboard.html'}")
     
     def generate_latex_tables(self, metrics: Dict, detailed_results: List):
-        """
-        Generate LaTeX tables for academic paper
-        """
         latex_dir = self.results_dir / 'latex'
         latex_dir.mkdir(exist_ok=True)
         
@@ -421,7 +396,6 @@ class ResultsVisualizer:
         print(f"LaTeX tables saved to {latex_dir}")
 
 def main():
-    """Generate all visualizations"""
     visualizer = ResultsVisualizer()
     
     # Load results

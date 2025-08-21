@@ -1,7 +1,6 @@
 # src/analysis/visualizer.py
 """
 Visualization tools for strategy analysis.
-Clean, publication-ready plots.
 """
 
 import pandas as pd
@@ -17,31 +16,13 @@ plt.style.use('seaborn-v0_8-darkgrid')
 sns.set_palette("husl")
 
 
-class StrategyVisualizer:
-    """Visualization tools for strategy analysis."""
-    
+class StrategyVisualizer:    
     def __init__(self, figsize: Tuple[int, int] = (12, 6)):
-        """
-        Initialize visualizer.
-        
-        Args:
-            figsize: Default figure size
-        """
         self.figsize = figsize
         
     def plot_equity_curves(self, 
                           results_list: List,
                           title: str = "Strategy Equity Curves") -> plt.Figure:
-        """
-        Plot equity curves for multiple strategies.
-        
-        Args:
-            results_list: List of BacktestResults
-            title: Plot title
-            
-        Returns:
-            Figure object
-        """
         fig, ax = plt.subplots(figsize=self.figsize)
         
         for result in results_list:
@@ -65,16 +46,6 @@ class StrategyVisualizer:
     def plot_returns_distribution(self,
                                  results_list: List,
                                  title: str = "Returns Distribution") -> plt.Figure:
-        """
-        Plot returns distribution for multiple strategies.
-        
-        Args:
-            results_list: List of BacktestResults
-            title: Plot title
-            
-        Returns:
-            Figure object
-        """
         fig, axes = plt.subplots(1, 2, figsize=(14, 6))
         
         # Histogram
@@ -120,16 +91,7 @@ class StrategyVisualizer:
     def plot_drawdown(self,
                       results_list: List,
                       title: str = "Strategy Drawdowns") -> plt.Figure:
-        """
-        Plot drawdown for multiple strategies.
-        
-        Args:
-            results_list: List of BacktestResults
-            title: Plot title
-            
-        Returns:
-            Figure object
-        """
+
         fig, ax = plt.subplots(figsize=self.figsize)
         
         for result in results_list:
@@ -152,16 +114,7 @@ class StrategyVisualizer:
     def plot_risk_return(self,
                         results_list: List,
                         title: str = "Risk-Return Profile") -> plt.Figure:
-        """
-        Plot risk-return scatter plot.
-        
-        Args:
-            results_list: List of BacktestResults
-            title: Plot title
-            
-        Returns:
-            Figure object
-        """
+
         fig, ax = plt.subplots(figsize=(10, 8))
         
         # Extract metrics
@@ -219,16 +172,7 @@ class StrategyVisualizer:
     def plot_correlation_matrix(self,
                               results_list: List,
                               title: str = "Strategy Returns Correlation") -> plt.Figure:
-        """
-        Plot correlation matrix of strategy returns.
-        
-        Args:
-            results_list: List of BacktestResults
-            title: Plot title
-            
-        Returns:
-            Figure object
-        """
+
         # Create returns DataFrame
         returns_df = pd.DataFrame()
         for result in results_list:
@@ -261,16 +205,7 @@ class StrategyVisualizer:
     def plot_monthly_returns_heatmap(self,
                                     result,
                                     title: Optional[str] = None) -> plt.Figure:
-        """
-        Plot monthly returns heatmap for a single strategy.
-        
-        Args:
-            result: BacktestResults object
-            title: Plot title
-            
-        Returns:
-            Figure object
-        """
+
         # Calculate monthly returns
         monthly_returns = result.returns.resample('M').apply(lambda x: (1 + x).prod() - 1)
         
@@ -315,16 +250,7 @@ class StrategyVisualizer:
     def create_summary_report(self,
                             results_list: List,
                             save_path: Optional[str] = None) -> plt.Figure:
-        """
-        Create comprehensive summary report.
-        
-        Args:
-            results_list: List of BacktestResults
-            save_path: Path to save the figure
-            
-        Returns:
-            Figure object
-        """
+
         fig = plt.figure(figsize=(16, 20))
         
         # Create subplots

@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """
 COMPREHENSIVE REINFORCEMENT LEARNING TRAINING
-Train RL agents with 5,000+ episodes and proper evaluation
 """
 
 import sys
 import os
-sys.path.append('src')
-os.chdir('C:/Users/manav/claude')
 
 import numpy as np
 import pandas as pd
@@ -26,13 +23,8 @@ print("=" * 60)
 print("COMPREHENSIVE RL TRAINING - 5,000+ EPISODES")
 print("=" * 60)
 
-# ============================================================================
-# ENHANCED TRADING ENVIRONMENT
-# ============================================================================
 
-class AdvancedCryptoTradingEnv:
-    """Enhanced trading environment with better reward shaping"""
-    
+class AdvancedCryptoTradingEnv:    
     def __init__(self, data, initial_balance=10000, lookback=30, commission=0.001):
         self.data = data.reset_index(drop=True)
         self.initial_balance = initial_balance
@@ -136,7 +128,6 @@ class AdvancedCryptoTradingEnv:
         return self._get_state(), reward, done, {'portfolio_value': new_total_value}
     
     def _execute_action(self, action, current_price):
-        """Execute trading action"""
         # Action mapping: 0=Hold, 1=Buy25%, 2=Buy50%, 3=Buy75%, 4=SellAll
         
         if action == 1:  # Buy 25%
@@ -170,7 +161,6 @@ class AdvancedCryptoTradingEnv:
             self.total_trades += 1
     
     def _calculate_reward(self, prev_value, new_value, action):
-        """Enhanced reward function"""
         # Base reward: portfolio value change
         value_change = (new_value - prev_value) / prev_value if prev_value > 0 else 0
         base_reward = value_change * 100  # Scale to percentage
@@ -193,12 +183,8 @@ class AdvancedCryptoTradingEnv:
         
         return base_reward + sharpe_component + drawdown_penalty + action_cost
 
-# ============================================================================
-# ENHANCED DQN AGENT
-# ============================================================================
 
 class EnhancedDQN(nn.Module):
-    """Enhanced DQN with better architecture"""
     
     def __init__(self, state_size, action_size):
         super().__init__()
@@ -238,7 +224,6 @@ class EnhancedDQN(nn.Module):
         return q_values
 
 class EnhancedDQNAgent:
-    """Enhanced DQN agent with prioritized experience replay"""
     
     def __init__(self, state_size, action_size, lr=1e-4, gamma=0.99):
         self.state_size = state_size
@@ -314,10 +299,6 @@ class EnhancedDQNAgent:
             self.epsilon *= self.epsilon_decay
         
         self.steps += 1
-
-# ============================================================================
-# PPO AGENT (Enhanced)
-# ============================================================================
 
 class PPONetwork(nn.Module):
     def __init__(self, state_size, action_size):
@@ -428,12 +409,7 @@ class EnhancedPPOAgent:
         self.critic_losses.append(critic_loss.item())
         self.entropy_history.append(entropy.item())
 
-# ============================================================================
-# TRAINING FUNCTIONS
-# ============================================================================
-
 def load_comprehensive_data():
-    """Load the full dataset for RL training"""
     print("\nLoading comprehensive dataset for RL training...")
     
     files = glob.glob('data/s3_cache/crypto_*.parquet')
@@ -489,7 +465,6 @@ def load_comprehensive_data():
     return None
 
 def train_comprehensive_dqn(data, episodes=5000):
-    """Train DQN with comprehensive episodes"""
     print(f"\n[DQN] Training with {episodes} episodes...")
     
     # Split data
@@ -545,7 +520,6 @@ def train_comprehensive_dqn(data, episodes=5000):
     return agent, episode_rewards, episode_values
 
 def train_comprehensive_ppo(data, episodes=5000):
-    """Train PPO with comprehensive episodes"""
     print(f"\n[PPO] Training with {episodes} episodes...")
     
     train_size = int(len(data) * 0.8)
@@ -599,7 +573,6 @@ def train_comprehensive_ppo(data, episodes=5000):
     return agent, episode_rewards, episode_values
 
 def evaluate_rl_agents(agents, data):
-    """Comprehensive evaluation of trained RL agents"""
     print("\n" + "="*60)
     print("COMPREHENSIVE RL EVALUATION")
     print("="*60)
@@ -671,10 +644,6 @@ def evaluate_rl_agents(agents, data):
     print(f"         Sharpe Ratio: {best_agent[1]['sharpe_ratio']:.3f}")
     
     return results
-
-# ============================================================================
-# MAIN EXECUTION
-# ============================================================================
 
 if __name__ == "__main__":
     print("Starting comprehensive RL training...")

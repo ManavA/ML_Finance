@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """
-DEMONSTRATION: Proper Model Training with Real Data
-Shows the difference between quick training vs proper training
 """
 
 import sys
 import os
-sys.path.append('src')
-os.chdir('C:/Users/manav/claude')
+
 
 import pandas as pd
 import numpy as np

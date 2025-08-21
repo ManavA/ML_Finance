@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """
-FOCUSED RL TRAINING - 1000 episodes for faster completion
+FOCUSED RL TRAINING
 """
 
 import sys
 import os
-sys.path.append('src')
-os.chdir('C:/Users/manav/claude')
 
 import numpy as np
 import pandas as pd
@@ -172,7 +170,6 @@ class SimpleDQNAgent:
             self.epsilon *= self.epsilon_decay
 
 def load_sample_data():
-    """Load sample of data for focused training"""
     files = glob.glob('data/s3_cache/crypto_*.parquet')
     
     if files:
@@ -375,4 +372,4 @@ if __name__ == "__main__":
     torch.save(dqn_agent.q_network.state_dict(), 'models/focused_dqn.pt')
     print(f"[SAVED] Model saved to models/focused_dqn.pt")
     
-    print(f"\n[+] RL model now properly trained with sufficient episodes!")
+    print(f"\n[+] RL model now properly trained with sufficient episodes!") 
