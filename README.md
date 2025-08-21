@@ -119,7 +119,7 @@ This repo includes a **final synthesis** in `06_final_summary.ipynb` and the exp
 
 ## Data
 
-Data comes from public APIs (yfinance) and, optionally, paid APIs (Polygon/CMC). **Do not commit raw data**. Use `.gitignore` to keep local data artifacts out of version control.
+Data comes from public APIs (yfinance) and, optionally, paid APIs (Polygon/CMC).
 
 ---
 
