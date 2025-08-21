@@ -1,11 +1,11 @@
-# ML Finance Trading System
+# CryptoML
 
 A comprehensive machine learning system for cryptocurrency and stock trading, featuring advanced models, real-time data collection, and both CLI and notebook interfaces.
 
-## 📊 Results & Analysis
+## Results & Analysis
 **[View Jupyter Notebook Results](https://github.com/ManavA/ML_Finance/tree/main/Jupyter%20Notebooks%2C%20Results%2C%20Analysis%20-%20Final)** - Comprehensive analysis including performance metrics, visualizations, and model comparisons
 
-## Features
+## Overview
 
 ### Data Collection
 - **Multiple Data Sources**: Polygon.io, CoinMarketCap, Yahoo Finance, S3
@@ -185,19 +185,7 @@ pytest --cov=src tests/
 pytest tests/test_models.py
 ```
 
-### Code Quality
-```bash
-# Format code
-black src/ cli/
-
-# Lint code
-flake8 src/ cli/
-
-# Type checking
-mypy src/
-```
-
-## Performance Tips
+## Tips
 
 1. **Use caching**: Enable cache in config.yaml
 2. **Parallel processing**: Set `n_jobs=-1` for all cores
@@ -233,25 +221,7 @@ pip install ta-lib
 
 ## Contributing
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Open Pull Request
-
-## License
-
-MIT License - see LICENSE file for details
-
 ## Disclaimer
-
-This software is for educational and research purposes only. Do not use for actual trading without understanding the risks. Cryptocurrency and stock trading involves substantial risk of loss.
-
-## Support
-
-- Documentation: [docs/](docs/)
-- Issues: [GitHub Issues](https://github.com/yourusername/ML_Finance/issues)
-- Discussions: [GitHub Discussions](https://github.com/yourusername/ML_Finance/discussions)
 
 ## Acknowledgments
 
@@ -261,11 +231,6 @@ This software is for educational and research purposes only. Do not use for actu
 - Inspired by quantitative finance research
 
 ## References & Resources
-
-### Academic Foundations
-- **Walk-Forward Optimization**: Based on Pardo (1992), enhanced with modern ML techniques
-- **Diebold-Mariano Test**: Statistical test for forecast comparison (Diebold & Mariano, 1995)
-- **Time Series Cross-Validation**: Bergmeir & Benitez (2012) methodology
 
 ### Data Sources & APIs
 - **Polygon.io**: [Documentation](https://polygon.io/docs/) - Primary historical data provider
