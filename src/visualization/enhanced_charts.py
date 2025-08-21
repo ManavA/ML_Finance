@@ -1,8 +1,5 @@
 """
-Enhanced Visualization Module with High-DPI Support
-====================================================
-Implements best practices for financial charts with proper styling,
-high DPI support, and no font cutoffs.
+Enhanced Visualization
 """
 
 import matplotlib.pyplot as plt
@@ -14,20 +11,15 @@ from typing import Dict, List, Optional, Tuple
 import warnings
 warnings.filterwarnings('ignore')
 
-# Configure high-quality visualization settings
 def setup_plotting_style():
-    """Configure matplotlib and seaborn for high-quality financial charts"""
     
-    # Set seaborn style - Set2 palette for better contrast
     sns.set_style("whitegrid")
     sns.set_palette("Set2")
     
-    # Configure matplotlib for high DPI
     plt.rcParams['figure.dpi'] = 150
     plt.rcParams['savefig.dpi'] = 300
     plt.rcParams['figure.figsize'] = (14, 8)
     
-    # Font settings to prevent cutoffs
     plt.rcParams['font.size'] = 11
     plt.rcParams['axes.titlesize'] = 14
     plt.rcParams['axes.labelsize'] = 12
@@ -36,7 +28,6 @@ def setup_plotting_style():
     plt.rcParams['legend.fontsize'] = 10
     plt.rcParams['figure.titlesize'] = 16
     
-    # Layout settings to prevent cutoffs
     plt.rcParams['figure.constrained_layout.use'] = True
     plt.rcParams['figure.constrained_layout.h_pad'] = 0.05
     plt.rcParams['figure.constrained_layout.w_pad'] = 0.05
@@ -306,12 +297,10 @@ class FinancialChartGenerator:
         table.set_fontsize(11)
         table.scale(1.2, 2)
         
-        # Style header row
         for i in range(3):
             table[(0, i)].set_facecolor('#40466e')
             table[(0, i)].set_text_props(weight='bold', color='white')
         
-        # Color code assessment column
         for i in range(1, len(summary_data)):
             if 'Good' in summary_data[i][2]:
                 table[(i, 2)].set_facecolor('#E8F5E9')
@@ -326,22 +315,16 @@ class FinancialChartGenerator:
         
         return fig
     
-    def save_figure(self, fig: plt.Figure, filename: str, dpi: int = 300) -> None:
-        """Save figure with high DPI and proper formatting"""
-        
-        # Ensure the figure uses constrained layout
+    def save_figure(self, fig: plt.Figure, filename: str, dpi: int = 300) -> None:        
         fig.set_constrained_layout(True)
         
-        # Save with high DPI
         fig.savefig(filename, dpi=dpi, bbox_inches='tight', 
                    facecolor='white', edgecolor='none')
         
         print(f"Figure saved: {filename} (DPI: {dpi})")
 
 
-class RiskDashboard:
-    """Create comprehensive risk management dashboards"""
-    
+class RiskDashboard:    
     def __init__(self):
         self.chart_gen = FinancialChartGenerator()
     
@@ -353,7 +336,6 @@ class RiskDashboard:
         fig, axes = plt.subplots(2, 2, figsize=(16, 10), dpi=150)
         fig.suptitle(title, fontsize=16, fontweight='bold', y=1.02)
         
-        # Prepare data
         methods = list(next(iter(var_results.values())).keys())
         assets = list(var_results.keys())
         
