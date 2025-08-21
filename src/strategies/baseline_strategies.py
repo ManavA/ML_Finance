@@ -1,8 +1,5 @@
-# src/strategies/baseline.py
-"""
-Baseline and simple technical trading strategies.
-All strategies return signals: 1 (buy), 0 (hold), -1 (sell)
-"""
+# src/strategies/baseline_strategies.py
+"""Baseline and simple technical trading strategies."""
 
 import pandas as pd
 import numpy as np
@@ -42,15 +39,7 @@ class BuyAndHoldStrategy(BaseStrategy):
         super().__init__("Buy and Hold")
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals: buy on first day, hold forever.
-        
-        Args:
-            data: DataFrame with OHLCV data
-            
-        Returns:
-            Series of signals
-        """
+        """Generate buy and hold signals."""
         signals = pd.Series(index=data.index, data=0)
         signals.iloc[0] = 1  # Buy on first day
         return signals
@@ -60,12 +49,6 @@ class DollarCostAveraging(BaseStrategy):
     """Dollar cost averaging - buy periodically."""
     
     def __init__(self, frequency: int = 30):
-        """
-        Initialize DCA strategy.
-        
-        Args:
-            frequency: Buy every N days
-        """
         super().__init__(f"DCA (every {frequency} days)")
         self.frequency = frequency
     
@@ -84,24 +67,12 @@ class SMACrossoverStrategy(BaseStrategy):
     """Simple moving average crossover strategy."""
     
     def __init__(self, fast_period: int = 10, slow_period: int = 30):
-        """
-        Initialize SMA crossover strategy.
-        
-        Args:
-            fast_period: Fast SMA period
-            slow_period: Slow SMA period
-        """
         super().__init__(f"SMA({fast_period}/{slow_period})")
         self.fast_period = fast_period
         self.slow_period = slow_period
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals based on SMA crossover.
-        
-        Buy when fast SMA crosses above slow SMA.
-        Sell when fast SMA crosses below slow SMA.
-        """
+        """Generate SMA crossover signals."""
         # Calculate SMAs
         fast_sma = data['close'].rolling(window=self.fast_period).mean()
         slow_sma = data['close'].rolling(window=self.slow_period).mean()
@@ -125,14 +96,6 @@ class RSIMeanReversionStrategy(BaseStrategy):
     """RSI-based mean reversion strategy."""
     
     def __init__(self, period: int = 14, oversold: float = 30, overbought: float = 70):
-        """
-        Initialize RSI strategy.
-        
-        Args:
-            period: RSI period
-            oversold: Oversold threshold (buy signal)
-            overbought: Overbought threshold (sell signal)
-        """
         super().__init__(f"RSI({period}, {oversold}/{overbought})")
         self.period = period
         self.oversold = oversold

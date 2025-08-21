@@ -1,8 +1,5 @@
 # src/models/baseline.py
-"""
-Baseline models for comparison with ML approaches.
-These provide benchmarks to ensure ML models add value.
-"""
+"""Baseline models for comparison with ML approaches."""
 
 import numpy as np
 import pandas as pd
@@ -40,18 +37,14 @@ class BaselineModel(ABC):
         pass
 
 
-# ============================================================================
-# SIMPLE BASELINE STRATEGIES
-# ============================================================================
 
 class BuyAndHoldStrategy(BaselineModel):
-    """Simple buy and hold strategy - the ultimate baseline."""
+    """Buy and hold strategy."""
     
     def __init__(self):
         self.name = "Buy & Hold"
         
     def fit(self, data: pd.DataFrame):
-        """No fitting required."""
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
@@ -75,7 +68,6 @@ class RandomStrategy(BaselineModel):
         np.random.seed(seed)
         
     def fit(self, data: pd.DataFrame):
-        """No fitting required."""
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
@@ -101,7 +93,6 @@ class SMAcrossoverStrategy(BaselineModel):
         self.slow_period = slow_period
         
     def fit(self, data: pd.DataFrame):
-        """No fitting required."""
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
@@ -147,7 +138,6 @@ class RSIStrategy(BaselineModel):
         self.overbought = overbought
         
     def fit(self, data: pd.DataFrame):
-        """No fitting required."""
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
@@ -190,7 +180,6 @@ class BollingerBandsStrategy(BaselineModel):
         self.num_std = num_std
         
     def fit(self, data: pd.DataFrame):
-        """No fitting required."""
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
@@ -247,7 +236,6 @@ class MACDStrategy(BaselineModel):
         self.signal = signal
         
     def fit(self, data: pd.DataFrame):
-        """No fitting required."""
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
@@ -293,9 +281,6 @@ class MACDStrategy(BaselineModel):
         return signals
 
 
-# ============================================================================
-# STATISTICAL & ML COMPARISON MODELS
-# ============================================================================
 
 class ARIMAModel(BaselineModel):
     """ARIMA time series model."""
@@ -673,9 +658,6 @@ class LightGBMModel(BaselineModel):
         return signals
 
 
-# ============================================================================
-# ENSEMBLE MODEL
-# ============================================================================
 
 class EnsembleBaselineModel(BaselineModel):
     """Ensemble of multiple baseline models."""

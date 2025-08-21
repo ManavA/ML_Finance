@@ -30,7 +30,7 @@ class BaseStrategy(ABC):
     @abstractmethod
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
         """Generate trading signals from data"""
-        pass
+        raise NotImplementedError("Subclasses must implement generate_signals")
     
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """Preprocess data before signal generation"""

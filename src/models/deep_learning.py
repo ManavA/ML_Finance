@@ -139,5 +139,53 @@ class InverseRLStrategy(BaseStrategy):
             self.model = pickle.load(f)
     
     def generate_signals(self, data):
-        # Your IRL implementation
-        pass
+        """Generate trading signals using Inverse Reinforcement Learning"""
+        # Simple implementation using the model's reward function
+        try:
+            # Extract features for the model
+            features = self._extract_features(data)
+            
+            # Get reward predictions from the IRL model
+            rewards = self.model.predict_rewards(features)
+            
+            # Convert rewards to trading signals
+            signals = pd.Series(0, index=data.index)
+            
+            # Use reward thresholds to generate signals
+            high_threshold = np.percentile(rewards, 75)
+            low_threshold = np.percentile(rewards, 25)
+            
+            signals[rewards > high_threshold] = 1   # Buy signal
+            signals[rewards < low_threshold] = -1   # Sell signal
+            
+            return signals
+            
+        except Exception as e:
+            print(f"Error in IRL signal generation: {e}")
+            # Fallback to neutral signals
+            return pd.Series(0, index=data.index)
+    
+    def _extract_features(self, data):
+        """Extract features for IRL model"""
+        features = []
+        
+        # Price features
+        features.append(data['close'].pct_change().fillna(0))
+        features.append(data['volume'].pct_change().fillna(0))
+        
+        # Simple technical indicators
+        if len(data) >= 20:
+            features.append((data['close'] - data['close'].rolling(20).mean()).fillna(0))
+            features.append(data['close'].rolling(20).std().fillna(0))
+        else:
+            features.extend([pd.Series(0, index=data.index)] * 2)
+        
+        # RSI
+        delta = data['close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+        rs = gain / loss
+        rsi = 100 - (100 / (1 + rs))
+        features.append(rsi.fillna(50))
+        
+        return np.column_stack(features)

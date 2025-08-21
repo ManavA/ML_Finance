@@ -12,7 +12,10 @@ import json
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.analysis.backtester import Backtester
-from src.strategies.baseline_strategies import BaselineStrategies
+from src.strategies.baseline_strategies import (
+    SMACrossoverStrategy, RSIMeanReversionStrategy, 
+    BollingerBandsStrategy, MACDStrategy, MomentumStrategy
+)
 
 @click.group(name='backtest')
 @click.pass_context
@@ -60,34 +63,41 @@ def run_backtest(ctx, symbol, strategy, start, end, capital, commission, output)
     
     click.echo(f"Loaded {len(df)} data points from {df.index[0]} to {df.index[-1]}")
     
-    # Initialize strategy
-    strategies = BaselineStrategies()
-    
     # Generate signals based on strategy
     if strategy == 'ma_crossover':
-        signals = strategies.ma_crossover_strategy(df)
+        strategy_obj = SMACrossoverStrategy()
+        signals = strategy_obj.generate_signals(df)
     elif strategy == 'rsi':
-        signals = strategies.rsi_strategy(df)
+        strategy_obj = RSIMeanReversionStrategy()
+        signals = strategy_obj.generate_signals(df)
     elif strategy == 'bollinger':
-        signals = strategies.bollinger_bands_strategy(df)
+        strategy_obj = BollingerBandsStrategy()
+        signals = strategy_obj.generate_signals(df)
     elif strategy == 'macd':
-        signals = strategies.macd_strategy(df)
+        strategy_obj = MACDStrategy()
+        signals = strategy_obj.generate_signals(df)
     elif strategy == 'combined':
-        signals = strategies.combined_strategy(df)
+        # Create ensemble of multiple strategies
+        strategies = [SMACrossoverStrategy(), RSIMeanReversionStrategy(), MACDStrategy()]
+        all_signals = [s.generate_signals(df) for s in strategies]
+        signals = pd.Series(0, index=df.index)
+        for sig in all_signals:
+            signals += sig
+        signals = (signals > 0).astype(int) - (signals < 0).astype(int)
     else:
         click.echo(f"Error: Unknown strategy {strategy}")
         return
     
     # Run backtest
     backtester = Backtester(initial_capital=capital, commission=commission)
-    results = backtester.run(df, signals)
+    results = backtester.backtest(df, signals, strategy_name=strategy)
     
     # Display results
     click.echo("\n" + "="*50)
     click.echo("BACKTEST RESULTS")
     click.echo("="*50)
     
-    metrics = results['metrics']
+    metrics = results.metrics
     click.echo(f"Total Return: {metrics['total_return']:.2%}")
     click.echo(f"Annual Return: {metrics.get('annual_return', 0):.2%}")
     click.echo(f"Sharpe Ratio: {metrics['sharpe_ratio']:.2f}")

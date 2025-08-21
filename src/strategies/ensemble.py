@@ -151,17 +151,23 @@ class StackedEnsemble(BaseStrategy):
             return
         
         # Create feature matrix
-        feature_matrix = pd.DataFrame(strategy_features, columns=feature_names).T
+        feature_matrix = pd.DataFrame(strategy_features).T
+        feature_matrix.columns = feature_names
         
-        # Train meta-model if provided
-        if self.meta_model is not None:
-            # Align features and targets
-            aligned_features = feature_matrix.dropna()
-            aligned_targets = target_returns.loc[aligned_features.index]
-            
+        # Initialize default meta-model if none provided
+        if self.meta_model is None:
+            from sklearn.linear_model import Ridge
+            self.meta_model = Ridge(alpha=1.0)
+        
+        # Align features and targets
+        aligned_features = feature_matrix.dropna()
+        aligned_targets = target_returns.loc[aligned_features.index]
+        
+        if len(aligned_features) > 0 and len(aligned_targets) > 0:
             # Train meta-model
             self.meta_model.fit(aligned_features, aligned_targets)
             self.is_trained = True
+            print(f"Meta-model trained on {len(aligned_features)} samples")
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
         """

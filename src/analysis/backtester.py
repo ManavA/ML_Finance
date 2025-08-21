@@ -1,8 +1,5 @@
 # src/analysis/backtester.py
-"""
-Simple backtesting framework for strategy analysis.
-Focus on clarity and metrics calculation.
-"""
+"""Backtesting framework for strategy analysis."""
 
 import pandas as pd
 import numpy as np
@@ -32,14 +29,6 @@ class Backtester:
                  initial_capital: float = 10000,
                  commission: float = 0.001,
                  slippage: float = 0.001):
-        """
-        Initialize backtester.
-        
-        Args:
-            initial_capital: Starting capital
-            commission: Commission per trade (as fraction)
-            slippage: Slippage per trade (as fraction)
-        """
         self.initial_capital = initial_capital
         self.commission = commission
         self.slippage = slippage
@@ -48,17 +37,7 @@ class Backtester:
                 data: pd.DataFrame, 
                 signals: pd.Series,
                 strategy_name: str = "Strategy") -> BacktestResults:
-        """
-        Run backtest on signals.
-        
-        Args:
-            data: DataFrame with OHLCV data
-            signals: Series with trading signals (1, 0, -1)
-            strategy_name: Name of the strategy
-            
-        Returns:
-            BacktestResults object
-        """
+        """Run backtest on signals."""
         # Align data and signals
         common_index = data.index.intersection(signals.index)
         data = data.loc[common_index]
@@ -252,15 +231,7 @@ class Backtester:
     
     def compare_strategies(self, 
                           results_list: List[BacktestResults]) -> pd.DataFrame:
-        """
-        Compare multiple strategy results.
-        
-        Args:
-            results_list: List of BacktestResults
-            
-        Returns:
-            DataFrame with comparison metrics
-        """
+        """Compare multiple strategy results."""
         comparison = []
         
         for result in results_list:

@@ -1,8 +1,4 @@
-#!/usr/bin/env python3
-"""
-Advanced ML models including deep learning and ensemble methods
-Comprehensive implementation of LSTM, GRU, Transformer, and Ensemble models
-"""
+"""Advanced ML models including deep learning and ensemble methods."""
 
 import pandas as pd
 import numpy as np
@@ -29,12 +25,9 @@ import lightgbm as lgb
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logger = logging.getLogger(__name__)
 
-# ============================================================================
-# PYTORCH DATASETS
-# ============================================================================
 
 class TimeSeriesDataset(Dataset):
-    """PyTorch dataset for time series data"""
+    """PyTorch dataset for time series data."""
     
     def __init__(self, X, y):
         self.X = torch.FloatTensor(X)
@@ -47,9 +40,6 @@ class TimeSeriesDataset(Dataset):
         return self.X[idx], self.y[idx]
 
 
-# ============================================================================
-# ADVANCED LSTM MODEL
-# ============================================================================
 
 class AdvancedLSTM(nn.Module):
     """Advanced LSTM with attention mechanism and residual connections"""
@@ -134,9 +124,6 @@ class AdvancedLSTM(nn.Module):
         return out
 
 
-# ============================================================================
-# ADVANCED GRU MODEL
-# ============================================================================
 
 class AdvancedGRU(nn.Module):
     """Advanced GRU with attention and layer normalization"""
@@ -209,9 +196,6 @@ class AdvancedGRU(nn.Module):
         return out
 
 
-# ============================================================================
-# ADVANCED TRANSFORMER MODEL
-# ============================================================================
 
 class AdvancedTransformer(nn.Module):
     """Advanced Transformer with custom positional encoding and multi-scale attention"""
@@ -305,9 +289,6 @@ class AdvancedTransformer(nn.Module):
         return out
 
 
-# ============================================================================
-# ENSEMBLE MODEL
-# ============================================================================
 
 class DeepEnsembleModel:
     """Ensemble of deep learning and traditional ML models"""
@@ -602,9 +583,6 @@ class DeepEnsembleModel:
         logger.info(f"Ensemble model saved to {filepath}")
 
 
-# ============================================================================
-# HYBRID CNN-LSTM MODEL
-# ============================================================================
 
 class CNNLSTMModel(nn.Module):
     """Hybrid CNN-LSTM model for capturing both local and temporal patterns"""

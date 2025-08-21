@@ -8,6 +8,7 @@ import logging
 from pathlib import Path
 import asyncio
 import aiohttp
+import concurrent.futures
 from tqdm import tqdm
 import pickle
 
@@ -153,7 +154,29 @@ class CryptoDataCollector:
                 logger.error(f"Failed to fetch {symbol}: {e}")
         return data
     
-    async def fetch_order_book(self, symbol: str, limit: int = 100) -> Dict:
+    def fetch_multiple_symbols_parallel(self, symbols: List[str], max_workers: int = 5, **kwargs) -> Dict[str, pd.DataFrame]:
+        """Fetch data for multiple symbols in parallel."""
+        data = {}
+        
+        def fetch_single_symbol(symbol):
+            try:
+                return symbol, self.fetch_ohlcv(symbol, **kwargs)
+            except Exception as e:
+                logger.error(f"Failed to fetch {symbol}: {e}")
+                return symbol, pd.DataFrame()
+        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(fetch_single_symbol, symbol) for symbol in symbols]
+            
+            for future in tqdm(concurrent.futures.as_completed(futures), 
+                             total=len(symbols), desc="Fetching symbols"):
+                symbol, df = future.result()
+                if not df.empty:
+                    data[symbol] = df
+        
+        return data
+    
+    def fetch_order_book(self, symbol: str, limit: int = 100) -> Dict:
         """Fetch order book data."""
         try:
             order_book = self.exchange.fetch_order_book(symbol, limit)
