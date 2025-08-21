@@ -1,4 +1,4 @@
-# CrypotoML
+# CryptoML
 
 A comprehensive machine learning system for cryptocurrency and stock trading, featuring advanced models, real-time data collection, and both CLI and notebook interfaces.
 
@@ -185,19 +185,7 @@ pytest --cov=src tests/
 pytest tests/test_models.py
 ```
 
-### Code Quality
-```bash
-# Format code
-black src/ cli/
-
-# Lint code
-flake8 src/ cli/
-
-# Type checking
-mypy src/
-```
-
-## Performance Tips
+## Tips
 
 1. **Use caching**: Enable cache in config.yaml
 2. **Parallel processing**: Set `n_jobs=-1` for all cores
@@ -233,15 +221,7 @@ pip install ta-lib
 
 ## Contributing
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Open Pull Request
-
 ## Disclaimer
-
-This software is for educational and research purposes only. Do not use for actual trading without understanding the risks. Cryptocurrency and stock trading involves substantial risk of loss.
 
 ## Acknowledgments
 
