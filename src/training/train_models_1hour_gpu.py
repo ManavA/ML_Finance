@@ -29,9 +29,6 @@ except:
     gpu_available = False
     gpu_name = "PyTorch not installed"
 
-print("="*80)
-print("OPTIMIZED 1-HOUR MODEL TRAINING PIPELINE")
-print("="*80)
 print(f"\nDevice: {device}")
 print(f"GPU Available: {gpu_available}")
 print(f"GPU Name: {gpu_name}")
@@ -64,7 +61,6 @@ print("="*60)
 start_time = time.time()
 
 def collect_crypto_equity_data():
-    """Collect data including Solana and other major cryptos"""
     
     end_date = datetime.now()
     start_date = end_date - timedelta(days=365*2)  # 2 years
@@ -121,19 +117,19 @@ all_data = collect_crypto_equity_data()
 # Check Solana specifically
 if 'SOL-USD' in all_data:
     sol_data = all_data['SOL-USD']
-    print(f"\n✓ SOLANA DATA LOADED:")
+    print(f"\nSOLANA DATA LOADED:")
     print(f"  Date range: {sol_data.index[0].date()} to {sol_data.index[-1].date()}")
     print(f"  Current price: ${sol_data['Close'].iloc[-1]:.2f}")
     print(f"  30-day return: {((sol_data['Close'].iloc[-1] / sol_data['Close'].iloc[-30]) - 1)*100:.1f}%")
     print(f"  Volatility: {sol_data['Close'].pct_change().std() * np.sqrt(365) * 100:.1f}% annual")
 else:
-    print("\n✗ SOLANA DATA NOT AVAILABLE")
+    print("\nSOLANA DATA NOT AVAILABLE")
 
 elapsed = time.time() - start_time
 print(f"\nData collection completed in {elapsed:.1f} seconds")
 
 print("\n" + "="*60)
-print("2. FEATURE ENGINEERING (3 minutes)")
+print("2. FEATURE ENGINEERING ()")
 print("="*60)
 
 def create_ml_features(df, symbol_name):
@@ -209,7 +205,7 @@ equity_data = {k: v for k, v in processed_data.items() if 'USD' not in k}
 print(f"\nProcessed {len(crypto_data)} crypto assets and {len(equity_data)} equity assets")
 
 print("\n" + "="*60)
-print("3. XGBOOST TRAINING (10 minutes)")
+print("3. XGBOOST TRAINING ()")
 print("="*60)
 
 import xgboost as xgb
@@ -292,7 +288,7 @@ xgb_equity_results = train_xgboost_conservative(
 )
 
 print("\n" + "="*60)
-print("4. LSTM TRAINING (15 minutes)")
+print("4. LSTM TRAINING ()")
 print("="*60)
 
 if gpu_available:
@@ -410,7 +406,7 @@ else:
     lstm_equity_results = {}
 
 print("\n" + "="*60)
-print("5. DQN TRAINING (10 minutes)")
+print("5. DQN TRAINING ()")
 print("="*60)
 
 # Simple trading environment
@@ -511,7 +507,7 @@ if crypto_accuracies and equity_accuracies:
     print(f"  Equity: {equity_mean:.1%}")
     print(f"  Crypto Advantage: {advantage*100:.1f}pp")
     
-    print(f"\nConclusion: {'✓ HYPOTHESIS CONFIRMED' if advantage > 0 else '✗ HYPOTHESIS NOT CONFIRMED'}")
+    print(f"\nConclusion: {'HYPOTHESIS CONFIRMED' if advantage > 0 else 'HYPOTHESIS NOT CONFIRMED'}")
     if advantage > 0:
         print(f"  ML models show {advantage*100:.1f}pp better accuracy on crypto")
         print(f"  This includes Solana which performed well")
@@ -565,15 +561,5 @@ KEY FINDINGS:
 1. Solana (SOL) was successfully included in analysis
 2. Crypto mean accuracy: {crypto_mean:.1%}
 3. Equity mean accuracy: {equity_mean:.1%}
-4. Advantage: {advantage*100:+.1f}pp for crypto
-
-NEXT STEPS:
-----------
-1. Run comprehensive notebooks with these trained models
-2. Generate visualizations using comprehensive_analysis.py
-3. Complete statistical significance testing
-4. Create final presentation materials
-
-Note: This was conservative training to fit within 1 hour.
-For production, consider 4-8 hours with full hyperparameter tuning.
+4.
 """)

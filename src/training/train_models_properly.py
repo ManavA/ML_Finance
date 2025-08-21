@@ -586,10 +586,10 @@ if lstm_results:
         print(f"Crypto Advantage: {advantage*100:.1f}pp")
         
         if advantage > 0:
-            print("\n✅ HYPOTHESIS CONFIRMED: ML models perform better on crypto")
+            print("\nHYPOTHESIS CONFIRMED: ML models perform better on crypto")
             print(f"   Crypto has {advantage*100:.1f} percentage points higher accuracy")
         else:
-            print("\n❌ HYPOTHESIS NOT CONFIRMED: ML models don't show crypto advantage")
+            print("\nHYPOTHESIS NOT CONFIRMED: ML models don't show crypto advantage")
 
 # Save all results
 results = {
@@ -606,5 +606,4 @@ with open('models/training_results.pkl', 'wb') as f:
 print("\n" + "="*80)
 print("TRAINING COMPLETE")
 print("="*80)
-print("\nModels properly trained with adequate iterations")
 print("Results saved to models/training_results.pkl")

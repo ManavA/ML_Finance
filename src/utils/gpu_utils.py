@@ -1,5 +1,5 @@
 """
-GPU Utilities for ML Finance
+GPU Utilities
 """
 
 import torch

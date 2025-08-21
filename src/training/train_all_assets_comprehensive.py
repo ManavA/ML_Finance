@@ -481,6 +481,4 @@ Regime Changes (2025+):
   - Significant changes: {sum(1 for r in regime_results.values() if r['regime_change_detected'])}
   - Stable assets: {len(regime_results) - sum(1 for r in regime_results.values() if r['regime_change_detected'])}
 
-All assets included with consistent color scheme and groupings.
-Ready for comprehensive notebook analysis.
 """)

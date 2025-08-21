@@ -26,10 +26,7 @@ print("Loading RL libraries...")
 # ============================================================================
 
 class CryptoTradingEnvironment:
-    """
-    Simple trading environment for RL agents
-    """
-    
+
     def __init__(self, data: pd.DataFrame, initial_balance: float = 10000, 
                  lookback: int = 20, commission: float = 0.001):
         self.data = data.reset_index(drop=True)
@@ -50,7 +47,6 @@ class CryptoTradingEnvironment:
         self.state_size = lookback * 4 + 3  # OHLC * lookback + balance/position/value
         
     def reset(self):
-        """Reset environment to initial state"""
         self.current_step = self.lookback
         self.balance = self.initial_balance
         self.position = 0
@@ -58,7 +54,6 @@ class CryptoTradingEnvironment:
         return self._get_state()
     
     def _get_state(self):
-        """Get current state observation"""
         # Get price history
         start = self.current_step - self.lookback
         price_data = self.data.iloc[start:self.current_step]
@@ -86,7 +81,6 @@ class CryptoTradingEnvironment:
         return np.array(norm_prices + position_info, dtype=np.float32)
     
     def step(self, action: int):
-        """Execute action and return next state, reward, done"""
         current_price = self.data.iloc[self.current_step]['close']
         prev_value = self.balance + self.position * current_price
         
@@ -121,12 +115,7 @@ class CryptoTradingEnvironment:
         
         return next_state, reward, done, {'value': new_value}
 
-# ============================================================================
-# DQN AGENT
-# ============================================================================
-
 class DQNNetwork(nn.Module):
-    """Deep Q-Network"""
     
     def __init__(self, state_size: int, action_size: int, hidden_size: int = 128):
         super().__init__()
@@ -146,7 +135,6 @@ class DQNNetwork(nn.Module):
         return x
 
 class DQNAgent:
-    """DQN Trading Agent"""
     
     def __init__(self, state_size: int, action_size: int, lr: float = 0.001):
         self.state_size = state_size
@@ -166,15 +154,12 @@ class DQNAgent:
         self.update_target_network()
         
     def update_target_network(self):
-        """Copy weights to target network"""
         self.target_network.load_state_dict(self.q_network.state_dict())
         
     def remember(self, state, action, reward, next_state, done):
-        """Store experience in replay buffer"""
         self.memory.append((state, action, reward, next_state, done))
         
     def act(self, state, training=True):
-        """Choose action using epsilon-greedy policy"""
         if training and random.random() <= self.epsilon:
             return random.randrange(self.action_size)
         
@@ -183,7 +168,6 @@ class DQNAgent:
         return np.argmax(q_values.detach().numpy())
     
     def replay(self, batch_size: int = 32):
-        """Train on batch of experiences"""
         if len(self.memory) < batch_size:
             return
         
@@ -207,12 +191,7 @@ class DQNAgent:
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
-# ============================================================================
-# TRAINING
-# ============================================================================
-
 def train_dqn_agent(env, episodes: int = 100):
-    """Train DQN agent"""
     
     agent = DQNAgent(env.state_size, env.action_space)
     
@@ -250,12 +229,8 @@ def train_dqn_agent(env, episodes: int = 100):
     
     return agent, scores
 
-# ============================================================================
-# SIMPLE PPO IMPLEMENTATION
-# ============================================================================
 
 class PolicyNetwork(nn.Module):
-    """Policy network for PPO"""
     
     def __init__(self, state_size: int, action_size: int, hidden_size: int = 64):
         super().__init__()
@@ -274,14 +249,12 @@ class PolicyNetwork(nn.Module):
         return action_probs, state_value
 
 class SimplePPO:
-    """Simplified PPO agent"""
     
     def __init__(self, state_size: int, action_size: int, lr: float = 0.0003):
         self.policy = PolicyNetwork(state_size, action_size)
         self.optimizer = optim.Adam(self.policy.parameters(), lr=lr)
         
     def get_action(self, state):
-        """Sample action from policy"""
         state_tensor = torch.FloatTensor(state).unsqueeze(0)
         action_probs, _ = self.policy(state_tensor)
         dist = torch.distributions.Categorical(action_probs)
@@ -289,7 +262,6 @@ class SimplePPO:
         return action.item(), dist.log_prob(action)
     
     def train_step(self, states, actions, rewards, log_probs):
-        """Simplified PPO update"""
         states = torch.FloatTensor(states)
         actions = torch.LongTensor(actions)
         rewards = torch.FloatTensor(rewards)
@@ -318,12 +290,7 @@ class SimplePPO:
         loss.backward()
         self.optimizer.step()
 
-# ============================================================================
-# MAIN EXECUTION
-# ============================================================================
-
 def load_data():
-    """Load and prepare data"""
     print("Loading data...")
     
     # Try to load real data
@@ -360,7 +327,6 @@ def load_data():
     return data
 
 def evaluate_agent(agent, env, episodes: int = 10):
-    """Evaluate trained agent"""
     total_rewards = []
     final_values = []
     
@@ -487,10 +453,3 @@ if __name__ == "__main__":
         plt.show()
     
     print("\n[+] RL Training Complete!")
-    print("Note: These are simplified implementations.")
-    print("Production systems would need:")
-    print("  - More sophisticated reward shaping")
-    print("  - Advanced architectures (LSTM, Attention)")
-    print("  - Hyperparameter optimization")
-    print("  - Ensemble methods")
-    print("  - Risk-adjusted rewards")

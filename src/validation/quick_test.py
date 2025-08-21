@@ -58,7 +58,7 @@ class QuickValidator:
         
     def fetch_quick_data(self, symbol='BTC-USD'):
         """Fetch minimal data for testing"""
-        print(f"\n📊 Fetching {self.config['data_days']} days of {symbol} data...")
+        print(f"\nFetching {self.config['data_days']} days of {symbol} data...")
         end_date = datetime.now()
         start_date = end_date - timedelta(days=self.config['data_days'])
         
@@ -112,11 +112,11 @@ class QuickValidator:
                 'status': 'PASS' if accuracy > 0.45 else 'FAIL'
             }
             
-            print(f"✅ XGBoost: {accuracy:.2%} accuracy in {duration:.1f}s")
+            print(f"XGBoost: {accuracy:.2%} accuracy in {duration:.1f}s")
             return True
             
         except Exception as e:
-            print(f"❌ XGBoost failed: {str(e)[:50]}")
+            print(f"XGBoost failed: {str(e)[:50]}")
             self.results['xgboost'] = {'status': 'ERROR', 'error': str(e)}
             return False
     
@@ -152,11 +152,11 @@ class QuickValidator:
                 'status': 'PASS' if accuracy > 0.45 else 'FAIL'
             }
             
-            print(f"✅ LightGBM: {accuracy:.2%} accuracy in {duration:.1f}s")
+            print(f"LightGBM: {accuracy:.2%} accuracy in {duration:.1f}s")
             return True
             
         except Exception as e:
-            print(f"❌ LightGBM failed: {str(e)[:50]}")
+            print(f"LightGBM failed: {str(e)[:50]}")
             self.results['lightgbm'] = {'status': 'ERROR', 'error': str(e)}
             return False
     
@@ -240,11 +240,11 @@ class QuickValidator:
                 'status': 'PASS' if accuracy > 0.45 else 'FAIL'
             }
             
-            print(f"✅ LSTM: {accuracy:.2%} accuracy in {duration:.1f}s")
+            print(f"LSTM: {accuracy:.2%} accuracy in {duration:.1f}s")
             return True
             
         except Exception as e:
-            print(f"❌ LSTM failed: {str(e)[:50]}")
+            print(f"LSTM failed: {str(e)[:50]}")
             self.results['lstm'] = {'status': 'ERROR', 'error': str(e)}
             return False
     
@@ -260,7 +260,7 @@ class QuickValidator:
         print(f"Data shape: {data.shape}")
         
         # Run tests
-        print(f"\n🧪 Running Model Tests...")
+        print(f"\nRunning Model Tests...")
         self.test_xgboost(data)
         self.test_lightgbm(data)
         self.test_lstm(data)
@@ -280,24 +280,24 @@ class QuickValidator:
         failed = sum(1 for r in self.results.values() if r.get('status') == 'FAIL')
         errors = sum(1 for r in self.results.values() if r.get('status') == 'ERROR')
         
-        print(f"\n📊 Results:")
+        print(f"\nResults:")
         for model, result in self.results.items():
             status = result.get('status', 'UNKNOWN')
-            emoji = '✅' if status == 'PASS' else '❌'
+            prefix = '[PASS]' if status == 'PASS' else '[FAIL]'
             acc = result.get('accuracy', 0)
             dur = result.get('duration', 0)
-            print(f"  {emoji} {model:10s}: {status:5s} | Acc: {acc:.1%} | Time: {dur:.1f}s")
+            print(f"  {prefix} {model:10s}: {status:5s} | Acc: {acc:.1%} | Time: {dur:.1f}s")
         
-        print(f"\n📈 Statistics:")
+        print(f"\nStatistics:")
         print(f"  Total Time: {total_time:.1f} seconds")
         print(f"  Passed: {passed}/{len(self.results)}")
         print(f"  Failed: {failed}/{len(self.results)}")
         print(f"  Errors: {errors}/{len(self.results)}")
         
         if total_time < 300:  # Under 5 minutes
-            print(f"\n✅ SMOKE TEST SUCCESSFUL - Ready for full training")
+            print(f"\nSMOKE TEST SUCCESSFUL - Ready for full training")
         else:
-            print(f"\n⚠️ Tests took {total_time:.1f}s - Consider optimization")
+            print(f"\nTests took {total_time:.1f}s - Consider optimization")
 
 
 def main():

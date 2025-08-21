@@ -338,7 +338,7 @@ def comprehensive_evaluation(models, rl_agents, X_test, y_test, test_data):
     print(f"  Buy & Hold Sharpe: {bh_sharpe:.3f}")
     
     if best_ml_sharpe > bh_sharpe:
-        print("\n✅ ML strategies outperform Buy & Hold!")
+        print("\nML strategies outperform Buy & Hold!")
         improvement = ((best_ml_sharpe - bh_sharpe) / abs(bh_sharpe)) * 100
         print(f"   Improvement: {improvement:.1f}%")
     else:

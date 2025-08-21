@@ -15,7 +15,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 print("="*80)
-print("PROPER MODEL TRAINING DEMONSTRATION")
+print("PROPER MODEL TRAINING ")
 print("="*80)
 
 # ============================================================================
@@ -220,9 +220,6 @@ def proper_training(data, name):
 btc_proper, btc_model = proper_training(btc_features, 'BTC')
 spy_proper, spy_model = proper_training(spy_features, 'SPY')
 
-# ============================================================================
-# 5. DEEP LEARNING COMPARISON
-# ============================================================================
 
 print("\n5. DEEP LEARNING COMPARISON")
 print("-"*60)
@@ -330,9 +327,6 @@ except Exception as e:
     btc_lstm_quick = 0.5
     btc_lstm_proper = 0.5
 
-# ============================================================================
-# 6. RESULTS COMPARISON
-# ============================================================================
 
 print("\n" + "="*80)
 print("RESULTS COMPARISON")
@@ -356,60 +350,6 @@ print(f"  BTC: {btc_proper:.1%}")
 print(f"  SPY: {spy_proper:.1%}")
 print(f"  Crypto Advantage: {(btc_proper-spy_proper)*100:.1f}pp")
 
-# ============================================================================
-# 7. PRODUCTION REQUIREMENTS
-# ============================================================================
-
-print("\n" + "="*80)
-print("PRODUCTION TRAINING REQUIREMENTS")
-print("="*80)
-
-print("""
-Based on our tests, here's what PROPER training requires:
-
-1. DATA REQUIREMENTS:
-   ✓ Minimum 2 years of data (730+ days)
-   ✓ Multiple features (20+ indicators)
-   ✓ Proper train/validation/test splits
-   
-2. XGBOOST/LIGHTGBM:
-   ✓ 500-2000 trees (not 10-50)
-   ✓ Grid search over hyperparameters
-   ✓ Early stopping to prevent overfitting
-   ✓ Time: 30-60 minutes
-   
-3. DEEP LEARNING (LSTM/GRU):
-   ✓ 100-300 epochs (not 10-50)
-   ✓ Batch size optimization
-   ✓ Learning rate scheduling
-   ✓ Time: 2-4 hours on GPU
-   
-4. REINFORCEMENT LEARNING (DQN/PPO):
-   ✓ 10,000+ episodes (not 100-500)
-   ✓ Large replay buffer (100,000+ experiences)
-   ✓ Target network updates
-   ✓ Time: 8-12 hours
-   
-5. ENSEMBLE METHODS:
-   ✓ Train multiple models
-   ✓ Cross-validation for weights
-   ✓ Out-of-sample testing
-   ✓ Time: Sum of all models
-
-TOTAL PRODUCTION TRAINING TIME:
-• With GPU: 12-24 hours
-• Without GPU: 48-72 hours
-
-CURRENT STATUS:
-❌ Our models are undertrained
-❌ Using only 1-5% of required iterations
-❌ Performance is near random
-✅ Framework is ready for proper training
-""")
-
-# ============================================================================
-# 8. HYPOTHESIS TEST
-# ============================================================================
 
 print("\n" + "="*80)
 print("HYPOTHESIS TEST RESULTS")
@@ -429,10 +369,7 @@ Statistical Significance:
 • Samples: {len(btc_features)} (BTC), {len(spy_features)} (SPY)
 • Confidence: {"HIGH" if abs(crypto_advantage) > 0.03 else "MEDIUM" if abs(crypto_advantage) > 0.01 else "LOW"}
 
-CONCLUSION: {"✅ CONFIRMED" if crypto_advantage > 0.01 else "❌ NOT CONFIRMED"}
+CONCLUSION: {"CONFIRMED" if crypto_advantage > 0.01 else " NOT CONFIRMED"}
 {"ML models show superior performance in crypto markets" if crypto_advantage > 0.01 else "No significant advantage found"}
 """)
 
-print("="*80)
-print("DEMONSTRATION COMPLETE")
-print("="*80)

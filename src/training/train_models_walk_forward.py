@@ -50,16 +50,12 @@ print(f"  Test Window: {WALK_FORWARD_CONFIG['test_window']} months")
 print(f"  Step Size: {WALK_FORWARD_CONFIG['step_size']} months")
 print(f"  Regime Test: {WALK_FORWARD_CONFIG['regime_test_start']} to {WALK_FORWARD_CONFIG['regime_test_end']}")
 
-# ============================================================================
-# 1. DATA COLLECTION (2023-2025+)
-# ============================================================================
 
 print("\n" + "="*60)
 print("1. DATA COLLECTION (2023-2025+)")
 print("="*60)
 
 def collect_walk_forward_data():
-    """Collect data for walk-forward analysis and regime testing"""
     
     # Get full date range (2023 to now)
     start_date = '2023-01-01'
@@ -67,7 +63,6 @@ def collect_walk_forward_data():
     
     data = {}
     
-    # CRYPTOCURRENCIES (including Solana)
     crypto_symbols = {
         'BTC-USD': 'Bitcoin',
         'ETH-USD': 'Ethereum', 
@@ -132,16 +127,11 @@ for symbol in ['BTC-USD', 'SOL-USD', 'SPY']:
         print(f"    Training (2023-2024): {len(df_train)} days")
         print(f"    Regime Test (2025+): {len(df_regime)} days")
 
-# ============================================================================
-# 2. FEATURE ENGINEERING
-# ============================================================================
-
 print("\n" + "="*60)
 print("2. FEATURE ENGINEERING")
 print("="*60)
 
 def create_features(df):
-    """Create features for ML models"""
     
     # Handle multi-index columns from yfinance
     if isinstance(df.columns, pd.MultiIndex):
@@ -216,16 +206,12 @@ for symbol, df in all_data.items():
     processed_data[symbol] = create_features(df)
     print(f"  {symbol}: {len(processed_data[symbol])} samples")
 
-# ============================================================================
-# 3. WALK-FORWARD VALIDATION
-# ============================================================================
 
 print("\n" + "="*60)
 print("3. WALK-FORWARD VALIDATION")
 print("="*60)
 
 def generate_walk_forward_splits(data, start_date, end_date, train_months, test_months, step_months):
-    """Generate walk-forward train/test splits"""
     
     splits = []
     current_date = pd.to_datetime(start_date)
@@ -274,10 +260,6 @@ for symbol in ['BTC-USD', 'SOL-USD', 'ETH-USD', 'SPY', 'QQQ']:
                   f"Test {split['test_start'].date()} to {split['test_end'].date()}")
             print(f"    Train: {len(split['train_data'])} samples, Test: {len(split['test_data'])} samples")
 
-# ============================================================================
-# 4. XGBOOST WITH WALK-FORWARD
-# ============================================================================
-
 print("\n" + "="*60)
 print("4. XGBOOST WALK-FORWARD TRAINING")
 print("="*60)
@@ -287,7 +269,6 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, recall_score
 
 def train_xgboost_walk_forward(symbol, splits):
-    """Train XGBoost using walk-forward validation"""
     
     print(f"\nTraining XGBoost for {symbol}:")
     
@@ -364,10 +345,6 @@ for symbol in ['BTC-USD', 'SOL-USD', 'SPY']:
     if symbol in walk_forward_splits and walk_forward_splits[symbol]:
         xgb_results[symbol] = train_xgboost_walk_forward(symbol, walk_forward_splits[symbol])
 
-# ============================================================================
-# 5. LSTM WITH WALK-FORWARD (REDUCED EPOCHS)
-# ============================================================================
-
 print("\n" + "="*60)
 print("5. LSTM WALK-FORWARD TRAINING")
 print("="*60)
@@ -377,7 +354,6 @@ if gpu_available:
     import torch.nn as nn
     import torch.optim as optim
     from torch.utils.data import DataLoader, TensorDataset
-    
     class WalkForwardLSTM(nn.Module):
         def __init__(self, input_size, hidden_size=32, num_layers=2):
             super().__init__()
@@ -390,7 +366,6 @@ if gpu_available:
             return torch.sigmoid(self.fc(out[:, -1, :]))
     
     def train_lstm_walk_forward(symbol, splits, epochs=20):  # Reduced epochs
-        """Train LSTM using walk-forward validation"""
         
         print(f"\nTraining LSTM for {symbol} ({epochs} epochs per fold):")
         
@@ -477,16 +452,11 @@ else:
     print("  GPU not available - skipping LSTM")
     lstm_results = {}
 
-# ============================================================================
-# 6. REGIME CHANGE TESTING (2025+)
-# ============================================================================
-
 print("\n" + "="*60)
 print("6. REGIME CHANGE TESTING (2025+)")
 print("="*60)
 
 def test_regime_change(symbol, model_results, processed_data):
-    """Test model performance on 2025+ data to detect regime changes"""
     
     print(f"\nRegime Change Testing for {symbol}:")
     
@@ -558,9 +528,6 @@ for symbol in ['BTC-USD', 'SOL-USD', 'SPY']:
             processed_data[symbol]
         )
 
-# ============================================================================
-# 7. CRYPTO VS EQUITY COMPARISON
-# ============================================================================
 
 print("\n" + "="*80)
 print("CRYPTO VS EQUITY COMPARISON")
@@ -590,10 +557,6 @@ if crypto_accuracies and equity_accuracies:
     print(f"  Crypto Advantage: {advantage*100:.1f}pp")
     print(f"\nHypothesis: {'CONFIRMED' if advantage > 0 else 'NOT CONFIRMED'}")
 
-# ============================================================================
-# 8. SAVE RESULTS
-# ============================================================================
-
 print("\n" + "="*60)
 print("SAVING RESULTS")
 print("="*60)
@@ -613,10 +576,6 @@ with open('models/walk_forward_results.pkl', 'wb') as f:
     pickle.dump(results_summary, f)
 
 print("Results saved to models/walk_forward_results.pkl")
-
-# ============================================================================
-# FINAL SUMMARY
-# ============================================================================
 
 print("\n" + "="*80)
 print("FINAL SUMMARY")
@@ -641,14 +600,4 @@ KEY FINDINGS:
 3. Crypto vs Equity:
    - Crypto advantage maintained: {advantage*100:.1f}pp
    - Hypothesis: {'CONFIRMED' if advantage > 0 else 'NOT CONFIRMED'}
-
-4. Model Robustness:
-   - Used walk-forward validation to avoid look-ahead bias
-   - Tested on out-of-sample 2025 data
-   - Multiple folds ensure stability
-
-Next Steps:
-- Run comprehensive notebooks with these results
-- Generate visualizations
-- Complete statistical significance testing
 """)
