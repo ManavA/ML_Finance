@@ -6,7 +6,7 @@ This repository contains a fully reproducible research pipeline comparing **base
 
 ---
 
-## 🔎 What this project does
+## What this project does
 
 - Builds a **clean data pipeline** with caching and fallbacks (Polygon, CoinMarketCap, yfinance, etc.).  
 - Performs **EDA** and distributional checks (skew/kurtosis, normality tests).  
@@ -16,319 +16,7 @@ This repository contains a fully reproducible research pipeline comparing **base
 - Trains **ML models** (XGBoost, LightGBM, CatBoost, Random Forest, Extra Trees, SVM) with **time‑series aware CV** and **walk‑forward** evaluation.  
 - Summarizes results and takeaways in a final report.
 
-All notebooks are exported to **PDFs** for quick reading.
-
 ---
-
-## 📂 Repository layout
-
-```
-├── Jupyter Notebooks
-│
- 
- 
- 
-├
-─
-─
- 
-0
-0
-_
-d
-a
-t
-a
-_
-t
-e
-s
-t
-i
-n
-g
-.
-i
-p
-y
-n
-b
-
-
-│
- 
- 
- 
-├
-─
-─
- 
-0
-1
-_
-d
-a
-t
-a
-_
-a
-n
-a
-l
-y
-s
-i
-s
-.
-i
-p
-y
-n
-b
-
-
-│
- 
- 
- 
-├
-─
-─
- 
-0
-2
-_
-a
-d
-v
-a
-n
-c
-e
-d
-_
-s
-t
-a
-t
-i
-s
-t
-i
-c
-a
-l
-_
-a
-n
-a
-l
-y
-s
-i
-s
-.
-i
-p
-y
-n
-b
-
-
-│
- 
- 
- 
-├
-─
-─
- 
-0
-3
-_
-f
-e
-a
-t
-u
-r
-e
-_
-e
-n
-g
-i
-n
-e
-e
-r
-i
-n
-g
-_
-o
-p
-t
-i
-m
-i
-z
-a
-t
-i
-o
-n
-.
-i
-p
-y
-n
-b
-
-
-│
- 
- 
- 
-├
-─
-─
- 
-0
-4
-_
-b
-a
-s
-e
-l
-i
-n
-e
-_
-a
-n
-a
-l
-y
-s
-i
-s
-.
-i
-p
-y
-n
-b
-
-
-│
- 
- 
- 
-├
-─
-─
- 
-0
-4
-_
-b
-a
-s
-e
-l
-i
-n
-e
-_
-m
-o
-d
-e
-l
-s
-.
-i
-p
-y
-n
-b
-
-
-│
- 
- 
- 
-├
-─
-─
- 
-0
-5
-_
-m
-l
-_
-m
-o
-d
-e
-l
-s
-_
-f
-i
-n
-a
-l
-.
-i
-p
-y
-n
-b
-
-
-│
- 
- 
- 
-└
-─
-─
- 
-0
-6
-_
-f
-i
-n
-a
-l
-_
-s
-u
-m
-m
-a
-r
-y
-.
-i
-p
-y
-n
-b
-├── 00_data_testing.pdf
-├── 01_data_analysis.pdf
-├── 02_advanced_statistical_analysis.pdf
-├── 03_feature_engineering_optimization.pdf
-├── 04_baseline_analysis.pdf
-├── 05_ml_models_final.pdf
-├── 06_final_summary.pdf
-└── Appendix - References.pdf
-```
 
 ### Notebooks (in order)
 
@@ -347,7 +35,7 @@ PDF exports of the notebooks are in the repository root for convenience.
 
 ---
 
-## 🧰 Environment & setup
+## Environment & setup
 
 > Python ≥ 3.10 recommended
 
@@ -372,7 +60,7 @@ pip install -U pip wheel
 pip install pandas numpy matplotlib scikit-learn scipy statsmodels xgboost lightgbm catboost yfinance ta shap mlxtend
 ```
 
-If you use APIs (Polygon/CMC), place your keys in a local **`.env`** (not committed):
+If you use APIs (Polygon/CMC), place your keys in a local **`.env`**
 
 ```
 POLYGONIO_KEY=...
@@ -381,7 +69,7 @@ COINMARKETCAP_KEY=...
 
 ---
 
-## ▶️ How to run
+## How to run
 
 1. **00_data_testing.ipynb** — verify data sources, caching, and API connectivity.  
 2. **01_data_analysis.ipynb** — run exploratory analysis and generate intermediate artifacts.  
@@ -395,7 +83,7 @@ Each notebook saves intermediate outputs for the next step (see inline paths).
 
 ---
 
-## 📊 Methods (high level)
+## Methods (high level)
 
 - **Statistical tests**: normality (Jarque–Bera/Shapiro), volatility & tail behavior, Sharpe & deflated Sharpe.  
 - **Cross‑market framing**: crypto (24/7) vs equities (RTH) handled consistently.  
@@ -408,7 +96,7 @@ For complete details, see the PDFs and notebooks (03–06).
 
 ---
 
-## ✅ Findings (where to look)
+## Findings
 
 This repo includes a **final synthesis** in `06_final_summary.ipynb` and the exported PDF `06_final_summary.pdf`. Those materials summarize:
 - Comparative performance of baseline strategies vs ML models
@@ -416,11 +104,11 @@ This repo includes a **final synthesis** in `06_final_summary.ipynb` and the exp
 - Effect of feature sets and selection methods on out‑of‑sample results
 - Robustness checks via walk‑forward and statistical testing
 
-> Numbers and plots are preserved in the notebooks and PDFs. If you want these summarized into a single markdown report, see `docs/RESULTS.md` (generated below).
+> Numbers and plots are preserved in the notebooks and PDFs. If you want these summarized into a single markdown report, see `docs/RESULTS.md`.
 
 ---
 
-## 🔁 Reproducibility
+## Reproducibility
 
 - Deterministic seeds are set where supported.  
 - Data pulls are cached; APIs have fallbacks.  
@@ -429,27 +117,15 @@ This repo includes a **final synthesis** in `06_final_summary.ipynb` and the exp
 
 ---
 
-## 📦 Data
+## Data
 
 Data comes from public APIs (yfinance) and, optionally, paid APIs (Polygon/CMC). **Do not commit raw data**. Use `.gitignore` to keep local data artifacts out of version control.
 
 ---
 
-## 🧭 Roadmap & extensions
+## Roadmap & extensions
 
 - Add **Prophet**/**SARIMAX** baselines for seasonality.  
 - Add **deep learning** baselines (LSTM/Temporal Convolution/Transformer) with proper walk‑forward.  
 - Expand **risk metrics** (Sortino, Calmar, Omega) and **bayesian** comparisons.  
 - Integrate a small **CLI** to reproduce figures from raw data.
-
----
-
-## 📄 License
-
-Choose a license that matches your goals (e.g., MIT for open research). Add a `LICENSE` file at the repo root.
-
----
-
-## ✨ Acknowledgments
-
-Thanks to open‑source contributors and data providers that made this work possible.
