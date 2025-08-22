@@ -71,7 +71,6 @@
 - **Tick Data**: Trade-by-trade data for high-frequency analysis
 - **Order Book**: Market depth and liquidity metrics
 - **On-chain**: Network metrics, wallet movements, mining data
-- **Social**: Reddit, Twitter sentiment indicators
 
 ---
 
@@ -132,7 +131,6 @@
 ## 4. Academic and Research References
 
 ### Research Foundations
-- **Walk-Forward Optimization**: Based on Pardo (1992), enhanced with modern ML techniques
 - **Diebold-Mariano Test**: Statistical test for forecast comparison
 - **Time Series Cross-Validation**: Bergmeir & Benitez (2012) methodology
 
@@ -141,14 +139,6 @@
 - **Portfolio Optimization**: Markowitz framework with crypto adaptations
 - **Risk Management**: VaR, CVaR, maximum drawdown metrics
 - **Feature Engineering**: Technical, fundamental, and alternative data features
-
-### Citation Format
-```
-Project: Cryptocurrency ML Trading Research
-Year: 2023-2024
-Type: Research and Educational Purpose
-License: Academic/Research Use
-```
 
 ---
 
@@ -190,16 +180,6 @@ License: Academic/Research Use
 - **TA-Lib GitHub**: https://github.com/mrjbq7/ta-lib#installation
 - **Dashboard**: http://localhost:8050 (Local Dash/Plotly server)
 
-### Communication APIs
-- **Telegram Bot API**: https://api.telegram.org/bot{token}/sendMessage
-- **Purpose**: Trading alerts and notifications
-
-### Social Data Sources (Mentioned but not implemented)
-- **Reddit**: r/cryptocurrency, r/bitcoin for sentiment
-- **Twitter/X**: Crypto influencer sentiment tracking
-- **Discord/Slack**: Community sentiment indicators
-- **Medium**: Technical analysis articles
-
 ---
 
 ## Usage Notes
@@ -222,22 +202,3 @@ License: Academic/Research Use
 - Parquet format for efficient storage
 - GPU acceleration available for deep learning
 - Caching layer at `data/cache/` directory
-
-### Reliability Hierarchy
-1. **Most Reliable**: Polygon S3 flat files (bulk historical)
-2. **Reliable**: CoinMarketCap, Bybit (with rate limits)
-3. **Moderate**: Sanbase (on-chain data delays)
-4. **Unreliable**: yfinance (frequent failures)
-
----
-
-## Appendix Notes
-
-This document represents all external references found in the codebase as of the current audit. The project demonstrates comprehensive integration with multiple data sources and libraries, following best practices for:
-
-- **API key security** (environment variables)
-- **Fallback strategies** (multiple data sources)
-- **Performance optimization** (caching, bulk downloads)
-- **Research reproducibility** (version pinning, documentation)
-
-The architecture supports both research experimentation and potential production deployment, with clear separation between development and production dependencies.
