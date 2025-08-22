@@ -17,8 +17,6 @@
 - **API Endpoint**: https://pro-api.coinmarketcap.com/v2
 - **Purpose**: Primary cryptocurrency market data, pricing, and volume information
 - **Usage**: Real-time and historical cryptocurrency data collection
-- **Tier**: $79/month recommended for comprehensive data access
-- **Key Features**: OHLCV data, market cap rankings, global metrics
 
 ### Polygon.io
 - **Documentation URLs**:
@@ -33,19 +31,16 @@
 - **API Endpoint**: https://api.polygon.io
 - **Purpose**: Multi-asset class financial data provider
 - **Usage**: Primary data source for cryptocurrency, stocks, forex historical data
-- **Key Features**: S3 bulk data access, real-time WebSocket feeds, aggregated bars
 
 ### Bybit Exchange
 - **Documentation URL**: https://bybit-exchange.github.io/docs/
 - **Purpose**: Cryptocurrency derivatives exchange API
 - **Usage**: Trading execution, order management, market data for derivatives
-- **Key Features**: Futures, perpetuals, options trading capabilities
 
 ### Santiment/Sanbase
 - **Documentation URL**: https://academy.santiment.net/sanapi/
 - **Purpose**: On-chain analytics and social sentiment data
 - **Usage**: Enhanced features using blockchain metrics and social signals
-- **Key Features**: Network activity, developer activity, social volume metrics
 
 ### Yahoo Finance (yfinance)
 - **Note**: Marked as unreliable since 2024 due to rate limiting
