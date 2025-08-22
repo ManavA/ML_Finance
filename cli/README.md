@@ -1,10 +1,9 @@
-# Crypto ML Trading CLI
+# Crypto ML  CLI
 
-A command-line interface for the cryptocurrency machine learning trading system.
+A command-line interface.. 
 
 ## Installation
 
-Ensure you have the required dependencies:
 
 ```bash
 pip install click pandas numpy torch xgboost lightgbm catboost scikit-learn
@@ -12,7 +11,6 @@ pip install click pandas numpy torch xgboost lightgbm catboost scikit-learn
 
 ## Usage
 
-The CLI provides several command groups for different operations:
 
 ### Data Management
 
@@ -76,7 +74,7 @@ python cli.py analyze compare --results-dir ./results --output comparison.csv
 python cli.py analyze report --symbol BTC --period 30d --output btc_report.json
 ```
 
-### Trading (Paper Trading Only)
+### Trading
 
 ```bash
 # Start paper trading with a strategy
@@ -177,12 +175,6 @@ python cli.py train evaluate models/btc_ensemble.pkl --symbol BTC
 - **Model Persistence**: Models are saved as pickle files with metadata.
 - **Caching**: Data is automatically cached to avoid repeated API calls.
 
-## Troubleshooting
-
-1. **Missing Dependencies**: Install required packages with pip
-2. **Data Access Issues**: Check API keys in `.env` file
-3. **Model Loading Errors**: Ensure model files exist and are compatible
-4. **Memory Issues**: Use smaller datasets or reduce model complexity
 
 ## Advanced Features
 
@@ -195,7 +187,6 @@ The CLI integrates with the advanced deep learning models from `src.models.advan
 - **AdvancedTransformer**: Transformer with custom positional encoding
 - **DeepEnsembleModel**: Ensemble with stacking and automatic weight optimization
 
-### Custom Strategy Development
 
 Create custom strategies by implementing the `BaseStrategy` interface and adding them to the CLI commands.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for the Crypto ML Trading CLI
+Test script 
 """
 
 import subprocess
@@ -8,7 +8,6 @@ import sys
 from pathlib import Path
 
 def run_command(cmd):
-    """Run a CLI command and return result"""
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
         return result.returncode == 0, result.stdout, result.stderr
@@ -18,7 +17,6 @@ def run_command(cmd):
         return False, "", str(e)
 
 def test_cli():
-    """Test basic CLI functionality"""
     print("Testing Crypto ML Trading CLI...")
     print("=" * 50)
     
@@ -31,31 +29,31 @@ def test_cli():
         print("\n1. Testing CLI help...")
         success, stdout, stderr = run_command("python cli.py --help")
         if success:
-            print("✓ CLI help works")
+            print(" CLI help works")
         else:
-            print(f"✗ CLI help failed: {stderr}")
+            print(f" CLI help failed: {stderr}")
         
         # Test version command
         print("\n2. Testing version command...")
         success, stdout, stderr = run_command("python cli.py version")
         if success:
-            print("✓ Version command works")
+            print(" Version command works")
         else:
-            print(f"✗ Version command failed: {stderr}")
+            print(f" Version command failed: {stderr}")
         
         # Test config command
         print("\n3. Testing config command...")
         success, stdout, stderr = run_command("python cli.py config")
         if success:
-            print("✓ Config command works")
+            print(" Config command works")
         else:
-            print(f"✗ Config command failed: {stderr}")
+            print(f" Config command failed: {stderr}")
         
         # Test data group
         print("\n4. Testing data commands...")
         success, stdout, stderr = run_command("python cli.py data --help")
         if success:
-            print("✓ Data group works")
+            print(" Data group works")
         else:
             print(f"✗ Data group failed: {stderr}")
         
@@ -63,33 +61,33 @@ def test_cli():
         print("\n5. Testing train commands...")
         success, stdout, stderr = run_command("python cli.py train --help")
         if success:
-            print("✓ Train group works")
+            print(" Train group works")
         else:
-            print(f"✗ Train group failed: {stderr}")
+            print(f" Train group failed: {stderr}")
         
         # Test backtest group
         print("\n6. Testing backtest commands...")
         success, stdout, stderr = run_command("python cli.py backtest --help")
         if success:
-            print("✓ Backtest group works")
+            print(" Backtest group works")
         else:
-            print(f"✗ Backtest group failed: {stderr}")
+            print(f" Backtest group failed: {stderr}")
         
         # Test analyze group
         print("\n7. Testing analyze commands...")
         success, stdout, stderr = run_command("python cli.py analyze --help")
         if success:
-            print("✓ Analyze group works")
+            print(" Analyze group works")
         else:
-            print(f"✗ Analyze group failed: {stderr}")
+            print(f" Analyze group failed: {stderr}")
         
         # Test trade group
         print("\n8. Testing trade commands...")
         success, stdout, stderr = run_command("python cli.py trade --help")
         if success:
-            print("✓ Trade group works")
+            print(" Trade group works")
         else:
-            print(f"✗ Trade group failed: {stderr}")
+            print(f" Trade group failed: {stderr}")
         
         print("\n" + "=" * 50)
         print("CLI basic functionality test complete!")
@@ -100,11 +98,10 @@ def test_cli():
             from cli.commands import data, backtest, train, analyze, trade
             from cli.core.config import get_default_config
             from cli.utils.logger import setup_logger
-            print("✓ All imports successful")
+            print(" All imports successful")
         except Exception as e:
-            print(f"✗ Import failed: {e}")
+            print(f" Import failed: {e}")
         
-        print("\nTo run full functionality tests:")
         print("1. Ensure data sources are configured in .env")
         print("2. Run: python cli.py data fetch --symbols BTC --start 2024-01-01 --end 2024-01-02")
         print("3. Run: python cli.py train model --symbol BTC --model-type xgboost")

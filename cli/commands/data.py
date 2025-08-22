@@ -15,7 +15,6 @@ from src.data.unified_collector import UnifiedDataCollector
 @click.group(name='data')
 @click.pass_context
 def data_group(ctx):
-    """Data collection and management commands"""
     pass
 
 @data_group.command(name='fetch')
@@ -26,7 +25,6 @@ def data_group(ctx):
 @click.option('--interval', default='1h', help='Data interval (1h, 1d, etc.)')
 @click.pass_context
 def fetch_data(ctx, symbols, start, end, source, interval):
-    """Fetch historical data for specified symbols"""
     logger = ctx.obj['logger']
     
     # Parse symbols
@@ -72,7 +70,6 @@ def fetch_data(ctx, symbols, start, end, source, interval):
 @data_group.command(name='list')
 @click.pass_context
 def list_data(ctx):
-    """List available cached data"""
     logger = ctx.obj['logger']
     
     cache_dir = Path('data/cache')
@@ -98,7 +95,6 @@ def list_data(ctx):
 @click.confirmation_option(prompt='Are you sure you want to clear the cache?')
 @click.pass_context
 def clear_cache(ctx, symbol, older_than):
-    """Clear cached data"""
     logger = ctx.obj['logger']
     
     collector = UnifiedDataCollector()
@@ -119,7 +115,6 @@ def clear_cache(ctx, symbol, older_than):
 @click.argument('symbol')
 @click.pass_context
 def data_info(ctx, symbol):
-    """Show information about data for a specific symbol"""
     logger = ctx.obj['logger']
     
     # Try to load from cache first
@@ -157,7 +152,6 @@ def data_info(ctx, symbol):
 @click.argument('symbol')
 @click.pass_context
 def validate_data(ctx, symbol):
-    """Validate data quality for a symbol"""
     logger = ctx.obj['logger']
     
     # Load data
@@ -186,14 +180,14 @@ def validate_data(ctx, symbol):
             for col, count in missing[missing > 0].items():
                 click.echo(f"    {col}: {count} ({count/len(df)*100:.2f}%)")
         else:
-            click.echo("  ✓ No missing values")
+            click.echo("  No missing values")
         
         # Check for duplicates
         duplicates = df.index.duplicated().sum()
         if duplicates > 0:
-            click.echo(f"  ⚠ {duplicates} duplicate timestamps found")
+            click.echo(f"  {duplicates} duplicate timestamps found")
         else:
-            click.echo("  ✓ No duplicate timestamps")
+            click.echo("  No duplicate timestamps")
         
         # Check time gaps
         if hasattr(df.index, 'to_series'):
@@ -201,13 +195,13 @@ def validate_data(ctx, symbol):
             expected_freq = time_diffs.mode()[0]
             gaps = time_diffs[time_diffs > expected_freq * 2]
             if len(gaps) > 0:
-                click.echo(f"  ⚠ {len(gaps)} time gaps detected")
+                click.echo(f"  {len(gaps)} time gaps detected")
             else:
-                click.echo("  ✓ No significant time gaps")
+                click.echo(" No significant time gaps")
         
         # Check price validity
         if 'close' in df.columns:
             if (df['close'] <= 0).any():
-                click.echo("  ⚠ Invalid prices (<=0) detected")
+                click.echo(" Invalid prices (<=0) detected")
             else:
-                click.echo("  ✓ All prices valid")
+                click.echo(" All prices valid")

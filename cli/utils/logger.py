@@ -1,5 +1,5 @@
 """
-Logging utilities for the Crypto ML Trading System
+Logging utilities for  Crypto ML
 """
 
 import logging
@@ -8,7 +8,6 @@ from pathlib import Path
 from datetime import datetime
 
 def setup_logger(level='INFO', log_file=None):
-    """Setup and configure logger"""
     
     # Create logger
     logger = logging.getLogger('crypto_trader')
@@ -42,7 +41,6 @@ def setup_logger(level='INFO', log_file=None):
     return logger
 
 def get_logger(name=None):
-    """Get logger instance"""
     if name:
         return logging.getLogger(f'crypto_trader.{name}')
     return logging.getLogger('crypto_trader')

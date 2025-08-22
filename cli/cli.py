@@ -19,11 +19,7 @@ from cli.utils.logger import setup_logger
 @click.option('--verbose', '-v', is_flag=True, help='Verbose output')
 @click.pass_context
 def cli(ctx, config, verbose):
-    """
-    Cryptocurrency ML Trading System
-    
-    A powerful command-line tool for cryptocurrency trading using machine learning.
-    """
+
     ctx.ensure_object(dict)
     
     # Load configuration
@@ -49,14 +45,12 @@ cli.add_command(trade.trade_group)
 @cli.command()
 @click.pass_context
 def version(ctx):
-    """Show version information"""
     from cli import __version__
     click.echo(f"Crypto ML Trader v{__version__}")
 
 @cli.command()
 @click.pass_context
 def config(ctx):
-    """Show current configuration"""
     import json
     click.echo("Current Configuration:")
     click.echo(json.dumps(ctx.obj['config'], indent=2))

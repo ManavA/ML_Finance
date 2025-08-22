@@ -1,5 +1,4 @@
 """
-Configuration management for the Crypto ML Trading System
 """
 
 import json
@@ -9,7 +8,6 @@ import os
 from typing import Dict, Any
 
 def load_config(config_path: str) -> Dict[str, Any]:
-    """Load configuration from file"""
     path = Path(config_path)
     
     if not path.exists():
@@ -25,7 +23,6 @@ def load_config(config_path: str) -> Dict[str, Any]:
         raise ValueError(f"Unsupported configuration format: {path.suffix}")
 
 def get_default_config() -> Dict[str, Any]:
-    """Get default configuration"""
     return {
         'data': {
             'sources': {
@@ -90,7 +87,6 @@ def get_default_config() -> Dict[str, Any]:
     }
 
 def save_config(config: Dict[str, Any], path: str):
-    """Save configuration to file"""
     path = Path(path)
     
     if path.suffix == '.json':
@@ -103,7 +99,6 @@ def save_config(config: Dict[str, Any], path: str):
         raise ValueError(f"Unsupported configuration format: {path.suffix}")
 
 def merge_configs(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
-    """Merge two configuration dictionaries"""
     result = base.copy()
     
     for key, value in override.items():

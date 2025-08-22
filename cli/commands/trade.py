@@ -1,5 +1,5 @@
 """
-Live/paper trading commands for the CLI
+Trading commands for the CLI
 """
 
 import click
@@ -19,7 +19,6 @@ from src.strategies.baseline_strategies import BaselineStrategies
 @click.group(name='trade')
 @click.pass_context
 def trade_group(ctx):
-    """Live and paper trading commands"""
     pass
 
 @trade_group.command(name='start')
@@ -31,7 +30,6 @@ def trade_group(ctx):
 @click.option('--interval', default=60, type=int, help='Update interval in seconds')
 @click.pass_context
 def start_trading(ctx, symbol, strategy, model_path, capital, paper, interval):
-    """Start live or paper trading"""
     logger = ctx.obj['logger']
     
     mode = "Paper" if paper else "Live"
@@ -165,7 +163,6 @@ def start_trading(ctx, symbol, strategy, model_path, capital, paper, interval):
 @trade_group.command(name='status')
 @click.pass_context
 def trading_status(ctx):
-    """Show current trading status"""
     logger = ctx.obj['logger']
     
     state_file = Path('.trading_state.json')
@@ -200,7 +197,6 @@ def trading_status(ctx):
 @click.confirmation_option(prompt='Are you sure you want to stop trading?')
 @click.pass_context
 def stop_trading(ctx):
-    """Stop current trading session"""
     logger = ctx.obj['logger']
     
     state_file = Path('.trading_state.json')
@@ -229,7 +225,6 @@ def stop_trading(ctx):
 @click.option('--limit', default=10, type=int, help='Number of sessions to show')
 @click.pass_context
 def trading_history(ctx, limit):
-    """Show trading history"""
     logger = ctx.obj['logger']
     
     # Find archived trading sessions
@@ -265,7 +260,6 @@ def trading_history(ctx, limit):
             logger.error(f"Error loading {session_file}: {e}")
 
 def generate_signal(symbol, strategy, model, feature_cols):
-    """Generate trading signal"""
     # This is a simplified signal generator
     # In production, this would use real-time data and sophisticated logic
     
@@ -319,7 +313,6 @@ def generate_signal(symbol, strategy, model, feature_cols):
         return 0
 
 def save_trading_state(state):
-    """Save trading state to file"""
     state_file = Path('.trading_state.json')
     
     # Convert datetime objects to strings

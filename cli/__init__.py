@@ -1,8 +1,6 @@
 """
-Cryptocurrency ML Trading System
-
-A command-line application for cryptocurrency trading using machine learning.
+Cryptocurrency ML
 """
 
 __version__ = "0.1.0"
-__author__ = "Crypto ML Trader"
+__author__ = "Crypto ML "

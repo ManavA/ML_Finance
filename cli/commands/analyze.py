@@ -1,5 +1,4 @@
 """
-Analysis and reporting commands for the CLI
 """
 
 import click
@@ -15,7 +14,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 @click.group(name='analyze')
 @click.pass_context
 def analyze_group(ctx):
-    """Analysis and reporting commands"""
     pass
 
 @analyze_group.command(name='performance')
@@ -23,7 +21,6 @@ def analyze_group(ctx):
 @click.option('--format', type=click.Choice(['text', 'json', 'html']), default='text')
 @click.pass_context
 def analyze_performance(ctx, results_file, format):
-    """Analyze backtest performance results"""
     logger = ctx.obj['logger']
     
     try:
@@ -76,7 +73,6 @@ def analyze_performance(ctx, results_file, format):
 @click.option('--output', '-o', help='Output file for comparison')
 @click.pass_context
 def compare_results(ctx, results_dir, output):
-    """Compare multiple backtest results"""
     logger = ctx.obj['logger']
     
     results_path = Path(results_dir)
@@ -150,7 +146,6 @@ def compare_results(ctx, results_dir, output):
 @click.option('--output', '-o', help='Output file for report')
 @click.pass_context
 def generate_report(ctx, symbol, period, output):
-    """Generate comprehensive analysis report"""
     logger = ctx.obj['logger']
     
     click.echo(f"Generating report for {symbol} over {period}...")
@@ -261,7 +256,6 @@ def generate_report(ctx, symbol, period, output):
         click.echo(f"\nReport saved to {output}")
 
 def calculate_rsi(prices, period=14):
-    """Calculate RSI indicator"""
     delta = prices.diff()
     gain = (delta.where(delta > 0, 0)).rolling(period).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(period).mean()
@@ -269,7 +263,6 @@ def calculate_rsi(prices, period=14):
     return 100 - (100 / (1 + rs))
 
 def generate_html_report(results):
-    """Generate HTML report"""
     html = f"""
     <!DOCTYPE html>
     <html>

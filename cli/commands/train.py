@@ -18,7 +18,6 @@ from src.models.advanced_models import AdvancedLSTM, AdvancedGRU, AdvancedTransf
 @click.group(name='train')
 @click.pass_context
 def train_group(ctx):
-    """Model training and management commands"""
     pass
 
 @train_group.command(name='model')
@@ -318,7 +317,6 @@ def train_model(ctx, symbol, model_type, features, start, end, validation_split,
 @train_group.command(name='list')
 @click.pass_context
 def list_models(ctx):
-    """List all trained models"""
     logger = ctx.obj['logger']
     
     models_dir = Path('models')
@@ -355,7 +353,6 @@ def list_models(ctx):
 @click.option('--end', help='Evaluation end date')
 @click.pass_context
 def evaluate_model(ctx, model_path, symbol, start, end):
-    """Evaluate a trained model on new data"""
     logger = ctx.obj['logger']
     
     # Load model
