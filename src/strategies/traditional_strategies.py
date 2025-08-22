@@ -4,8 +4,8 @@
 import pandas as pd
 import numpy as np
 from typing import Dict, Optional, Tuple
-from abc import ABC, abstractmethod
 import logging
+from .base_strategy import BaseStrategy
 
 logger = logging.getLogger(__name__)
 
@@ -16,15 +16,7 @@ except ImportError:
     TALIB_AVAILABLE = False
     print("TA-Lib not available. Using fallback implementations.")
 
-class BaseStrategy(ABC):
-    
-    def __init__(self, name: str, params: Optional[Dict] = None):
-        self.name = name
-        self.params = params or {}
-        
-    @abstractmethod
-    def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        raise NotImplementedError("Subclasses must implement generate_signals")
+class TradingStrategy(BaseStrategy):
     
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         # Ensure we have required columns
