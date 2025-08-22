@@ -1,6 +1,3 @@
-"""
-GPU Utilities
-"""
 
 import torch
 import numpy as np
@@ -29,7 +26,6 @@ except ImportError:
 
 
 class GPUManager:
-    
     def __init__(self):
         self.device = self._get_optimal_device()
         self.gpu_info = self._get_gpu_info()
@@ -84,12 +80,12 @@ class GPUManager:
                           sample_size_mb: float,
                           safety_factor: float = 0.8) -> int:
         if not torch.cuda.is_available():
-            return 32  # Default CPU batch size
+            return 32
         
         # Get available memory
-        free_memory = torch.cuda.mem_get_info()[0] / (1024**2)  # Convert to MB
+        free_memory = torch.cuda.mem_get_info()[0] / (1024**2)
         
-        # Reserve memory for gradients and optimizer (roughly 3x model size)
+        # Reserve memory for gradients and optimizer
         reserved = model_size_mb * 3
         
         # Available for batch
@@ -125,15 +121,13 @@ class GPUManager:
 
 
 class DataAccelerator:
-    
     def __init__(self):
         self.use_cupy = CUPY_AVAILABLE
         self.use_polars = POLARS_AVAILABLE
         
         if self.use_cupy:
-            # Set memory pool for better performance
             mempool = cp.get_default_memory_pool()
-            mempool.set_limit(size=8 * 1024**3)  # 8GB limit
+            mempool.set_limit(size=8 * 1024**3)
     
     def pandas_to_cupy(self, df: pd.DataFrame) -> cp.ndarray:
         if not self.use_cupy:
@@ -203,7 +197,6 @@ class DataAccelerator:
 
 
 class GPUMonitor:
-    
     def __init__(self):
         self.start_time = None
         self.metrics = []
@@ -337,10 +330,8 @@ def get_optimal_num_workers() -> int:
     cpu_count = psutil.cpu_count(logical=False)
     
     if torch.cuda.is_available():
-        # With GPU, use more workers for data loading
         return min(cpu_count, 8)
     else:
-        # CPU only, leave some cores for processing
         return max(1, cpu_count - 2)
 
 
@@ -385,7 +376,7 @@ if __name__ == '__main__':
         
         # Test optimal batch size calculation
         batch_size = manager.optimize_batch_size(
-            model_size_mb=500,  # 500MB model
-            sample_size_mb=1    # 1MB per sample
+            model_size_mb=500,
+            sample_size_mb=1
         )
         print(f"Recommended batch size: {batch_size}")

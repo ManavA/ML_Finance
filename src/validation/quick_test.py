@@ -1,6 +1,3 @@
-"""
-Quick Validation Framework for ML Finance Models
-"""
 
 import sys
 import os
@@ -49,7 +46,6 @@ QUICK_TEST_CONFIG = {
 }
 
 class QuickValidator:
-    
     def __init__(self, level='smoke'):
         self.level = level
         self.config = QUICK_TEST_CONFIG[level]
@@ -57,7 +53,6 @@ class QuickValidator:
         self.results = {}
         
     def fetch_quick_data(self, symbol='BTC-USD'):
-        """Fetch minimal data for testing"""
         print(f"\nFetching {self.config['data_days']} days of {symbol} data...")
         end_date = datetime.now()
         start_date = end_date - timedelta(days=self.config['data_days'])
@@ -73,7 +68,6 @@ class QuickValidator:
         return data.dropna()
     
     def _calculate_rsi(self, prices, period=14):
-        """Quick RSI calculation"""
         delta = prices.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()

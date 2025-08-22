@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-Main ML Comparison Framework
-Tests the hypothesis: ML models offer greater performance edge in crypto vs equities
-"""
+
 
 import pandas as pd
 import numpy as np
@@ -327,7 +324,7 @@ class MLComparisonFramework:
             self.save_results()
     
     def save_results(self):
-        """Save all results to files"""
+        
         # Save comparison metrics
         metrics_file = self.results_dir / 'comparison_metrics.json'
         with open(metrics_file, 'w') as f:
@@ -344,7 +341,7 @@ class MLComparisonFramework:
         logger.info(f"\nResults saved to {self.results_dir}")
     
     def generate_report(self):
-        """Generate summary report"""
+        
         report_file = self.results_dir / 'summary_report.txt'
         
         with open(report_file, 'w') as f:

@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""
-WALK-FORWARD MODEL TRAINING WITH REGIME CHANGE TESTING
-Training period: 2023-2025 with walk-forward validation
-Testing period: 2025+ for regime change detection
-"""
+
 
 import sys
 import os
@@ -581,23 +577,4 @@ print("\n" + "="*80)
 print("FINAL SUMMARY")
 print("="*80)
 
-print(f"""
-WALK-FORWARD VALIDATION RESULTS
---------------------------------
-Training Period: 2023-2024
-Testing Period: 2025+
-Method: {WALK_FORWARD_CONFIG['train_window']}-month train, {WALK_FORWARD_CONFIG['test_window']}-month test windows
-
-KEY FINDINGS:
-1. Solana (SOL) Performance:
-   - Walk-forward accuracy: {np.mean([r['accuracy'] for r in xgb_results.get('SOL-USD', [])])*100:.1f}% 
-   - Included in all analyses
-
-2. Regime Change Detection (2025+):
-   - Tested on actual 2025 data
-   - Significant changes detected in: {sum(1 for r in regime_test_results.values() if r and r['regime_change_detected'])} assets
-
-3. Crypto vs Equity:
-   - Crypto advantage maintained: {advantage*100:.1f}pp
-   - Hypothesis: {'CONFIRMED' if advantage > 0 else 'NOT CONFIRMED'}
-""")
+print(f)

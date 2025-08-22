@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Complete and train Reinforcement Learning models for crypto trading
-"""
 
 import sys
 import os
@@ -26,7 +23,6 @@ print("Loading RL libraries...")
 # ============================================================================
 
 class CryptoTradingEnvironment:
-
     def __init__(self, data: pd.DataFrame, initial_balance: float = 10000, 
                  lookback: int = 20, commission: float = 0.001):
         self.data = data.reset_index(drop=True)
@@ -34,17 +30,14 @@ class CryptoTradingEnvironment:
         self.lookback = lookback
         self.commission = commission
         
-        # State components
         self.current_step = 0
         self.balance = initial_balance
         self.position = 0  # BTC holdings
         self.trades = []
         
-        # Action space: 0=Hold, 1=Buy, 2=Sell
         self.action_space = 3
         
-        # State space: price features + position info
-        self.state_size = lookback * 4 + 3  # OHLC * lookback + balance/position/value
+        self.state_size = lookback * 4 + 3
         
     def reset(self):
         self.current_step = self.lookback
@@ -54,11 +47,9 @@ class CryptoTradingEnvironment:
         return self._get_state()
     
     def _get_state(self):
-        # Get price history
         start = self.current_step - self.lookback
         price_data = self.data.iloc[start:self.current_step]
         
-        # Normalize prices
         current_price = self.data.iloc[self.current_step]['close']
         norm_prices = []
         
@@ -87,12 +78,12 @@ class CryptoTradingEnvironment:
         # Execute action
         if action == 1:  # Buy
             if self.balance > 0:
-                buy_amount = self.balance * 0.95  # Use 95% of balance
+                buy_amount = self.balance * 0.95
                 self.position += buy_amount / current_price * (1 - self.commission)
                 self.balance -= buy_amount
                 self.trades.append(('BUY', current_price, self.current_step))
                 
-        elif action == 2:  # Sell
+        elif action == 2:
             if self.position > 0:
                 sell_value = self.position * current_price * (1 - self.commission)
                 self.balance += sell_value
@@ -110,13 +101,11 @@ class CryptoTradingEnvironment:
         # Reward = portfolio value change
         reward = (new_value - prev_value) / self.initial_balance
         
-        # Get next state
         next_state = self._get_state() if not done else None
         
         return next_state, reward, done, {'value': new_value}
 
 class DQNNetwork(nn.Module):
-    
     def __init__(self, state_size: int, action_size: int, hidden_size: int = 128):
         super().__init__()
         self.fc1 = nn.Linear(state_size, hidden_size)
@@ -135,7 +124,6 @@ class DQNNetwork(nn.Module):
         return x
 
 class DQNAgent:
-    
     def __init__(self, state_size: int, action_size: int, lr: float = 0.001):
         self.state_size = state_size
         self.action_size = action_size
@@ -146,7 +134,6 @@ class DQNAgent:
         self.gamma = 0.95
         self.learning_rate = lr
         
-        # Neural networks
         self.q_network = DQNNetwork(state_size, action_size)
         self.target_network = DQNNetwork(state_size, action_size)
         self.optimizer = optim.Adam(self.q_network.parameters(), lr=lr)
@@ -192,7 +179,6 @@ class DQNAgent:
             self.epsilon *= self.epsilon_decay
 
 def train_dqn_agent(env, episodes: int = 100):
-    
     agent = DQNAgent(env.state_size, env.action_space)
     
     scores = []
@@ -231,7 +217,6 @@ def train_dqn_agent(env, episodes: int = 100):
 
 
 class PolicyNetwork(nn.Module):
-    
     def __init__(self, state_size: int, action_size: int, hidden_size: int = 64):
         super().__init__()
         self.fc1 = nn.Linear(state_size, hidden_size)
@@ -249,7 +234,6 @@ class PolicyNetwork(nn.Module):
         return action_probs, state_value
 
 class SimplePPO:
-    
     def __init__(self, state_size: int, action_size: int, lr: float = 0.0003):
         self.policy = PolicyNetwork(state_size, action_size)
         self.optimizer = optim.Adam(self.policy.parameters(), lr=lr)
@@ -267,7 +251,6 @@ class SimplePPO:
         rewards = torch.FloatTensor(rewards)
         old_log_probs = torch.stack(log_probs)
         
-        # Normalize rewards
         rewards = (rewards - rewards.mean()) / (rewards.std() + 1e-8)
         
         # Get current policy outputs

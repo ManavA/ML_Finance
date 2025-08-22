@@ -1,6 +1,5 @@
 """
 Polygon.io S3 Flat File Data Collector
-Provides access to bulk historical data without API rate limits
 """
 
 import os
@@ -23,17 +22,9 @@ from normalize.ohlcv_schema import coerce_schema, validate_ohlcv
 
 
 class PolygonS3Collector:
-    """
-    Collector for Polygon.io S3 flat files
-    
-    Flat files are organized by:
-    - Asset class (stocks, options, crypto, forex)
-    - Year/Month/Day
-    - Available in CSV and Parquet formats
-    """
+
     
     def __init__(self, cache_dir: str = "data/s3_cache"):
-        """Initialize S3 client with Polygon credentials"""
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         
@@ -69,16 +60,7 @@ class PolygonS3Collector:
     
     def list_available_dates(self, market: str = "crypto", 
                            year: Optional[int] = None) -> List[str]:
-        """
-        List available dates for a given market
-        
-        Args:
-            market: Market type (crypto, stocks, options, forex)
-            year: Optional year to filter
-            
-        Returns:
-            List of available date paths
-        """
+
         prefix = f"us_{market}_aggs_minute/"
         if year:
             prefix += f"{year}/"
@@ -101,17 +83,7 @@ class PolygonS3Collector:
     
     def fetch_minute_data(self, date: str, market: str = "crypto",
                          symbols: Optional[List[str]] = None) -> pd.DataFrame:
-        """
-        Fetch minute-level data for a specific date
-        
-        Args:
-            date: Date in YYYY-MM-DD format
-            market: Market type (crypto, stocks, options, forex)
-            symbols: Optional list of symbols to filter
-            
-        Returns:
-            DataFrame with minute-level OHLCV data
-        """
+
         # Convert date to path format
         date_obj = pd.to_datetime(date)
         year = date_obj.year
@@ -170,19 +142,7 @@ class PolygonS3Collector:
     def fetch_aggregated_data(self, symbol: str, start: str, end: str,
                             market: str = "crypto", 
                             timeframe: str = "hour") -> pd.DataFrame:
-        """
-        Fetch and aggregate data for a symbol over a date range
-        
-        Args:
-            symbol: Trading symbol (e.g., 'BTCUSD')
-            start: Start date (YYYY-MM-DD)
-            end: End date (YYYY-MM-DD)
-            market: Market type
-            timeframe: Target timeframe (minute, hour, day)
-            
-        Returns:
-            Aggregated DataFrame
-        """
+
         start_date = pd.to_datetime(start)
         end_date = pd.to_datetime(end)
         
@@ -217,18 +177,7 @@ class PolygonS3Collector:
     def fetch_bulk_historical(self, symbols: List[str], 
                             start: str, end: str,
                             market: str = "crypto") -> Dict[str, pd.DataFrame]:
-        """
-        Fetch historical data for multiple symbols efficiently
-        
-        Args:
-            symbols: List of symbols
-            start: Start date
-            end: End date
-            market: Market type
-            
-        Returns:
-            Dictionary of symbol -> DataFrame
-        """
+
         start_date = pd.to_datetime(start)
         end_date = pd.to_datetime(end)
         
@@ -263,7 +212,6 @@ class PolygonS3Collector:
         return final_result
     
     def _to_polygon_symbol(self, symbol: str, market: str) -> str:
-        """Convert symbol to Polygon format"""
         if market == "crypto":
             # Handle various formats - Polygon uses X:BTC-USD format
             symbol = symbol.upper()
@@ -281,7 +229,6 @@ class PolygonS3Collector:
             return symbol.upper()
     
     def _standardize_columns(self, df: pd.DataFrame, market: str) -> pd.DataFrame:
-        """Standardize column names to our schema"""
         # Polygon flat file columns mapping (CSV format)
         column_map = {
             'ticker': 'symbol',
@@ -324,7 +271,6 @@ class PolygonS3Collector:
         return df
     
     def _aggregate_timeframe(self, df: pd.DataFrame, timeframe: str) -> pd.DataFrame:
-        """Aggregate minute data to higher timeframes"""
         if df.empty or 'timestamp' not in df.columns:
             return df
         
@@ -373,7 +319,6 @@ class PolygonS3Collector:
         return df_resampled
     
     def get_data_availability(self) -> Dict:
-        """Check what data is available in S3"""
         markets = ['crypto', 'stocks', 'options', 'forex']
         availability = {}
         
@@ -404,16 +349,7 @@ class PolygonS3Collector:
         return availability
 
     def fetch_crypto_day(self, ticker: str, date: str) -> pd.DataFrame:
-        """
-        Fetch daily crypto data for a specific date
-        
-        Args:
-            ticker: Crypto ticker in format "X:BTCUSD"
-            date: Date in format "YYYY-MM-DD"
-            
-        Returns:
-            DataFrame with OHLCV data for the day
-        """
+
         try:
             # Convert date string to datetime
             target_date = pd.to_datetime(date)
@@ -457,16 +393,7 @@ class PolygonS3Collector:
         return pd.DataFrame()
     
     def fetch_stock_day(self, ticker: str, date: str) -> pd.DataFrame:
-        """
-        Fetch daily stock data for a specific date
-        
-        Args:
-            ticker: Stock ticker symbol (e.g., "SPY")
-            date: Date in format "YYYY-MM-DD"
-            
-        Returns:
-            DataFrame with OHLCV data for the day
-        """
+
         try:
             # Use fetch_aggregated_data for daily data
             data = self.fetch_aggregated_data(

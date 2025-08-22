@@ -1,6 +1,4 @@
-"""
-Backtesting commands for the CLI
-"""
+
 
 import click
 import pandas as pd
@@ -20,7 +18,7 @@ from src.strategies.baseline_strategies import (
 @click.group(name='backtest')
 @click.pass_context
 def backtest_group(ctx):
-    """Backtesting and strategy evaluation commands"""
+    
     pass
 
 @backtest_group.command(name='run')
@@ -35,7 +33,7 @@ def backtest_group(ctx):
 @click.option('--output', '-o', help='Output file for results')
 @click.pass_context
 def run_backtest(ctx, symbol, strategy, start, end, capital, commission, output):
-    """Run a backtest for a specific strategy"""
+    
     logger = ctx.obj['logger']
     
     click.echo(f"Running backtest for {symbol} using {strategy} strategy...")
@@ -130,7 +128,7 @@ def run_backtest(ctx, symbol, strategy, start, end, capital, commission, output)
 @click.option('--capital', default=10000, type=float, help='Initial capital')
 @click.pass_context
 def compare_strategies(ctx, symbol, strategies, start, end, capital):
-    """Compare multiple strategies"""
+    
     logger = ctx.obj['logger']
     
     # Parse strategies
@@ -223,7 +221,7 @@ def compare_strategies(ctx, symbol, strategies, start, end, capital):
               help='Metric to optimize')
 @click.pass_context
 def optimize_strategy(ctx, symbol, strategy, metric):
-    """Optimize strategy parameters"""
+    
     logger = ctx.obj['logger']
     
     click.echo(f"Optimizing {strategy} strategy for {symbol} to maximize {metric}...")

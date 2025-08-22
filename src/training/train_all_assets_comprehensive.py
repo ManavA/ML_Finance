@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-COMPREHENSIVE TRAINING
-"""
+
 
 import sys
 import os
@@ -25,13 +23,11 @@ except:
     device = 'cpu'
     gpu_available = False
 
-print("="*80)
 print("COMPREHENSIVE WALK-FORWARD TRAINING - ALL ASSETS")
 print("="*80)
 print(f"Device: {device}")
 
 ASSET_COLORS = {
-    # Cryptocurrencies - Orange/Red spectrum
     'BTC': '#FF6B35',  # Orange
     'ETH': '#F77B71',  # Light red
     'SOL': '#FF9F1C',  # Gold
@@ -39,7 +35,6 @@ ASSET_COLORS = {
     'ADA': '#FFD93D',  # Yellow
     'XRP': '#FCB1A6',  # Peach
     
-    # Equity Indices - Blue/Green spectrum  
     'SPY': '#2E86AB',  # Blue
     'QQQ': '#42B883',  # Green
     'DIA': '#264653',  # Dark blue
@@ -56,10 +51,6 @@ ASSET_GROUPS = {
     'Small Cap Equity': ['IWM'],
     'Total Market': ['VTI']
 }
-
-# ============================================================================
-# WALK-FORWARD CONFIGURATION
-# ============================================================================
 
 WALK_FORWARD_CONFIG = {
     'train_window': 12,  # months
@@ -379,7 +370,7 @@ print("6. REGIME CHANGE TESTING (2025+)")
 print("="*60)
 
 def test_regime_change(symbol, model_results, data):
-    """Test on 2025+ data"""
+    
     
     regime_data = data[data.index >= '2025-01-01']
     
@@ -457,28 +448,4 @@ print("\n" + "="*80)
 print("COMPREHENSIVE TRAINING COMPLETE")
 print("="*80)
 
-print(f"""
-SUMMARY
--------
-Assets Trained: {len(xgb_results)}
-  - Cryptocurrencies: {sum(1 for s in xgb_results.keys() if 'USD' in s)}
-    (BTC, ETH, SOL, BNB, ADA, XRP)
-  - Equity Indices: {sum(1 for s in xgb_results.keys() if 'USD' not in s)}
-    (SPY, QQQ, DIA, IWM, VTI)
-
-Walk-Forward Validation:
-  - Folds: {len(walk_forward_splits.get('BTC-USD', []))}
-  - Period: 2023-2024
-  - Method: 12mo train, 3mo test, 3mo step
-
-Key Performance:
-  - Best Crypto: {max((s, np.mean([r['accuracy'] for r in res])) for s, res in xgb_results.items() if 'USD' in s)[0]} 
-  - Best Equity: {max((s, np.mean([r['accuracy'] for r in res])) for s, res in xgb_results.items() if 'USD' not in s)[0]}
-  - Crypto Mean: {np.mean(crypto_accs):.1%}
-  - Equity Mean: {np.mean(equity_accs):.1%}
-
-Regime Changes (2025+):
-  - Significant changes: {sum(1 for r in regime_results.values() if r['regime_change_detected'])}
-  - Stable assets: {len(regime_results) - sum(1 for r in regime_results.values() if r['regime_change_detected'])}
-
-""")
+print(f)

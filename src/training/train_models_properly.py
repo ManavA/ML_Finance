@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-PROPER MODEL TRAINING 
-"""
+
 
 import sys
 import os
@@ -446,7 +444,7 @@ print("5. TRAINING DQN (PROPER)")
 print("="*60)
 
 def train_dqn_properly(data, symbol, episodes=1000):
-    """Train DQN with adequate episodes"""
+    
     
     print(f"\nTraining DQN for {symbol}...")
     

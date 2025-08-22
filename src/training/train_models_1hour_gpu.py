@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-OPTIMIZED MODEL TRAINING FOR 1-HOUR
-"""
+
 
 import sys
 import os
@@ -36,15 +34,15 @@ print("\nTime Budget: 1 hour total")
 print("Strategy: Conservative parameters for practical training")
 
 TIME_BUDGET = {
-    'data_loading': 2,      # 2 minutes
-    'feature_engineering': 3,  # 3 minutes
-    'xgboost': 10,         # 10 minutes (quick grid search)
-    'lightgbm': 10,        # 10 minutes
-    'lstm': 15,            # 15 minutes (50 epochs with GPU)
-    'ensemble': 5,         # 5 minutes
-    'rl_dqn': 10,          # 10 minutes (1000 episodes)
-    'evaluation': 5,       # 5 minutes
-    'total': 60           # 60 minutes
+    'data_loading': 2,
+    'feature_engineering': 3,
+    'xgboost': 10,
+    'lightgbm': 10,
+    'lstm': 15,
+    'ensemble': 5,
+    'rl_dqn': 10,
+    'evaluation': 5,
+    'total': 60
 }
 
 print("\nTime Allocation:")
@@ -63,7 +61,7 @@ start_time = time.time()
 def collect_crypto_equity_data():
     
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=365*2)  # 2 years
+    start_date = end_date - timedelta(days=365*2)
     
     data = {}
     
@@ -71,7 +69,7 @@ def collect_crypto_equity_data():
     crypto_symbols = {
         'BTC-USD': 'Bitcoin',
         'ETH-USD': 'Ethereum', 
-        'SOL-USD': 'Solana',     # SOLANA INCLUDED HERE
+        'SOL-USD': 'Solana',
         'BNB-USD': 'Binance',
         'ADA-USD': 'Cardano',
         'XRP-USD': 'Ripple',

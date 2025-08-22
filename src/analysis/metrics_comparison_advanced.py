@@ -1,7 +1,6 @@
 # src/analysis/metrics_comparison.py
 """
 Comprehensive Metrics Framework for Model Comparison
-Answers: "Are we looking at the right metrics?"
 """
 
 import numpy as np
@@ -14,13 +13,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-# ============================================================================
-# METRICS CATEGORIES
-# ============================================================================
-
 @dataclass
 class MetricCategory:
-    """Categories of metrics for different evaluation purposes"""
     
     # Return-based metrics (most common but can be misleading)
     RETURN_METRICS = [
@@ -32,7 +26,6 @@ class MetricCategory:
         'money_weighted_return'
     ]
     
-    # Risk-adjusted metrics (better for comparison)
     RISK_ADJUSTED_METRICS = [
         'sharpe_ratio',          # Return per unit of total risk
         'sortino_ratio',          # Return per unit of downside risk
@@ -50,7 +43,6 @@ class MetricCategory:
         'deflated_sharpe',        # Adjusted for multiple testing
     ]
     
-    # Drawdown metrics (critical for crypto's volatility)
     DRAWDOWN_METRICS = [
         'max_drawdown',
         'average_drawdown',
@@ -65,7 +57,6 @@ class MetricCategory:
         'burke_ratio',            # Drawdown deviation based
     ]
     
-    # Risk metrics (for position sizing)
     RISK_METRICS = [
         'volatility',
         'downside_deviation',
@@ -80,7 +71,6 @@ class MetricCategory:
         'kelly_fraction',
     ]
     
-    # Statistical metrics (for robustness)
     STATISTICAL_METRICS = [
         'skewness',
         'kurtosis',
@@ -95,7 +85,6 @@ class MetricCategory:
         'active_share',
     ]
     
-    # Trading efficiency metrics (for execution quality)
     TRADING_METRICS = [
         'win_rate',
         'profit_factor',
@@ -132,7 +121,6 @@ class MetricCategory:
         'brier_score',
     ]
     
-    # Stability metrics (for consistency)
     STABILITY_METRICS = [
         'rolling_sharpe_stability',
         'rolling_return_stability',
@@ -146,10 +134,6 @@ class MetricCategory:
 
 
 class ComprehensiveMetrics:
-    """
-    Calculate all relevant metrics for strategy comparison
-    """
-    
     def __init__(self, risk_free_rate: float = 0.02):
         self.risk_free_rate = risk_free_rate
         self.annualization_factor = 252  # Daily data
@@ -159,18 +143,6 @@ class ComprehensiveMetrics:
                              predictions: Optional[np.ndarray] = None,
                              actual: Optional[np.ndarray] = None,
                              benchmark: Optional[pd.Series] = None) -> Dict:
-        """
-        Calculate comprehensive metrics suite
-        
-        Args:
-            returns: Strategy returns
-            predictions: Model predictions (for ML metrics)
-            actual: Actual values (for ML metrics)
-            benchmark: Benchmark returns for comparison
-            
-        Returns:
-            Dictionary of all calculated metrics
-        """
         
         metrics = {}
         
@@ -205,7 +177,6 @@ class ComprehensiveMetrics:
         return metrics
     
     def _calculate_return_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate return-based metrics"""
         
         total_return = (1 + returns).prod() - 1
         n_periods = len(returns)
@@ -222,7 +193,6 @@ class ComprehensiveMetrics:
         }
     
     def _calculate_risk_adjusted_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate risk-adjusted performance metrics"""
         
         # Basic statistics
         mean_return = returns.mean()
@@ -279,7 +249,6 @@ class ComprehensiveMetrics:
         }
     
     def _calculate_drawdown_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate drawdown-related metrics"""
         
         equity_curve = (1 + returns).cumprod()
         peak = equity_curve.cummax()
@@ -302,7 +271,6 @@ class ComprehensiveMetrics:
         }
     
     def _calculate_recovery_time(self, drawdowns: pd.Series) -> float:
-        """Calculate average recovery time from drawdowns"""
         
         # Find drawdown periods
         in_drawdown = drawdowns < 0
@@ -319,7 +287,6 @@ class ComprehensiveMetrics:
         return np.mean(recovery_times) if recovery_times else 0
     
     def _calculate_risk_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate risk metrics"""
         
         # VaR and CVaR
         var_95 = returns.quantile(0.05)
@@ -350,7 +317,6 @@ class ComprehensiveMetrics:
         }
     
     def _calculate_risk_of_ruin(self, returns: pd.Series, ruin_threshold: float = -0.5) -> float:
-        """Calculate probability of ruin (losing 50% of capital)"""
         
         # Simplified calculation using normal approximation
         mean = returns.mean()
@@ -366,7 +332,6 @@ class ComprehensiveMetrics:
         return prob_ruin
     
     def _calculate_statistical_metrics(self, returns: pd.Series, benchmark: Optional[pd.Series] = None) -> Dict:
-        """Calculate statistical metrics"""
         
         metrics = {
             'skewness': stats.skew(returns),
@@ -408,7 +373,6 @@ class ComprehensiveMetrics:
         return metrics
     
     def _calculate_hurst_exponent(self, returns: pd.Series) -> float:
-        """Calculate Hurst exponent for time series memory"""
         
         # Simplified R/S analysis
         lags = range(2, min(100, len(returns) // 2))
@@ -452,7 +416,6 @@ class ComprehensiveMetrics:
         return 0.5  # Random walk
     
     def _calculate_trading_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate trading efficiency metrics"""
         
         # Identify trades (non-zero returns)
         trades = returns[returns != 0]
@@ -505,7 +468,6 @@ class ComprehensiveMetrics:
         }
     
     def _max_consecutive(self, series: pd.Series, value: bool) -> int:
-        """Find maximum consecutive occurrences of value"""
         
         groups = (series != value).cumsum()[series == value]
         if len(groups) == 0:
@@ -513,7 +475,6 @@ class ComprehensiveMetrics:
         return groups.value_counts().max()
     
     def _calculate_ml_metrics(self, predictions: np.ndarray, actual: np.ndarray) -> Dict:
-        """Calculate machine learning specific metrics"""
         
         # Convert to binary classification if needed
         pred_direction = np.sign(predictions)
@@ -558,7 +519,6 @@ class ComprehensiveMetrics:
         }
     
     def _calculate_stability_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate stability and consistency metrics"""
         
         # Rolling window metrics
         window = min(252, len(returns) // 4)
@@ -594,7 +554,6 @@ class ComprehensiveMetrics:
         return stability_metrics
     
     def _calculate_crypto_specific_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate metrics specific to cryptocurrency trading"""
         
         # 24/7 trading adjustments
         hourly_factor = 24 * 365  # If using hourly data
@@ -626,10 +585,7 @@ class ComprehensiveMetrics:
 
 
 class MetricsValidator:
-    """
-    Validate and test metrics for significance
-    """
-    
+
     def __init__(self):
         self.min_samples = 30  # Minimum samples for statistical tests
         
@@ -637,17 +593,7 @@ class MetricsValidator:
                         strategy_metrics: Dict,
                         baseline_metrics: Dict,
                         n_samples: int) -> Dict:
-        """
-        Validate if strategy metrics are statistically better than baseline
-        
-        Args:
-            strategy_metrics: Metrics from strategy
-            baseline_metrics: Metrics from baseline (e.g., buy-and-hold)
-            n_samples: Number of samples used
-            
-        Returns:
-            Validation results with statistical tests
-        """
+
         
         validation_results = {}
         
@@ -689,11 +635,7 @@ class MetricsValidator:
                           strategy_value: float,
                           baseline_value: float,
                           n_samples: int) -> bool:
-        """
-        Test if difference is statistically significant
-        
-        Simplified test - in practice would use bootstrap or more sophisticated methods
-        """
+
         
         # Calculate standard error (simplified)
         se = np.sqrt(2 / n_samples)  # Simplified assumption
@@ -705,7 +647,6 @@ class MetricsValidator:
         return abs(z_score) > 1.96
     
     def _get_recommendation(self, significant_improvements: int, total_metrics: int) -> str:
-        """Get recommendation based on validation results"""
         
         ratio = significant_improvements / total_metrics
         
@@ -720,17 +661,7 @@ class MetricsValidator:
 
 
 def select_optimal_metrics(strategy_type: str, market_type: str = 'crypto') -> List[str]:
-    """
-    Select the most relevant metrics for evaluation based on strategy and market
-    
-    Args:
-        strategy_type: Type of strategy ('ml', 'momentum', 'mean_reversion', 'arbitrage')
-        market_type: Market type ('crypto', 'equity', 'forex')
-        
-    Returns:
-        List of recommended metrics to focus on
-    """
-    
+
     # Base metrics for all strategies
     base_metrics = [
         'sharpe_ratio',
@@ -797,9 +728,7 @@ def select_optimal_metrics(strategy_type: str, market_type: str = 'crypto') -> L
 
 
 class AdvancedMetrics(ComprehensiveMetrics):
-    """
-    Extended metrics class with additional advanced calculations
-    """
+
     
     def __init__(self, risk_free_rate: float = 0.02):
         super().__init__(risk_free_rate)
@@ -809,10 +738,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
                                        sharpe: float, 
                                        n_samples: int,
                                        n_strategies_tested: int = 1) -> float:
-        """
-        Calculate Deflated Sharpe Ratio (DSR) accounting for multiple testing
-        Bailey & Lopez de Prado (2014)
-        """
+
         
         # Estimate probability of observing this Sharpe by chance
         if n_samples < 2:
@@ -836,10 +762,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
                                             observed_sharpe: float,
                                             benchmark_sharpe: float,
                                             n_samples: int) -> float:
-        """
-        Probability that strategy Sharpe exceeds benchmark Sharpe
-        Marcos Lopez de Prado (2018)
-        """
+
         
         if n_samples < 2:
             return 0.5
@@ -859,9 +782,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
     def calculate_t_statistic_sharpe(self, 
                                     sharpe: float,
                                     n_samples: int) -> Tuple[float, float]:
-        """
-        Calculate t-statistic and p-value for Sharpe ratio
-        """
+
         
         if n_samples < 2:
             return 0, 1.0
@@ -878,10 +799,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
                                              observed_sharpe: float,
                                              target_sharpe: float = 1.0,
                                              confidence: float = 0.95) -> int:
-        """
-        Calculate minimum track record length needed for statistical significance
-        """
-        
+  
         if observed_sharpe <= 0:
             return float('inf')
             
@@ -894,9 +812,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
         return max(2, int(np.ceil(min_n)))
     
     def calculate_break_even_probability(self, returns: pd.Series) -> float:
-        """
-        Probability of breaking even (positive return) using empirical distribution
-        """
+
         
         # Fit distribution to returns
         mean_return = returns.mean()
@@ -917,9 +833,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
     def calculate_rachev_ratio(self, returns: pd.Series, 
                               alpha: float = 0.05,
                               beta: float = 0.05) -> float:
-        """
-        Rachev Ratio: Ratio of expected tail gain to expected tail loss
-        """
+
         
         # Calculate expected tail gain (ETG) and expected tail loss (ETL)
         etg = returns.quantile(1 - alpha)
@@ -931,11 +845,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
     
     def calculate_generalized_sharpe_ratio(self, returns: pd.Series, 
                                           order: int = 3) -> float:
-        """
-        Generalized Sharpe Ratio using higher moments
-        Zakamouline & Koekebakker (2009)
-        """
-        
+
         mean_return = returns.mean()
         
         # Calculate lower partial moment
@@ -947,9 +857,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
         return gsr * np.sqrt(self.annualization_factor)
     
     def calculate_bias_ratio(self, returns: pd.Series) -> float:
-        """
-        Bias Ratio: Measures smoothness of returns (potential manipulation indicator)
-        """
+
         
         # Count consecutive positive returns
         positive_streaks = []
@@ -980,9 +888,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
         return bias_ratio
     
     def calculate_effective_number_of_bets(self, returns: pd.Series) -> float:
-        """
-        Effective number of independent bets (accounting for correlation)
-        """
+
         
         n = len(returns)
         if n < 2:
@@ -1002,9 +908,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
     def calculate_active_premium(self, 
                                 strategy_returns: pd.Series,
                                 benchmark_returns: pd.Series) -> float:
-        """
-        Active Premium: Excess return over benchmark
-        """
+
         
         if len(strategy_returns) != len(benchmark_returns):
             return np.nan
@@ -1018,10 +922,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
                           strategy_returns: pd.Series,
                           benchmark_returns: pd.Series,
                           market_returns: pd.Series) -> float:
-        """
-        M-squared: Risk-adjusted performance relative to market
-        """
-        
+
         strategy_sharpe = self._calculate_risk_adjusted_metrics(strategy_returns)['sharpe_ratio']
         market_vol = market_returns.std() * np.sqrt(self.annualization_factor)
         
@@ -1032,9 +933,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
     
     def calculate_upside_potential_ratio(self, returns: pd.Series,
                                         threshold: float = 0) -> float:
-        """
-        Upside Potential Ratio: Upside potential vs downside risk
-        """
+
         
         upside_returns = returns[returns > threshold]
         downside_returns = returns[returns < threshold]
@@ -1052,9 +951,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
     def calculate_capture_ratios(self,
                                 strategy_returns: pd.Series,
                                 benchmark_returns: pd.Series) -> Dict[str, float]:
-        """
-        Calculate upside and downside capture ratios
-        """
+
         
         if len(strategy_returns) != len(benchmark_returns):
             return {'upside_capture': np.nan, 'downside_capture': np.nan}
@@ -1083,9 +980,7 @@ class AdvancedMetrics(ComprehensiveMetrics):
 
 
 class CryptoSpecificMetrics:
-    """
-    Cryptocurrency-specific metrics and calculations
-    """
+
     
     def __init__(self):
         self.hourly_periods = 24
@@ -1093,7 +988,6 @@ class CryptoSpecificMetrics:
         self.annual_periods = 365 * 24
         
     def calculate_24h_volatility(self, hourly_returns: pd.Series) -> float:
-        """Calculate 24-hour rolling volatility"""
         
         if len(hourly_returns) < 24:
             return hourly_returns.std() * np.sqrt(24)
@@ -1103,10 +997,7 @@ class CryptoSpecificMetrics:
     def calculate_funding_rate_impact(self,
                                     returns: pd.Series,
                                     funding_rates: Optional[pd.Series] = None) -> float:
-        """
-        Calculate impact of funding rates on returns (for perpetual futures)
-        """
-        
+
         if funding_rates is None:
             # Estimate funding impact (typically 0.01% every 8 hours)
             funding_cost = 0.0001 * 3  # Daily funding cost
@@ -1120,9 +1011,7 @@ class CryptoSpecificMetrics:
     def calculate_exchange_risk_score(self,
                                      returns: pd.Series,
                                      exchange_volumes: Optional[Dict] = None) -> float:
-        """
-        Calculate risk score based on exchange concentration
-        """
+
         
         if exchange_volumes is None:
             # Default assumption: single exchange
@@ -1139,9 +1028,7 @@ class CryptoSpecificMetrics:
     def calculate_defi_yield_adjusted_return(self,
                                             returns: pd.Series,
                                             staking_apy: float = 0.05) -> pd.Series:
-        """
-        Adjust returns for opportunity cost of DeFi yields
-        """
+
         
         # Daily staking return
         daily_staking = (1 + staking_apy) ** (1/365) - 1
@@ -1155,9 +1042,6 @@ class CryptoSpecificMetrics:
                                       returns: pd.Series,
                                       trade_sizes: pd.Series,
                                       gas_prices: Optional[pd.Series] = None) -> pd.Series:
-        """
-        Adjust returns for Ethereum gas costs
-        """
         
         if gas_prices is None:
             # Estimate gas cost as percentage of trade
@@ -1174,9 +1058,7 @@ class CryptoSpecificMetrics:
     def calculate_impermanent_loss(self,
                                   price_start: float,
                                   price_end: float) -> float:
-        """
-        Calculate impermanent loss for liquidity providers
-        """
+
         
         price_ratio = price_end / price_start
         
@@ -1187,10 +1069,7 @@ class CryptoSpecificMetrics:
     
     def calculate_flash_crash_score(self, returns: pd.Series,
                                    window: int = 60) -> float:
-        """
-        Calculate susceptibility to flash crashes (1-minute to 1-hour recovery)
-        """
-        
+
         if len(returns) < window:
             return 0
             
@@ -1214,17 +1093,7 @@ class CryptoSpecificMetrics:
 def compare_strategies_comprehensive(strategies: Dict[str, pd.Series],
                                     benchmark: pd.Series,
                                     strategy_types: Optional[Dict[str, str]] = None) -> pd.DataFrame:
-    """
-    Comprehensive comparison of multiple strategies
-    
-    Args:
-        strategies: Dictionary of strategy names to return series
-        benchmark: Benchmark return series
-        strategy_types: Optional dictionary of strategy types
-        
-    Returns:
-        DataFrame with comprehensive metrics for all strategies
-    """
+
     
     # Initialize metrics calculator
     metrics_calc = AdvancedMetrics()

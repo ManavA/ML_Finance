@@ -1,7 +1,5 @@
 # src/models/hellformer.py
-"""
-Advanced trading strategies based on cutting-edge architectures
-"""
+
 
 import numpy as np
 import pandas as pd
@@ -10,7 +8,6 @@ import torch.nn as nn
 from typing import Dict, List, Optional
 
 class BaseStrategy:
-    """Base class for trading strategies"""
     def __init__(self, name: str):
         self.name = name
     
@@ -23,7 +20,6 @@ class BaseStrategy:
 # A. Transformer-based (Helformer-style)
 class TransformerStrategy(BaseStrategy):
     """
-    Implement Helformer architecture that achieved 925% returns
     Paper: "Helformer: A Unified Transformer Model for Multi-Horizon Time Series Forecasting"
     """
     def __init__(self):
@@ -31,9 +27,7 @@ class TransformerStrategy(BaseStrategy):
         self.model = self.build_transformer()
     
     def build_transformer(self):
-        # Multi-head attention + positional encoding
-        # Hierarchical time encoding
-        # Multi-horizon prediction
+
         class SimpleTransformer(nn.Module):
             def __init__(self, input_dim=20, d_model=256, nhead=8, num_layers=6):
                 super().__init__()
@@ -52,18 +46,14 @@ class TransformerStrategy(BaseStrategy):
         return SimpleTransformer()
     
     def predict(self, data):
-        # Implementation placeholder
         return np.random.random() - 0.5
     
     def fit(self, data):
-        # Training implementation placeholder
         pass
 
 # B. Graph Neural Networks for Cross-Asset Dependencies
 class GNNStrategy(BaseStrategy):
-    """
-    Model inter-cryptocurrency relationships
-    """
+
     def __init__(self, assets=['BTC', 'ETH', 'SOL']):
         super().__init__("GNN Cross-Asset")
         self.assets = assets
@@ -99,10 +89,7 @@ class GNNStrategy(BaseStrategy):
 
 # C. Diffusion Models for Synthetic Data
 class DiffusionAugmentedStrategy(BaseStrategy):
-    """
-    Use diffusion models to generate synthetic training data
-    Helps with limited historical data
-    """
+
     def __init__(self):
         super().__init__("Diffusion Augmented")
         self.diffusion_model = self.build_diffusion_model()

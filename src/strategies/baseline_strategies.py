@@ -1,5 +1,4 @@
 # src/strategies/baseline_strategies.py
-"""Baseline and simple technical trading strategies."""
 
 import pandas as pd
 import numpy as np
@@ -7,7 +6,6 @@ from typing import Tuple, Optional, Dict, Any
 
 
 class BaseStrategy:
-    """Base class for all trading strategies."""
     
     def __init__(self, name: str):
         self.name = name
@@ -15,11 +13,9 @@ class BaseStrategy:
         self.positions = None
         
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """Generate trading signals. Must be implemented by subclasses."""
         raise NotImplementedError
     
     def get_positions(self, signals: pd.Series) -> pd.Series:
-        """Convert signals to positions (0 or 1)."""
         positions = pd.Series(index=signals.index, data=0)
         positions[signals == 1] = 1
         
@@ -33,27 +29,25 @@ class BaseStrategy:
 
 
 class BuyAndHoldStrategy(BaseStrategy):
-    """Simple buy and hold strategy - the ultimate baseline."""
     
     def __init__(self):
         super().__init__("Buy and Hold")
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """Generate buy and hold signals."""
+        
         signals = pd.Series(index=data.index, data=0)
         signals.iloc[0] = 1  # Buy on first day
         return signals
 
 
 class DollarCostAveraging(BaseStrategy):
-    """Dollar cost averaging - buy periodically."""
     
     def __init__(self, frequency: int = 30):
         super().__init__(f"DCA (every {frequency} days)")
         self.frequency = frequency
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """Generate periodic buy signals."""
+        
         signals = pd.Series(index=data.index, data=0)
         
         # Buy every N days
@@ -64,7 +58,6 @@ class DollarCostAveraging(BaseStrategy):
 
 
 class SMACrossoverStrategy(BaseStrategy):
-    """Simple moving average crossover strategy."""
     
     def __init__(self, fast_period: int = 10, slow_period: int = 30):
         super().__init__(f"SMA({fast_period}/{slow_period})")
@@ -72,7 +65,6 @@ class SMACrossoverStrategy(BaseStrategy):
         self.slow_period = slow_period
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """Generate SMA crossover signals."""
         # Calculate SMAs
         fast_sma = data['close'].rolling(window=self.fast_period).mean()
         slow_sma = data['close'].rolling(window=self.slow_period).mean()
@@ -93,7 +85,6 @@ class SMACrossoverStrategy(BaseStrategy):
 
 
 class RSIMeanReversionStrategy(BaseStrategy):
-    """RSI-based mean reversion strategy."""
     
     def __init__(self, period: int = 14, oversold: float = 30, overbought: float = 70):
         super().__init__(f"RSI({period}, {oversold}/{overbought})")
@@ -102,12 +93,7 @@ class RSIMeanReversionStrategy(BaseStrategy):
         self.overbought = overbought
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals based on RSI levels.
-        
-        Buy when RSI < oversold (expecting bounce).
-        Sell when RSI > overbought (expecting pullback).
-        """
+
         # Use pre-calculated RSI if available, otherwise calculate
         if 'rsi' in data.columns:
             rsi = data['rsi']
@@ -124,7 +110,7 @@ class RSIMeanReversionStrategy(BaseStrategy):
         return signals
     
     def calculate_rsi(self, prices: pd.Series, period: int) -> pd.Series:
-        """Calculate RSI."""
+
         delta = prices.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
@@ -134,27 +120,15 @@ class RSIMeanReversionStrategy(BaseStrategy):
 
 
 class BollingerBandsStrategy(BaseStrategy):
-    """Bollinger Bands mean reversion strategy."""
     
     def __init__(self, period: int = 20, num_std: float = 2):
-        """
-        Initialize Bollinger Bands strategy.
-        
-        Args:
-            period: Moving average period
-            num_std: Number of standard deviations for bands
-        """
+ 
         super().__init__(f"BB({period}, {num_std}σ)")
         self.period = period
         self.num_std = num_std
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals based on Bollinger Bands.
-        
-        Buy when price touches lower band (oversold).
-        Sell when price touches upper band (overbought).
-        """
+
         # Calculate Bollinger Bands if not present
         if 'bb_lower' not in data.columns or 'bb_upper' not in data.columns:
             middle = data['close'].rolling(window=self.period).mean()
@@ -176,29 +150,17 @@ class BollingerBandsStrategy(BaseStrategy):
 
 
 class MACDStrategy(BaseStrategy):
-    """MACD momentum strategy."""
+
     
     def __init__(self, fast: int = 12, slow: int = 26, signal: int = 9):
-        """
-        Initialize MACD strategy.
-        
-        Args:
-            fast: Fast EMA period
-            slow: Slow EMA period
-            signal: Signal line EMA period
-        """
+
         super().__init__(f"MACD({fast},{slow},{signal})")
         self.fast = fast
         self.slow = slow
         self.signal_period = signal
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals based on MACD crossovers.
-        
-        Buy when MACD crosses above signal line.
-        Sell when MACD crosses below signal line.
-        """
+
         # Calculate MACD if not present
         if 'macd' not in data.columns or 'macd_signal' not in data.columns:
             ema_fast = data['close'].ewm(span=self.fast, adjust=False).mean()
@@ -225,27 +187,15 @@ class MACDStrategy(BaseStrategy):
 
 
 class MomentumStrategy(BaseStrategy):
-    """Simple momentum strategy based on recent returns."""
     
     def __init__(self, lookback: int = 20, threshold: float = 0.02):
-        """
-        Initialize momentum strategy.
-        
-        Args:
-            lookback: Lookback period for momentum calculation
-            threshold: Threshold for generating signals
-        """
+  
         super().__init__(f"Momentum({lookback})")
         self.lookback = lookback
         self.threshold = threshold
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals based on momentum.
-        
-        Buy when recent momentum is strongly positive.
-        Sell when recent momentum is strongly negative.
-        """
+
         # Calculate momentum (rate of change)
         momentum = (data['close'] / data['close'].shift(self.lookback) - 1)
         

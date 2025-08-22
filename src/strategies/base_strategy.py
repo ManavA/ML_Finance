@@ -1,5 +1,5 @@
 # src/strategies/base_strategy.py
-"""Base strategy class for all trading strategies."""
+
 
 import pandas as pd
 import numpy as np
@@ -8,7 +8,6 @@ from typing import Dict, Optional, Any
 
 
 class BaseStrategy(ABC):
-    """Base class for all trading strategies."""
     
     def __init__(self, name: str, params: Optional[Dict[str, Any]] = None):
         self.name = name
@@ -18,11 +17,9 @@ class BaseStrategy(ABC):
         
     @abstractmethod
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """Generate trading signals. Must be implemented by subclasses."""
         raise NotImplementedError("Subclasses must implement generate_signals")
     
     def get_positions(self, signals: pd.Series) -> pd.Series:
-        """Convert signals to positions (0 or 1)."""
         positions = pd.Series(index=signals.index, data=0)
         positions[signals == 1] = 1
         
@@ -35,7 +32,6 @@ class BaseStrategy(ABC):
         return positions
     
     def validate_data(self, data: pd.DataFrame) -> None:
-        """Validate input data."""
         required_columns = ['close']
         for col in required_columns:
             if col not in data.columns:
@@ -45,6 +41,5 @@ class BaseStrategy(ABC):
             raise ValueError("Data cannot be empty")
     
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Preprocess data before signal generation."""
         self.validate_data(data)
         return data.copy()

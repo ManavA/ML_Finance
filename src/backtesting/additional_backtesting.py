@@ -1,7 +1,5 @@
-# src/backtesting/advanced_backtesting.py
 """
-Advanced Backtesting Framework with Statistical Validation
-Addresses common pitfalls and ensures robust testing
+Advanced Backtesting
 """
 
 import numpy as np
@@ -32,7 +30,6 @@ class BacktestConfig:
 
 @dataclass
 class BacktestResults:
-    """Complete backtesting results with all metrics"""
     # Core metrics
     total_return: float
     annual_return: float
@@ -86,10 +83,7 @@ class BacktestResults:
 
 
 class AdvancedBacktester:
-    """
-    Advanced backtesting engine with robust validation
-    """
-    
+
     def __init__(self, config: BacktestConfig = None):
         self.config = config or BacktestConfig()
         self.results_cache = {}
@@ -98,17 +92,7 @@ class AdvancedBacktester:
                 data: pd.DataFrame,
                 signals: pd.Series,
                 benchmark: Optional[pd.Series] = None) -> BacktestResults:
-        """
-        Run comprehensive backtest with all validations
-        
-        Args:
-            data: OHLCV data
-            signals: Trading signals (-1, 0, 1)
-            benchmark: Benchmark returns for comparison
-            
-        Returns:
-            Complete backtest results
-        """
+
         
         # Validate inputs
         self._validate_inputs(data, signals)
@@ -145,7 +129,6 @@ class AdvancedBacktester:
         return results
     
     def _validate_inputs(self, data: pd.DataFrame, signals: pd.Series):
-        """Validate input data integrity"""
         
         # Check for missing values
         if data.isnull().any().any():
@@ -166,7 +149,6 @@ class AdvancedBacktester:
         """Check for potential look-ahead bias"""
         
         # Signals should not depend on future data
-        # This is a simple check - more sophisticated tests needed for complex strategies
         for i in range(1, len(signals)):
             if signals.index[i] < data.index[i]:
                 warnings.warn("Potential look-ahead bias detected")
@@ -179,15 +161,7 @@ class AdvancedBacktester:
         return data.loc[common_index], signals.loc[common_index]
     
     def _calculate_positions(self, signals: pd.Series, data: pd.DataFrame) -> pd.Series:
-        """
-        Calculate actual positions with risk management
-        
-        Implements:
-        - Position sizing based on volatility
-        - Maximum position limits
-        - Minimum trade size requirements
-        """
-        
+
         positions = signals.copy()
         
         # Calculate rolling volatility for position sizing
@@ -209,15 +183,7 @@ class AdvancedBacktester:
         return positions
     
     def _calculate_returns(self, data: pd.DataFrame, positions: pd.Series) -> pd.Series:
-        """
-        Calculate returns with realistic transaction costs
-        
-        Includes:
-        - Commissions
-        - Slippage
-        - Market impact (for large positions)
-        - Borrowing costs (for short positions)
-        """
+
         
         # Base returns
         price_returns = data['close'].pct_change()
@@ -244,7 +210,6 @@ class AdvancedBacktester:
         return strategy_returns
     
     def _build_equity_curve(self, returns: pd.Series) -> pd.Series:
-        """Build equity curve from returns"""
         
         equity_curve = (1 + returns).cumprod() * self.config.initial_capital
         equity_curve.iloc[0] = self.config.initial_capital
@@ -256,7 +221,6 @@ class AdvancedBacktester:
                               equity_curve: pd.Series,
                               positions: pd.Series,
                               benchmark: Optional[pd.Series] = None) -> Dict:
-        """Calculate comprehensive performance metrics"""
         
         # Clean returns
         returns_clean = returns.dropna()
@@ -322,7 +286,6 @@ class AdvancedBacktester:
         else:
             information_ratio = 0
         
-        # Treynor ratio (using market beta)
         if benchmark is not None:
             beta = np.cov(returns_clean, benchmark)[0, 1] / np.var(benchmark)
             treynor_ratio = (annual_return - self.config.risk_free_rate) / beta if beta != 0 else 0
@@ -373,24 +336,19 @@ class AdvancedBacktester:
             'drawdown_series': drawdown_series,
             'rolling_sharpe': rolling_sharpe,
         }
-    }
-    
-    return pd.DataFrame(metrics).T
+
     def _calculate_drawdown_series(self, equity_curve: pd.Series) -> pd.Series:
-        """Calculate drawdown series"""
         peak = equity_curve.expanding().max()
         drawdown = (equity_curve - peak) / peak
         return drawdown
     
     def _calculate_max_drawdown_duration(self, drawdown_series: pd.Series) -> int:
-        """Calculate maximum drawdown duration in days"""
         underwater = drawdown_series < 0
         runs = underwater.ne(underwater.shift()).cumsum()
         run_lengths = underwater.groupby(runs).sum()
         return int(run_lengths.max()) if len(run_lengths) > 0 else 0
     
     def _identify_trades(self, positions: pd.Series) -> List[Dict]:
-        """Identify individual trades from position series"""
         trades = []
         position_changes = positions.diff()
         
@@ -406,7 +364,6 @@ class AdvancedBacktester:
         return trades
     
     def _calculate_trade_returns(self, trades: List[Dict], returns: pd.Series) -> pd.Series:
-        """Calculate returns for each trade"""
         trade_returns = []
         
         for i in range(len(trades) - 1):
@@ -500,22 +457,12 @@ class AdvancedBacktester:
 
 
 class WalkForwardValidator:
-    """
-    Walk-forward analysis for strategy validation
-    """
     
     def __init__(self, 
                 n_splits: int = 5,
                 train_period: int = 252,
                 test_period: int = 63):
-        """
-        Initialize walk-forward validator
-        
-        Args:
-            n_splits: Number of walk-forward windows
-            train_period: Training period length (days)
-            test_period: Testing period length (days)
-        """
+
         self.n_splits = n_splits
         self.train_period = train_period
         self.test_period = test_period
@@ -524,17 +471,7 @@ class WalkForwardValidator:
                 data: pd.DataFrame,
                 strategy_func: callable,
                 backtester: AdvancedBacktester) -> Dict:
-        """
-        Run walk-forward validation
-        
-        Args:
-            data: Full dataset
-            strategy_func: Function that generates signals given data
-            backtester: Backtester instance
-            
-        Returns:
-            Validation results with statistics
-        """
+
         
         results = []
         
@@ -580,15 +517,12 @@ class WalkForwardValidator:
         }
     
     def _optimize_strategy(self, data: pd.DataFrame, strategy_func: callable) -> Dict:
-        """Optimize strategy parameters on training data"""
         # Simplified - in practice would use proper optimization
         return {}
 
 
 def calculate_performance_metrics(results: BacktestResults) -> pd.DataFrame:
-    """
-    Create comprehensive performance report
-    """
+
     
     metrics = {
         'Performance': {
@@ -623,4 +557,6 @@ def calculate_performance_metrics(results: BacktestResults) -> pd.DataFrame:
             'Burke Ratio': f"{results.burke_ratio:.3f}",
             'Info Ratio': f"{results.information_ratio:.3f}",
         }
-    
+    }
+
+    return pd.DataFrame(metrics).T

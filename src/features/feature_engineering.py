@@ -18,22 +18,12 @@ warnings.filterwarnings('ignore')
 logger = logging.getLogger(__name__)
 
 class FeatureEngineer:
-    """
-    Comprehensive feature engineering for crypto and equity data
-    """
     
     def __init__(self, feature_config: Optional[Dict] = None):
-        """
-        Initialize feature engineer
-        
-        Args:
-            feature_config: Configuration for feature selection
-        """
         self.feature_config = feature_config or self.get_default_config()
         self.scaler = None
         
     def get_default_config(self) -> Dict:
-        """Get default feature configuration"""
         return {
             'price_features': True,
             'volume_features': True,
@@ -55,16 +45,7 @@ class FeatureEngineer:
         }
     
     def create_features(self, df: pd.DataFrame, symbol: str = None) -> pd.DataFrame:
-        """
-        Create all features for a dataframe
-        
-        Args:
-            df: DataFrame with OHLCV data
-            symbol: Symbol name for asset-specific features
-            
-        Returns:
-            DataFrame with engineered features
-        """
+
         # Create copy to avoid modifying original
         data = df.copy()
         
@@ -112,7 +93,6 @@ class FeatureEngineer:
         return data
     
     def add_price_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add price-based features"""
         # Returns
         df['returns'] = df['close'].pct_change()
         df['log_returns'] = np.log(df['close'] / df['close'].shift(1))
@@ -145,7 +125,6 @@ class FeatureEngineer:
         return df
     
     def add_volume_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add volume-based features"""
         # Volume moving averages
         for period in self.feature_config['lookback_periods']:
             df[f'volume_sma_{period}'] = df['volume'].rolling(period).mean()
@@ -165,7 +144,6 @@ class FeatureEngineer:
         return df
     
     def add_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add technical analysis indicators"""
         config = self.feature_config['ta_periods']
         
         # RSI
@@ -243,7 +221,6 @@ class FeatureEngineer:
         return df
     
     def add_volatility_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add volatility-based features"""
         # Historical volatility
         for period in self.feature_config['lookback_periods']:
             df[f'volatility_{period}'] = df['returns'].rolling(period).std()
@@ -267,7 +244,6 @@ class FeatureEngineer:
         return df
     
     def add_market_structure_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add market microstructure features"""
         # Spread measures
         df['bid_ask_proxy'] = (df['high'] - df['low']) / df['close']
         
@@ -312,7 +288,6 @@ class FeatureEngineer:
         return df
     
     def add_time_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add time-based features"""
         if 'timestamp' in df.columns:
             # Convert to datetime if needed
             df['timestamp'] = pd.to_datetime(df['timestamp'])
@@ -340,7 +315,6 @@ class FeatureEngineer:
         return df
     
     def add_symbol_specific_features(self, df: pd.DataFrame, symbol: str) -> pd.DataFrame:
-        """Add features specific to certain assets"""
         # Crypto-specific features
         if 'USD' in symbol:
             df['is_crypto'] = 1
@@ -375,7 +349,6 @@ class FeatureEngineer:
         return df
     
     def handle_missing_values(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Handle missing values from feature creation"""
         # Forward fill for most features
         df = df.fillna(method='ffill', limit=5)
         
@@ -392,16 +365,7 @@ class FeatureEngineer:
         return df
     
     def create_target_variables(self, df: pd.DataFrame, horizons: List[int] = [1, 5, 10]) -> pd.DataFrame:
-        """
-        Create target variables for prediction
-        
-        Args:
-            df: DataFrame with features
-            horizons: List of prediction horizons (in periods)
-        
-        Returns:
-            DataFrame with target variables
-        """
+
         for horizon in horizons:
             # Future returns
             df[f'target_return_{horizon}'] = df['close'].shift(-horizon) / df['close'] - 1
@@ -426,17 +390,7 @@ class FeatureEngineer:
     def normalize_features(self, df: pd.DataFrame, 
                           method: str = 'standard',
                           fit: bool = True) -> pd.DataFrame:
-        """
-        Normalize features for ML models
-        
-        Args:
-            df: DataFrame with features
-            method: 'standard' or 'robust'
-            fit: Whether to fit the scaler or use existing
-        
-        Returns:
-            Normalized DataFrame
-        """
+
         # Identify numeric columns (exclude targets and identifiers)
         exclude_cols = ['timestamp', 'symbol', 'data_usage'] + \
                       [col for col in df.columns if 'target' in col]
@@ -456,16 +410,7 @@ class FeatureEngineer:
         return df
     
     def get_feature_importance(self, df: pd.DataFrame, target_col: str) -> pd.DataFrame:
-        """
-        Calculate feature importance using correlation and mutual information
-        
-        Args:
-            df: DataFrame with features
-            target_col: Name of target column
-        
-        Returns:
-            DataFrame with feature importance scores
-        """
+
         from sklearn.feature_selection import mutual_info_regression
         
         # Get feature columns

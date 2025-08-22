@@ -1,16 +1,4 @@
-"""
-Helformer: Hierarchical Efficient Long-range Transformer for Financial Time Series
 
-A specialized transformer architecture designed for cryptocurrency and financial markets
-that handles multiple time scales, long-range dependencies, and market microstructure.
-
-Key Features:
-- Multi-scale temporal attention (minute, hour, day, week patterns)
-- Efficient attention mechanism for long sequences
-- Market-specific positional encoding
-- Volatility-aware attention scaling
-- Cross-asset attention for portfolio modeling
-"""
 
 import torch
 import torch.nn as nn
@@ -23,7 +11,6 @@ from dataclasses import dataclass
 
 @dataclass
 class HelformerConfig:
-    """Configuration for Helformer model"""
     # Model dimensions
     d_model: int = 512
     n_heads: int = 8
@@ -59,14 +46,7 @@ class HelformerConfig:
 
 
 class FinancialPositionalEncoding(nn.Module):
-    """
-    Positional encoding that incorporates financial time structure:
-    - Intraday patterns (time of day)
-    - Day of week effects
-    - Month/quarter seasonality
-    - Market regime indicators
-    """
-    
+
     def __init__(self, d_model: int, max_len: int = 5000):
         super().__init__()
         self.d_model = d_model
@@ -91,12 +71,7 @@ class FinancialPositionalEncoding(nn.Module):
         
     def forward(self, x: torch.Tensor, timestamps: Optional[torch.Tensor] = None,
                 volatility_regime: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """
-        Args:
-            x: Input tensor (batch, seq_len, d_model)
-            timestamps: Unix timestamps (batch, seq_len)
-            volatility_regime: Current volatility regime (batch, seq_len, 1)
-        """
+
         batch_size, seq_len, _ = x.shape
         
         # Base positional encoding
@@ -134,9 +109,7 @@ class FinancialPositionalEncoding(nn.Module):
 
 
 class MultiScaleAttention(nn.Module):
-    """
-    Multi-scale attention that captures patterns at different time resolutions
-    """
+
     
     def __init__(self, config: HelformerConfig):
         super().__init__()
@@ -155,9 +128,7 @@ class MultiScaleAttention(nn.Module):
         self.scale_projection = nn.Linear(config.d_model * self.n_scales, config.d_model)
         
     def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """
-        Apply attention at multiple time scales and combine
-        """
+
         batch_size, seq_len, d_model = x.shape
         scale_outputs = []
         
@@ -194,10 +165,7 @@ class MultiScaleAttention(nn.Module):
 
 
 class VolatilityAwareAttention(nn.Module):
-    """
-    Attention mechanism that adjusts based on market volatility
-    """
-    
+
     def __init__(self, config: HelformerConfig):
         super().__init__()
         self.config = config
@@ -218,25 +186,17 @@ class VolatilityAwareAttention(nn.Module):
         
     def forward(self, x: torch.Tensor, volatility: torch.Tensor,
                 mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """
-        Args:
-            x: Input tensor (batch, seq_len, d_model)
-            volatility: Volatility estimates (batch, seq_len, 1)
-            mask: Attention mask
-        """
-        # Compute volatility-based attention scaling
+
         vol_scales = self.volatility_net(volatility)  # (batch, seq_len, n_heads)
         
         # Apply attention with volatility scaling
         batch_size, seq_len, _ = x.shape
         
-        # Reshape for multi-head attention
         q = k = v = x
         
         # Apply standard attention
         attn_output, attn_weights = self.attention(q, k, v, attn_mask=mask)
         
-        # Scale by volatility (simplified - in practice modify attention computation)
         vol_scale_avg = vol_scales.mean(dim=1, keepdim=True)
         attn_output = attn_output * (1 + vol_scale_avg)
         
@@ -244,24 +204,18 @@ class VolatilityAwareAttention(nn.Module):
 
 
 class HelformerBlock(nn.Module):
-    """
-    Single Helformer block with multi-scale and volatility-aware attention
-    """
-    
+
     def __init__(self, config: HelformerConfig):
         super().__init__()
         self.config = config
         
-        # Multi-scale attention
         self.multi_scale_attn = MultiScaleAttention(config)
         self.norm1 = nn.LayerNorm(config.d_model)
         
-        # Volatility-aware attention (optional)
         if config.use_volatility_scaling:
             self.vol_attn = VolatilityAwareAttention(config)
             self.norm_vol = nn.LayerNorm(config.d_model)
         
-        # Feed-forward network
         self.ffn = nn.Sequential(
             nn.Linear(config.d_model, config.d_ff),
             nn.GELU(),
@@ -273,19 +227,14 @@ class HelformerBlock(nn.Module):
         
     def forward(self, x: torch.Tensor, volatility: Optional[torch.Tensor] = None,
                 mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """
-        Forward pass through Helformer block
-        """
-        # Multi-scale attention
+        
         attn_out = self.multi_scale_attn(x, mask)
         x = self.norm1(x + attn_out)
         
-        # Volatility-aware attention
         if self.config.use_volatility_scaling and volatility is not None:
             vol_out = self.vol_attn(x, volatility, mask)
             x = self.norm_vol(x + vol_out)
         
-        # Feed-forward
         ffn_out = self.ffn(x)
         x = self.norm2(x + ffn_out)
         
@@ -293,9 +242,7 @@ class HelformerBlock(nn.Module):
 
 
 class Helformer(nn.Module):
-    """
-    Main Helformer model for financial time series prediction
-    """
+    
     
     def __init__(self, config: HelformerConfig):
         super().__init__()
@@ -321,7 +268,6 @@ class Helformer(nn.Module):
             'direction': nn.Linear(config.d_model, config.prediction_horizon * 3)  # 3 classes
         })
         
-        # Cross-asset attention (optional)
         if config.use_cross_asset_attention and config.n_assets > 1:
             self.cross_asset_attn = nn.MultiheadAttention(
                 config.d_model, config.n_heads, 
@@ -331,14 +277,9 @@ class Helformer(nn.Module):
         self.dropout = nn.Dropout(config.dropout)
         
     def compute_volatility(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Compute rolling volatility from price data
-        """
-        # Simple rolling std as volatility proxy
-        # In practice, use more sophisticated methods (GARCH, etc.)
+
         returns = torch.diff(x[:, :, 3], dim=1) / x[:, :-1, 3]  # Using close prices
         
-        # Compute rolling volatility with window size 20
         window = 20
         volatilities = []
         for i in range(returns.shape[1]):
@@ -358,24 +299,9 @@ class Helformer(nn.Module):
     def forward(self, x: torch.Tensor, 
                 timestamps: Optional[torch.Tensor] = None,
                 mask: Optional[torch.Tensor] = None) -> Dict[str, torch.Tensor]:
-        """
-        Forward pass through Helformer
-        
-        Args:
-            x: Input features (batch, seq_len, n_features)
-                Expected format: [open, high, low, close, volume, ...]
-            timestamps: Unix timestamps (batch, seq_len)
-            mask: Attention mask (batch, seq_len)
-        
-        Returns:
-            Dictionary with predictions:
-                - 'return': Predicted returns
-                - 'volatility': Predicted volatility
-                - 'direction': Direction probabilities (down, neutral, up)
-        """
+
         batch_size, seq_len, _ = x.shape
         
-        # Compute volatility for volatility-aware attention
         volatility = self.compute_volatility(x)
         
         # Input projection
@@ -392,12 +318,10 @@ class Helformer(nn.Module):
         
         # Cross-asset attention if applicable
         if self.config.use_cross_asset_attention and self.config.n_assets > 1:
-            # Reshape for cross-asset attention
             # This would need proper implementation for multi-asset scenarios
             pass
         
         # Generate predictions from the last position
-        # In practice, might want to use pooling or attention-based aggregation
         final_representation = x_encoded[:, -1, :]  # (batch, d_model)
         
         # Output predictions
@@ -414,10 +338,7 @@ class Helformer(nn.Module):
 
 
 class HelformerTrainer:
-    """
-    Training utilities for Helformer model
-    """
-    
+
     def __init__(self, model: Helformer, config: HelformerConfig):
         self.model = model
         self.config = config
@@ -442,9 +363,7 @@ class HelformerTrainer:
         
     def compute_loss(self, predictions: Dict[str, torch.Tensor],
                     targets: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, Dict[str, float]]:
-        """
-        Compute combined loss for all prediction tasks
-        """
+        
         losses = {}
         
         # Return prediction loss
@@ -471,9 +390,7 @@ class HelformerTrainer:
         return total_loss, losses
     
     def train_step(self, batch: Dict[str, torch.Tensor]) -> Dict[str, float]:
-        """
-        Single training step
-        """
+
         self.model.train()
         self.optimizer.zero_grad()
         
@@ -493,16 +410,13 @@ class HelformerTrainer:
         self.optimizer.step()
         self.scheduler.step()
         
-        # Return losses for logging
         return {
             'total_loss': total_loss.item(),
             **{k: v.item() for k, v in losses.items()}
         }
     
     def evaluate(self, dataloader) -> Dict[str, float]:
-        """
-        Evaluate model on validation/test data
-        """
+
         self.model.eval()
         total_losses = {}
         n_batches = 0
@@ -527,9 +441,7 @@ def create_helformer(
     prediction_horizon: int = 60,  # Predict next hour
     **kwargs
 ) -> Helformer:
-    """
-    Factory function to create Helformer model with sensible defaults
-    """
+    
     config = HelformerConfig(
         n_features=n_features,
         max_seq_length=max_seq_length,
@@ -561,18 +473,15 @@ if __name__ == "__main__":
         n_heads=8
     )
     
-    # Print model info
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Total parameters: {total_params:,}")
     print(f"Trainable parameters: {trainable_params:,}")
     
-    # Test forward pass
     batch_size = 2
     seq_len = 1440
     n_features = 7
     
-    # Create dummy data
     x = torch.randn(batch_size, seq_len, n_features)
     timestamps = torch.arange(seq_len).unsqueeze(0).expand(batch_size, -1) * 60  # Minute timestamps
     

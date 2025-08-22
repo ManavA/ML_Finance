@@ -1,4 +1,3 @@
-"""Advanced ML models including deep learning and ensemble methods."""
 
 import pandas as pd
 import numpy as np
@@ -27,7 +26,6 @@ logger = logging.getLogger(__name__)
 
 
 class TimeSeriesDataset(Dataset):
-    """PyTorch dataset for time series data."""
     
     def __init__(self, X, y):
         self.X = torch.FloatTensor(X)
@@ -42,7 +40,6 @@ class TimeSeriesDataset(Dataset):
 
 
 class AdvancedLSTM(nn.Module):
-    """Advanced LSTM with attention mechanism and residual connections"""
     
     def __init__(self,
                  input_size: int,
@@ -126,7 +123,6 @@ class AdvancedLSTM(nn.Module):
 
 
 class AdvancedGRU(nn.Module):
-    """Advanced GRU with attention and layer normalization"""
     
     def __init__(self,
                  input_size: int,
@@ -198,7 +194,6 @@ class AdvancedGRU(nn.Module):
 
 
 class AdvancedTransformer(nn.Module):
-    """Advanced Transformer with custom positional encoding and multi-scale attention"""
     
     def __init__(self,
                  input_size: int,
@@ -243,7 +238,6 @@ class AdvancedTransformer(nn.Module):
         self.fc3 = nn.Linear(d_model // 2, output_size)
         
     def _create_positional_encoding(self, max_len, d_model):
-        """Create sinusoidal positional encoding"""
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
         
@@ -291,20 +285,12 @@ class AdvancedTransformer(nn.Module):
 
 
 class DeepEnsembleModel:
-    """Ensemble of deep learning and traditional ML models"""
     
     def __init__(self,
                  models: Optional[Dict[str, Any]] = None,
                  ensemble_method: str = 'weighted_average',
                  use_stacking: bool = False):
-        """
-        Initialize ensemble model
-        
-        Args:
-            models: Dictionary of models to ensemble
-            ensemble_method: 'weighted_average', 'voting', 'stacking'
-            use_stacking: Whether to use meta-learner for stacking
-        """
+
         self.ensemble_method = ensemble_method
         self.use_stacking = use_stacking
         
@@ -319,7 +305,6 @@ class DeepEnsembleModel:
         self.scalers = {}
         
     def add_model(self, name: str, model: Any, weight: float = 1.0):
-        """Add a model to the ensemble"""
         self.models[name] = {
             'model': model,
             'weight': weight,
@@ -328,7 +313,6 @@ class DeepEnsembleModel:
         logger.info(f"Added {name} to ensemble with weight {weight}")
     
     def _get_model_type(self, model):
-        """Determine model type"""
         if isinstance(model, nn.Module):
             return 'pytorch'
         elif hasattr(model, 'predict'):
@@ -337,15 +321,7 @@ class DeepEnsembleModel:
             return 'unknown'
     
     def fit(self, X_train, y_train, X_val=None, y_val=None, **kwargs):
-        """
-        Fit all models in the ensemble
-        
-        Args:
-            X_train: Training features
-            y_train: Training targets
-            X_val: Validation features (optional)
-            y_val: Validation targets (optional)
-        """
+
         logger.info(f"Training ensemble with {len(self.models)} models")
         
         # Train each model
@@ -374,7 +350,6 @@ class DeepEnsembleModel:
     
     def _train_pytorch_model(self, model, X_train, y_train, X_val, y_val, 
                            epochs=50, batch_size=32, learning_rate=0.001):
-        """Train a PyTorch model"""
         # Create datasets
         train_dataset = TimeSeriesDataset(X_train, y_train)
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -438,7 +413,6 @@ class DeepEnsembleModel:
                         break
     
     def _optimize_weights(self, X_val, y_val):
-        """Optimize ensemble weights using validation data"""
         from scipy.optimize import minimize
         
         # Get predictions from each model
@@ -474,7 +448,6 @@ class DeepEnsembleModel:
             logger.info(f"Optimized weight for {name}: {self.weights[i]:.3f}")
     
     def _train_meta_learner(self, X_val, y_val):
-        """Train meta-learner for stacking"""
         # Get predictions from base models
         meta_features = []
         
@@ -492,7 +465,6 @@ class DeepEnsembleModel:
         logger.info("Trained meta-learner for stacking ensemble")
     
     def predict(self, X):
-        """Generate ensemble predictions"""
         predictions = []
         
         # Get predictions from each model
@@ -529,7 +501,6 @@ class DeepEnsembleModel:
         return ensemble_pred
     
     def _predict_single(self, model, model_type, X):
-        """Get predictions from a single model"""
         if model_type == 'pytorch':
             model.eval()
             with torch.no_grad():
@@ -541,7 +512,6 @@ class DeepEnsembleModel:
         return predictions
     
     def save(self, filepath: str):
-        """Save ensemble model"""
         save_dict = {
             'ensemble_method': self.ensemble_method,
             'use_stacking': self.use_stacking,
@@ -585,7 +555,6 @@ class DeepEnsembleModel:
 
 
 class CNNLSTMModel(nn.Module):
-    """Hybrid CNN-LSTM model for capturing both local and temporal patterns"""
     
     def __init__(self,
                  input_size: int,
@@ -654,7 +623,6 @@ class CNNLSTMModel(nn.Module):
 
 
 def create_default_ensemble():
-    """Create a default ensemble with multiple models"""
     
     # Initialize ensemble
     ensemble = DeepEnsembleModel(ensemble_method='weighted_average')
@@ -672,8 +640,6 @@ def create_default_ensemble():
 
 
 def main():
-    """Test advanced models"""
-    print("Advanced Models Module Loaded")
     print("\nAvailable Models:")
     print("  - AdvancedLSTM: Bidirectional LSTM with attention and residual connections")
     print("  - AdvancedGRU: Bidirectional GRU with multi-head attention")

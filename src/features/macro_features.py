@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 Macroeconomic Feature Engineering
-Integrates economic indicators with market data for enhanced ML features
 """
 
 import pandas as pd
@@ -19,18 +18,9 @@ from data.polygon_economic_indicators import PolygonEconomicIndicators
 logger = logging.getLogger(__name__)
 
 class MacroFeatureEngineer:
-    """
-    Engineer macroeconomic features for ML trading models
-    Combines market data with economic indicators
-    """
-    
+
     def __init__(self, polygon_api_key: Optional[str] = None):
-        """
-        Initialize macro feature engineer
-        
-        Args:
-            polygon_api_key: Polygon API key for economic data
-        """
+
         self.econ_client = PolygonEconomicIndicators(api_key=polygon_api_key)
         
         # Feature configuration
@@ -62,18 +52,6 @@ class MacroFeatureEngineer:
                             start_date: str = None,
                             end_date: str = None,
                             feature_groups: List[str] = None) -> pd.DataFrame:
-        """
-        Create comprehensive macro features combined with market data
-        
-        Args:
-            market_data: DataFrame with OHLCV market data
-            start_date: Start date for economic data
-            end_date: End date for economic data
-            feature_groups: Which feature groups to include
-            
-        Returns:
-            DataFrame with market data and macro features
-        """
         logger.info("Creating macro-enhanced features...")
         
         # Get date range from market data if not specified
@@ -117,9 +95,7 @@ class MacroFeatureEngineer:
         return enhanced_data
     
     def _align_macro_data(self, macro_data: pd.DataFrame, market_index: pd.DatetimeIndex) -> pd.DataFrame:
-        """
-        Align macro data (often monthly) with market data frequency (daily/hourly)
-        """
+
         if macro_data.empty:
             return pd.DataFrame(index=market_index)
         
@@ -132,7 +108,6 @@ class MacroFeatureEngineer:
         return aligned
     
     def _add_inflation_features(self, data: pd.DataFrame, macro: pd.DataFrame) -> pd.DataFrame:
-        """Add inflation-related features"""
         
         # Core inflation metrics
         if 'cpi_yoy' in macro.columns:
@@ -172,7 +147,6 @@ class MacroFeatureEngineer:
         return data
     
     def _add_rate_features(self, data: pd.DataFrame, macro: pd.DataFrame) -> pd.DataFrame:
-        """Add interest rate features"""
         
         # Fed funds rate
         if 'effective_rate' in macro.columns:
@@ -213,7 +187,6 @@ class MacroFeatureEngineer:
         return data
     
     def _add_economic_features(self, data: pd.DataFrame, macro: pd.DataFrame) -> pd.DataFrame:
-        """Add economic growth and activity features"""
         
         # GDP growth
         if 'gdp_growth_yoy' in macro.columns:
@@ -256,7 +229,6 @@ class MacroFeatureEngineer:
         return data
     
     def _add_risk_features(self, data: pd.DataFrame, macro: pd.DataFrame) -> pd.DataFrame:
-        """Add market risk and sentiment features"""
         
         # VIX
         if 'vix_close' in macro.columns:
@@ -298,7 +270,6 @@ class MacroFeatureEngineer:
         return data
     
     def _add_regime_features(self, data: pd.DataFrame, macro: pd.DataFrame) -> pd.DataFrame:
-        """Add regime and state features"""
         
         # Combined regime indicator
         regimes = []
@@ -347,7 +318,6 @@ class MacroFeatureEngineer:
         return data
     
     def _create_interaction_features(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Create interaction features between macro and market data"""
         
         # Market returns vs economic conditions
         if 'returns' in data.columns:
@@ -386,7 +356,6 @@ class MacroFeatureEngineer:
         return data
     
     def _create_lead_lag_features(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Create lead and lag features for economic indicators"""
         
         # Economic indicators often lead/lag market movements
         lag_features = []
@@ -419,11 +388,7 @@ class MacroFeatureEngineer:
         return data
     
     def get_feature_importance_analysis(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        Analyze importance of macro features
-        
-        Returns DataFrame with feature statistics
-        """
+
         macro_cols = [col for col in data.columns if 'macro_' in col or 'regime_' in col]
         
         importance_data = []
@@ -446,7 +411,6 @@ class MacroFeatureEngineer:
 
 
 def main():
-    """Test macro feature engineering"""
     print("="*60)
     print("MACROECONOMIC FEATURE ENGINEERING")
     print("="*60)
@@ -507,10 +471,6 @@ def main():
         for idx, row in importance.head(10).iterrows():
             if not pd.isna(row['correlation_with_returns']):
                 print(f"  {row['feature']}: {row['correlation_with_returns']:.3f}")
-    
-    print("\n" + "="*60)
-    print("Macro features ready for ML models!")
-    print("="*60)
 
 if __name__ == "__main__":
     main()

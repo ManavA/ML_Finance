@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-COMPREHENSIVE REINFORCEMENT LEARNING TRAINING
-"""
 
 import sys
 import os
@@ -24,7 +21,7 @@ print("COMPREHENSIVE RL TRAINING - 5,000+ EPISODES")
 print("=" * 60)
 
 
-class AdvancedCryptoTradingEnv:    
+class AdvancedCryptoTradingEnv:
     def __init__(self, data, initial_balance=10000, lookback=30, commission=0.001):
         self.data = data.reset_index(drop=True)
         self.initial_balance = initial_balance
@@ -138,7 +135,7 @@ class AdvancedCryptoTradingEnv:
                 self.balance -= buy_amount
                 self.total_trades += 1
                 
-        elif action == 2:  # Buy 50%
+        elif action == 2:
             buy_amount = self.balance * 0.50
             shares = buy_amount / (current_price * (1 + self.commission))
             if buy_amount > 1 and shares > 0:
@@ -146,7 +143,7 @@ class AdvancedCryptoTradingEnv:
                 self.balance -= buy_amount
                 self.total_trades += 1
                 
-        elif action == 3:  # Buy 75%
+        elif action == 3:
             buy_amount = self.balance * 0.75
             shares = buy_amount / (current_price * (1 + self.commission))
             if buy_amount > 1 and shares > 0:
@@ -154,18 +151,16 @@ class AdvancedCryptoTradingEnv:
                 self.balance -= buy_amount
                 self.total_trades += 1
                 
-        elif action == 4 and self.position > 0:  # Sell all
+        elif action == 4 and self.position > 0:
             sell_value = self.position * current_price * (1 - self.commission)
             self.balance += sell_value
             self.position = 0
             self.total_trades += 1
     
     def _calculate_reward(self, prev_value, new_value, action):
-        # Base reward: portfolio value change
         value_change = (new_value - prev_value) / prev_value if prev_value > 0 else 0
-        base_reward = value_change * 100  # Scale to percentage
+        base_reward = value_change * 100
         
-        # Risk-adjusted component
         if len(self.portfolio_values) > 30:
             recent_values = np.array(self.portfolio_values[-30:])
             recent_returns = np.diff(recent_values) / recent_values[:-1]
@@ -174,18 +169,15 @@ class AdvancedCryptoTradingEnv:
         else:
             sharpe_component = 0
         
-        # Drawdown penalty
         current_drawdown = (new_value - self.max_portfolio_value) / self.max_portfolio_value
         drawdown_penalty = current_drawdown * 0.5 if current_drawdown < 0 else 0
         
-        # Action cost (reduce overtrading)
         action_cost = -0.001 if action != 0 else 0
         
         return base_reward + sharpe_component + drawdown_penalty + action_cost
 
 
 class EnhancedDQN(nn.Module):
-    
     def __init__(self, state_size, action_size):
         super().__init__()
         
@@ -224,7 +216,6 @@ class EnhancedDQN(nn.Module):
         return q_values
 
 class EnhancedDQNAgent:
-    
     def __init__(self, state_size, action_size, lr=1e-4, gamma=0.99):
         self.state_size = state_size
         self.action_size = action_size
@@ -727,9 +718,6 @@ if __name__ == "__main__":
     plt.savefig('rl_training_results.png', dpi=300, bbox_inches='tight')
     plt.show()
     
-    print("\n" + "="*60)
-    print("COMPREHENSIVE RL TRAINING COMPLETE!")
-    print("="*60)
     print("\n[SUCCESS] All RL agents trained with 5,000+ episodes each")
     print(f"[DATA] Training dataset: {len(data):,} records")
     print(f"[DQN] Final epsilon: {dqn_agent.epsilon:.4f}, Total steps: {dqn_agent.steps:,}")
@@ -740,4 +728,3 @@ if __name__ == "__main__":
     torch.save(ppo_agent.network.state_dict(), 'models/comprehensive_ppo.pt')
     print(f"[SAVED] Models saved to models/ directory")
     
-    print(f"\n[+] RL models are now FULLY and PROPERLY TRAINED!")

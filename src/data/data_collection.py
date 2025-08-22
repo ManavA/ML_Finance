@@ -1,7 +1,6 @@
 # src/data/data_collection.py
 """
 Simplified data collection utilities for research.
-Focus on free APIs and cached data.
 """
 
 import pandas as pd
@@ -17,10 +16,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 class DataCollector:
-    """Simple data collector using free APIs."""
     
     def __init__(self, cache_dir: str = "data/cache"):
-        """Initialize data collector with caching."""
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         
@@ -30,19 +27,7 @@ class DataCollector:
                          end_date: str,
                          interval: str = '1d',
                          use_cache: bool = True) -> pd.DataFrame:
-        """
-        Fetch cryptocurrency data using yfinance.
-        
-        Args:
-            symbol: Crypto ticker (e.g., 'BTC-USD', 'ETH-USD')
-            start_date: Start date (YYYY-MM-DD)
-            end_date: End date (YYYY-MM-DD)
-            interval: Data interval (1d, 1h, etc.)
-            use_cache: Whether to use cached data
-            
-        Returns:
-            DataFrame with OHLCV data
-        """
+
         # Create cache key
         cache_key = f"{symbol}_{start_date}_{end_date}_{interval}.pkl"
         cache_path = self.cache_dir / cache_key
@@ -82,18 +67,7 @@ class DataCollector:
                         start_date: str,
                         end_date: str,
                         interval: str = '1d') -> pd.DataFrame:
-        """
-        Fetch stock data (including indices like ^GSPC for S&P 500).
-        
-        Args:
-            symbol: Stock ticker (e.g., 'AAPL', '^GSPC' for S&P 500)
-            start_date: Start date
-            end_date: End date
-            interval: Data interval
-            
-        Returns:
-            DataFrame with OHLCV data
-        """
+
         # Same as crypto but with different symbols
         return self.fetch_crypto_data(symbol, start_date, end_date, interval)
     
@@ -102,18 +76,7 @@ class DataCollector:
                             start_date: str,
                             end_date: str,
                             interval: str = '1d') -> Dict[str, pd.DataFrame]:
-        """
-        Fetch data for multiple assets.
-        
-        Args:
-            symbols: List of tickers
-            start_date: Start date
-            end_date: End date
-            interval: Data interval
-            
-        Returns:
-            Dictionary mapping symbols to DataFrames
-        """
+
         data = {}
         for symbol in symbols:
             try:
@@ -136,15 +99,7 @@ class DataCollector:
         return data
     
     def add_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Add common technical indicators to DataFrame.
-        
-        Args:
-            df: DataFrame with OHLCV data
-            
-        Returns:
-            DataFrame with additional technical indicators
-        """
+
         df = df.copy()
         
         # Simple Moving Averages
@@ -188,7 +143,6 @@ class DataCollector:
         return df
     
     def calculate_rsi(self, prices: pd.Series, period: int = 14) -> pd.Series:
-        """Calculate RSI indicator."""
         delta = prices.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
@@ -197,7 +151,6 @@ class DataCollector:
         return rsi
     
     def calculate_atr(self, df: pd.DataFrame, period: int = 14) -> pd.Series:
-        """Calculate Average True Range."""
         high_low = df['high'] - df['low']
         high_close = abs(df['high'] - df['close'].shift())
         low_close = abs(df['low'] - df['close'].shift())
@@ -211,16 +164,6 @@ class DataCollector:
     def prepare_ml_features(self, 
                            df: pd.DataFrame,
                            lookback: int = 20) -> pd.DataFrame:
-        """
-        Prepare features for ML models.
-        
-        Args:
-            df: DataFrame with OHLCV and indicators
-            lookback: Number of periods for rolling features
-            
-        Returns:
-            DataFrame with ML-ready features
-        """
         df = df.copy()
         
         # Add lagged returns
@@ -251,16 +194,7 @@ class DataCollector:
         return df
     
     def get_risk_free_rate(self, start_date: str, end_date: str) -> float:
-        """
-        Get average risk-free rate (3-month Treasury).
-        
-        Args:
-            start_date: Start date
-            end_date: End date
-            
-        Returns:
-            Average risk-free rate
-        """
+
         try:
             # Fetch 3-month Treasury yield
             treasury = yf.Ticker('^IRX')
@@ -277,16 +211,7 @@ class DataCollector:
 
 def create_sample_dataset(start_date: str = '2020-01-01',
                          end_date: str = '2024-01-01') -> Dict[str, pd.DataFrame]:
-    """
-    Create a sample dataset for analysis.
-    
-    Args:
-        start_date: Start date
-        end_date: End date
-        
-    Returns:
-        Dictionary with crypto and stock data
-    """
+
     collector = DataCollector()
     
     # Assets to analyze

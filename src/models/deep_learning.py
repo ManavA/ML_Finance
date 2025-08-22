@@ -33,11 +33,9 @@ class AdvancedGRUStrategy(BaseStrategy):
             print(f"Error loading model: {e}, using untrained model")
     
     def prepare_features(self, data):
-        """Prepare features for the GRU model"""
-        # Create technical indicators
+        
         features_df = data.copy()
         
-        # Price-based features
         features_df['returns'] = features_df['close'].pct_change()
         features_df['log_returns'] = np.log(features_df['close'] / features_df['close'].shift(1))
         
@@ -96,7 +94,6 @@ class AdvancedGRUStrategy(BaseStrategy):
         return features_df[feature_cols].fillna(0)
     
     def generate_signals(self, data):
-        """Generate trading signals using the GRU model"""
         # Prepare features
         features = self.prepare_features(data)
         
@@ -105,7 +102,6 @@ class AdvancedGRUStrategy(BaseStrategy):
             return pd.Series(0, index=data.index)
         
         # Convert to tensor for model input
-        # Reshape to (batch_size, sequence_length, features)
         sequence_length = min(10, len(features))  # Use last 10 time steps
         
         # Get the last sequence_length samples
@@ -139,7 +135,6 @@ class InverseRLStrategy(BaseStrategy):
             self.model = pickle.load(f)
     
     def generate_signals(self, data):
-        """Generate trading signals using Inverse Reinforcement Learning"""
         # Simple implementation using the model's reward function
         try:
             # Extract features for the model
@@ -166,7 +161,6 @@ class InverseRLStrategy(BaseStrategy):
             return pd.Series(0, index=data.index)
     
     def _extract_features(self, data):
-        """Extract features for IRL model"""
         features = []
         
         # Price features

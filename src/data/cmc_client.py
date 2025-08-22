@@ -10,7 +10,6 @@ from normalize.ohlcv_schema import coerce_schema, validate_ohlcv
 CMC_BASE = "https://pro-api.coinmarketcap.com/v2"
 DEFAULT_MAX_MONTHS = 24
 api_key='e64efce5-b78d-4175-9f35-9626265824e0'
-# If you use python‑dotenv elsewhere, this is harmless here
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -64,9 +63,6 @@ def _cmc_get(path: str, params: dict) -> dict:
 
 
 def fetch_cmc_quote_latest(symbol: str, convert: str = "USD") -> pd.DataFrame:
-    """Always-available sanity check on Free plan.
-    Returns a 1-row DataFrame with price, market_cap, volume_24h.
-    """
     params = {"symbol": symbol, "convert": convert}
     data = _cmc_get("/cryptocurrency/quotes/latest", params)
     d = data.get("data", {})
@@ -108,10 +104,7 @@ def fetch_cmc_ohlcv(
     interval: str = "daily",
     max_months: int = DEFAULT_MAX_MONTHS,
 ) -> pd.DataFrame:
-    """Historical OHLCV via CMC.
-    NOTE: Requires a CMC plan that includes historical OHLCV. On Free, this raises a clear message.
-    If you want silent fallback, call via fetch_cmc_ohlcv_safe() below.
-    """
+
     start, end = _clamp_cmc_window(start, end, max_months=max_months)
     params = {
         "symbol": symbol,
@@ -151,7 +144,6 @@ def fetch_cmc_ohlcv(
 
 
 def fetch_cmc_ohlcv_safe(*args, **kwargs) -> pd.DataFrame:
-    """Wrapper that degrades gracefully to typed-empty if your plan doesn't allow OHLCV."""
     try:
         return fetch_cmc_ohlcv(*args, **kwargs)
     except Exception as e:

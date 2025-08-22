@@ -15,30 +15,15 @@ logger = logging.getLogger(__name__)
 
 
 class DataLoader:
-    """Handles loading and caching of financial data for analysis."""
     
     def __init__(self, data_dir: str = "data", cache_dir: str = "data/cache"):
-        """
-        Initialize data loader.
-        
-        Args:
-            data_dir: Directory containing data files
-            cache_dir: Directory for caching processed data
-        """
+
         self.data_dir = Path(data_dir)
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         
     def load_cached_data(self, cache_key: str) -> Optional[pd.DataFrame]:
-        """
-        Load data from cache if it exists.
-        
-        Args:
-            cache_key: Unique identifier for cached data
-            
-        Returns:
-            DataFrame if cached data exists, None otherwise
-        """
+
         cache_file = self.cache_dir / f"{cache_key}.pkl"
         
         if cache_file.exists():
@@ -52,13 +37,7 @@ class DataLoader:
         return None
     
     def save_to_cache(self, data: pd.DataFrame, cache_key: str) -> None:
-        """
-        Save data to cache.
-        
-        Args:
-            data: DataFrame to cache
-            cache_key: Unique identifier for cached data
-        """
+
         cache_file = self.cache_dir / f"{cache_key}.pkl"
         
         try:
@@ -70,17 +49,7 @@ class DataLoader:
     def load_symbol_data(self, symbol: str, 
                         start_date: Optional[str] = None,
                         end_date: Optional[str] = None) -> pd.DataFrame:
-        """
-        Load data for a specific symbol.
-        
-        Args:
-            symbol: Trading symbol
-            start_date: Start date filter (YYYY-MM-DD)
-            end_date: End date filter (YYYY-MM-DD)
-            
-        Returns:
-            DataFrame with symbol data
-        """
+
         # Look for various file formats
         possible_files = [
             self.data_dir / f"{symbol}.pkl",
@@ -120,17 +89,7 @@ class DataLoader:
     def load_multiple_symbols(self, symbols: List[str],
                              start_date: Optional[str] = None,
                              end_date: Optional[str] = None) -> Dict[str, pd.DataFrame]:
-        """
-        Load data for multiple symbols.
-        
-        Args:
-            symbols: List of trading symbols
-            start_date: Start date filter
-            end_date: End date filter
-            
-        Returns:
-            Dictionary mapping symbols to DataFrames
-        """
+
         data = {}
         for symbol in symbols:
             df = self.load_symbol_data(symbol, start_date, end_date)
@@ -142,17 +101,7 @@ class DataLoader:
     def filter_by_dates(self, df: pd.DataFrame,
                        start_date: Optional[str] = None,
                        end_date: Optional[str] = None) -> pd.DataFrame:
-        """
-        Filter DataFrame by date range.
-        
-        Args:
-            df: DataFrame with datetime index
-            start_date: Start date (YYYY-MM-DD)
-            end_date: End date (YYYY-MM-DD)
-            
-        Returns:
-            Filtered DataFrame
-        """
+
         if df.empty:
             return df
         
@@ -175,15 +124,7 @@ class DataLoader:
         return df
     
     def load_model_results(self, model_name: str) -> Optional[Dict]:
-        """
-        Load saved model results.
-        
-        Args:
-            model_name: Name of the model
-            
-        Returns:
-            Dictionary with model results or None
-        """
+
         results_file = self.data_dir / "results" / f"{model_name}_results.pkl"
         
         if results_file.exists():
@@ -198,13 +139,7 @@ class DataLoader:
         return None
     
     def save_model_results(self, results: Dict, model_name: str) -> None:
-        """
-        Save model results.
-        
-        Args:
-            results: Dictionary with model results
-            model_name: Name of the model
-        """
+
         results_dir = self.data_dir / "results"
         results_dir.mkdir(exist_ok=True)
         
@@ -218,12 +153,7 @@ class DataLoader:
             logger.error(f"Failed to save results for {model_name}: {e}")
     
     def get_available_symbols(self) -> List[str]:
-        """
-        Get list of available symbols in data directory.
-        
-        Returns:
-            List of symbol names
-        """
+
         symbols = set()
         
         # Check different data directories
@@ -239,15 +169,7 @@ class DataLoader:
         return sorted(list(symbols))
     
     def get_data_info(self, symbol: str) -> Dict:
-        """
-        Get information about available data for a symbol.
-        
-        Args:
-            symbol: Trading symbol
-            
-        Returns:
-            Dictionary with data information
-        """
+
         df = self.load_symbol_data(symbol)
         
         if df.empty:
@@ -271,18 +193,7 @@ class DataLoader:
                                feature_columns: List[str],
                                start_date: Optional[str] = None,
                                end_date: Optional[str] = None) -> pd.DataFrame:
-        """
-        Create a combined dataset from multiple symbols.
-        
-        Args:
-            symbols: List of symbols to combine
-            feature_columns: Columns to include
-            start_date: Start date filter
-            end_date: End date filter
-            
-        Returns:
-            Combined DataFrame with MultiIndex columns (symbol, feature)
-        """
+
         data_frames = []
         
         for symbol in symbols:
@@ -306,15 +217,7 @@ class DataLoader:
             return pd.DataFrame()
     
     def clear_cache(self, older_than_days: Optional[int] = None) -> int:
-        """
-        Clear cached data files.
-        
-        Args:
-            older_than_days: Only clear files older than this many days
-            
-        Returns:
-            Number of files deleted
-        """
+
         deleted = 0
         cutoff_date = None
         
@@ -339,12 +242,10 @@ class DataLoader:
 
 # Convenience functions
 def load_data(symbol: str, data_dir: str = "data") -> pd.DataFrame:
-    """Quick function to load data for a single symbol."""
     loader = DataLoader(data_dir)
     return loader.load_symbol_data(symbol)
 
 
 def load_multiple_data(symbols: List[str], data_dir: str = "data") -> Dict[str, pd.DataFrame]:
-    """Quick function to load data for multiple symbols."""
     loader = DataLoader(data_dir)
     return loader.load_multiple_symbols(symbols)

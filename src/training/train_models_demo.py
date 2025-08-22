@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-"""
+
 
 import sys
 import os
@@ -44,7 +43,7 @@ print("\n2. FEATURE ENGINEERING")
 print("-"*60)
 
 def create_features(data, name):
-    """Create ML features"""
+    
     df = pd.DataFrame()
     
     # Handle multi-level columns from yfinance
@@ -105,7 +104,7 @@ from sklearn.metrics import accuracy_score
 import xgboost as xgb
 
 def quick_training(data, name):
-    """Quick training with minimal iterations - what we've been doing"""
+    
     
     print(f"\n{name} - Quick Training:")
     
@@ -159,7 +158,7 @@ print("\n4. PROPER TRAINING (SUFFICIENT)")
 print("-"*60)
 
 def proper_training(data, name):
-    """Proper training with adequate iterations"""
+    
     
     print(f"\n{name} - Proper Training:")
     
@@ -245,7 +244,7 @@ try:
             return torch.sigmoid(self.fc(out[:, -1, :]))
     
     def train_lstm(data, name, epochs=10):
-        """Train LSTM with given epochs"""
+        
         
         print(f"\n{name} LSTM Training ({epochs} epochs):")
         

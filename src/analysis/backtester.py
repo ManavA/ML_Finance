@@ -1,5 +1,5 @@
 # src/analysis/backtester.py
-"""Backtesting framework for strategy analysis."""
+
 
 import pandas as pd
 import numpy as np
@@ -11,7 +11,7 @@ warnings.filterwarnings('ignore')
 
 @dataclass
 class BacktestResults:
-    """Container for backtest results."""
+    
     strategy_name: str
     returns: pd.Series
     cumulative_returns: pd.Series
@@ -23,7 +23,7 @@ class BacktestResults:
 
 
 class Backtester:
-    """Simple backtesting engine for research."""
+    
     
     def __init__(self, 
                  initial_capital: float = 10000,
@@ -37,7 +37,7 @@ class Backtester:
                 data: pd.DataFrame, 
                 signals: pd.Series,
                 strategy_name: str = "Strategy") -> BacktestResults:
-        """Run backtest on signals."""
+        
         # Align data and signals
         common_index = data.index.intersection(signals.index)
         data = data.loc[common_index]
@@ -87,7 +87,7 @@ class Backtester:
         )
     
     def _calculate_positions(self, signals: pd.Series) -> pd.Series:
-        """Convert signals to positions."""
+        
         positions = pd.Series(index=signals.index, data=0.0)
         
         position = 0
@@ -101,13 +101,13 @@ class Backtester:
         return positions
     
     def _identify_trades(self, positions: pd.Series) -> pd.Series:
-        """Identify when trades occur."""
+        
         trades = positions.diff().abs()
         trades = trades.fillna(0)
         return trades
     
     def _calculate_drawdown(self, equity_curve: pd.Series) -> pd.Series:
-        """Calculate drawdown series."""
+        
         running_max = equity_curve.expanding().max()
         drawdown = (equity_curve - running_max) / running_max
         return drawdown
@@ -117,7 +117,7 @@ class Backtester:
                           equity_curve: pd.Series,
                           positions: pd.Series,
                           trades: pd.Series) -> Dict[str, float]:
-        """Calculate performance metrics."""
+        
         
         # Basic metrics
         total_return = (equity_curve.iloc[-1] / self.initial_capital) - 1
@@ -196,7 +196,7 @@ class Backtester:
                           data: pd.DataFrame,
                           positions: pd.Series,
                           trades: pd.Series) -> pd.DataFrame:
-        """Compile detailed trade log."""
+        
         trade_list = []
         position = 0
         entry_date = None
@@ -231,7 +231,7 @@ class Backtester:
     
     def compare_strategies(self, 
                           results_list: List[BacktestResults]) -> pd.DataFrame:
-        """Compare multiple strategy results."""
+        
         comparison = []
         
         for result in results_list:

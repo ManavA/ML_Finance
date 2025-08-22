@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-FOCUSED RL TRAINING
-"""
+
 
 import sys
 import os
@@ -372,4 +370,3 @@ if __name__ == "__main__":
     torch.save(dqn_agent.q_network.state_dict(), 'models/focused_dqn.pt')
     print(f"[SAVED] Model saved to models/focused_dqn.pt")
     
-    print(f"\n[+] RL model now properly trained with sufficient episodes!") 

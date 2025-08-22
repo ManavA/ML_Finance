@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-Traditional trading strategies for baseline comparison
-Implements momentum, mean reversion, trend following, and buy-and-hold
-"""
+
 
 import pandas as pd
 import numpy as np
@@ -12,7 +9,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Try to import talib, but provide fallback implementations
 try:
     import talib
     TALIB_AVAILABLE = True
@@ -21,7 +17,6 @@ except ImportError:
     print("TA-Lib not available. Using fallback implementations.")
 
 class BaseStrategy(ABC):
-    """Base class for all trading strategies"""
     
     def __init__(self, name: str, params: Optional[Dict] = None):
         self.name = name
@@ -29,11 +24,9 @@ class BaseStrategy(ABC):
         
     @abstractmethod
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate trading signals from data"""
         raise NotImplementedError("Subclasses must implement generate_signals")
     
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Preprocess data before signal generation"""
         # Ensure we have required columns
         required_cols = ['open', 'high', 'low', 'close', 'volume']
         for col in required_cols:
@@ -42,18 +35,16 @@ class BaseStrategy(ABC):
         return data
 
 class BuyAndHoldStrategy(BaseStrategy):
-    """Simple buy and hold strategy"""
     
     def __init__(self):
         super().__init__("BuyAndHold")
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Always long position"""
+        
         data = self.preprocess_data(data)
         return np.ones(len(data))
 
 class MomentumStrategy(BaseStrategy):
-    """Momentum-based trading strategy"""
     
     def __init__(self, lookback: int = 20, threshold: float = 0.0):
         super().__init__("Momentum", {"lookback": lookback, "threshold": threshold})
@@ -61,7 +52,6 @@ class MomentumStrategy(BaseStrategy):
         self.threshold = threshold
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on momentum"""
         data = self.preprocess_data(data)
         
         # Calculate momentum (rate of change)
@@ -78,7 +68,6 @@ class MomentumStrategy(BaseStrategy):
         return signals
 
 class MeanReversionStrategy(BaseStrategy):
-    """Mean reversion trading strategy using Bollinger Bands"""
     
     def __init__(self, period: int = 20, num_std: float = 2.0):
         super().__init__("MeanReversion", {"period": period, "num_std": num_std})
@@ -86,7 +75,6 @@ class MeanReversionStrategy(BaseStrategy):
         self.num_std = num_std
     
     def _calculate_bollinger_bands(self, prices: np.ndarray):
-        """Fallback Bollinger Bands calculation"""
         middle = pd.Series(prices).rolling(window=self.period).mean().values
         std = pd.Series(prices).rolling(window=self.period).std().values
         upper = middle + (std * self.num_std)
@@ -94,7 +82,6 @@ class MeanReversionStrategy(BaseStrategy):
         return upper, middle, lower
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on mean reversion"""
         data = self.preprocess_data(data)
         
         # Calculate Bollinger Bands
@@ -130,7 +117,6 @@ class MeanReversionStrategy(BaseStrategy):
         return signals
 
 class TrendFollowingStrategy(BaseStrategy):
-    """Trend following strategy using moving average crossover"""
     
     def __init__(self, fast_period: int = 10, slow_period: int = 30):
         super().__init__("TrendFollowing", {"fast_period": fast_period, "slow_period": slow_period})
@@ -138,11 +124,9 @@ class TrendFollowingStrategy(BaseStrategy):
         self.slow_period = slow_period
     
     def _calculate_ema(self, prices: np.ndarray, period: int):
-        """Fallback EMA calculation"""
         return pd.Series(prices).ewm(span=period, adjust=False).mean().values
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on MA crossover"""
         data = self.preprocess_data(data)
         
         # Calculate moving averages
@@ -168,7 +152,6 @@ class TrendFollowingStrategy(BaseStrategy):
         return signals
 
 class RSIMeanReversionStrategy(BaseStrategy):
-    """RSI-based mean reversion strategy"""
     
     def __init__(self, period: int = 14, oversold: float = 30, overbought: float = 70):
         super().__init__("RSIMeanReversion", {
@@ -181,7 +164,6 @@ class RSIMeanReversionStrategy(BaseStrategy):
         self.overbought = overbought
     
     def _calculate_rsi(self, prices: np.ndarray):
-        """Fallback RSI calculation"""
         delta = pd.Series(prices).diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=self.period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=self.period).mean()
@@ -190,7 +172,6 @@ class RSIMeanReversionStrategy(BaseStrategy):
         return rsi.values
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on RSI levels"""
         data = self.preprocess_data(data)
         
         # Calculate RSI
@@ -216,7 +197,6 @@ class RSIMeanReversionStrategy(BaseStrategy):
         return signals
 
 class MACDStrategy(BaseStrategy):
-    """MACD-based trading strategy"""
     
     def __init__(self, fast: int = 12, slow: int = 26, signal: int = 9):
         super().__init__("MACD", {"fast": fast, "slow": slow, "signal": signal})
@@ -225,7 +205,6 @@ class MACDStrategy(BaseStrategy):
         self.signal = signal
     
     def _calculate_macd(self, prices: np.ndarray):
-        """Fallback MACD calculation"""
         prices_series = pd.Series(prices)
         ema_fast = prices_series.ewm(span=self.fast, adjust=False).mean()
         ema_slow = prices_series.ewm(span=self.slow, adjust=False).mean()
@@ -235,7 +214,6 @@ class MACDStrategy(BaseStrategy):
         return macd.values, macd_signal.values, macd_hist.values
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on MACD"""
         data = self.preprocess_data(data)
         
         # Calculate MACD
@@ -264,7 +242,6 @@ class MACDStrategy(BaseStrategy):
         return signals
 
 class BreakoutStrategy(BaseStrategy):
-    """Breakout trading strategy"""
     
     def __init__(self, lookback: int = 20, breakout_factor: float = 1.0):
         super().__init__("Breakout", {"lookback": lookback, "breakout_factor": breakout_factor})
@@ -272,7 +249,6 @@ class BreakoutStrategy(BaseStrategy):
         self.breakout_factor = breakout_factor
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on price breakouts"""
         data = self.preprocess_data(data)
         
         # Calculate rolling high and low
@@ -300,7 +276,6 @@ class BreakoutStrategy(BaseStrategy):
         return signals
 
 class VolumeWeightedMomentumStrategy(BaseStrategy):
-    """Volume-weighted momentum strategy"""
     
     def __init__(self, lookback: int = 20, volume_ma: int = 20):
         super().__init__("VolumeWeightedMomentum", {
@@ -311,7 +286,6 @@ class VolumeWeightedMomentumStrategy(BaseStrategy):
         self.volume_ma = volume_ma
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on volume-weighted momentum"""
         data = self.preprocess_data(data)
         
         # Calculate momentum
@@ -339,14 +313,12 @@ class VolumeWeightedMomentumStrategy(BaseStrategy):
         return signals
 
 class AdaptiveTrendStrategy(BaseStrategy):
-    """Adaptive trend following using simple adaptive moving average"""
     
     def __init__(self, period: int = 10):
         super().__init__("AdaptiveTrend", {"period": period})
         self.period = period
     
     def _calculate_adaptive_ma(self, prices: np.ndarray):
-        """Simple adaptive moving average calculation"""
         prices_series = pd.Series(prices)
         # Use exponential moving average with varying alpha based on volatility
         volatility = prices_series.rolling(self.period).std()
@@ -362,7 +334,6 @@ class AdaptiveTrendStrategy(BaseStrategy):
         return ema.values
     
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on adaptive moving average"""
         data = self.preprocess_data(data)
         
         # Calculate adaptive moving average
@@ -395,20 +366,13 @@ class AdaptiveTrendStrategy(BaseStrategy):
         return signals
 
 class CompositeStrategy(BaseStrategy):
-    """Composite strategy combining multiple signals"""
     
     def __init__(self, strategies: Dict[BaseStrategy, float]):
-        """
-        Initialize composite strategy
-        
-        Args:
-            strategies: Dictionary of strategy -> weight
-        """
+
         super().__init__("Composite")
         self.strategies = strategies
         
     def generate_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals by combining multiple strategies"""
         data = self.preprocess_data(data)
         
         # Collect signals from all strategies
@@ -434,7 +398,6 @@ class CompositeStrategy(BaseStrategy):
         return final_signals
 
 def create_strategy_suite() -> Dict[str, BaseStrategy]:
-    """Create a suite of traditional strategies for comparison"""
     strategies = {
         'buy_and_hold': BuyAndHoldStrategy(),
         'momentum': MomentumStrategy(lookback=20),

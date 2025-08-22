@@ -1,6 +1,4 @@
-"""
-Model Validation and Testing
-"""
+
 
 import numpy as np
 import pandas as pd
@@ -13,9 +11,7 @@ warnings.filterwarnings('ignore')
 
 
 class WalkForwardValidator:
-    """
-    Implements proper walk-forward validation for time series
-    """
+    
     
     def __init__(self, 
                  n_splits: int = 5,
@@ -56,9 +52,7 @@ class WalkForwardValidator:
     
     def validate_model(self, model, X: pd.DataFrame, y: pd.Series, 
                        model_name: str = "Model") -> Dict:
-        """
-        Perform walk-forward validation and return comprehensive metrics
-        """
+        
         results = {
             'model_name': model_name,
             'fold_results': [],
@@ -137,9 +131,7 @@ class StatisticalValidator:
                              errors1: np.ndarray, 
                              errors2: np.ndarray,
                              h: int = 1) -> Dict:
-        """
-        Diebold-Mariano test for comparing forecast accuracy
-        """
+        
         d = errors1**2 - errors2**2  # Using squared loss
         
         # Calculate test statistic
@@ -164,9 +156,7 @@ class StatisticalValidator:
         }
     
     def white_reality_check(self, returns: np.ndarray, n_bootstrap: int = 1000) -> Dict:
-        """
-        White's Reality Check for data snooping bias
-        """
+        
         n = len(returns)
         
         # Bootstrap distribution under null hypothesis
@@ -202,9 +192,7 @@ class StatisticalValidator:
         }
     
     def variance_ratio_test(self, returns: pd.Series, lags: List[int] = [2, 4, 8, 16]) -> Dict:
-        """
-        Variance ratio test for market efficiency
-        """
+        
         results = {}
         
         for lag in lags:
@@ -236,9 +224,7 @@ class HyperparameterValidator:
 
     @staticmethod
     def get_xgboost_params(data_size: int, task: str = 'regression') -> Dict:
-        """
-        Get recommended XGBoost parameters based on data size
-        """
+        
         if data_size < 10000:
             # Small dataset - prevent overfitting
             params = {
@@ -287,9 +273,7 @@ class HyperparameterValidator:
     
     @staticmethod
     def get_lightgbm_params(data_size: int, task: str = 'regression') -> Dict:
-        """
-        Get recommended LightGBM parameters based on data size
-        """
+        
         if data_size < 10000:
             # Small dataset
             params = {

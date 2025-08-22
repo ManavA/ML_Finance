@@ -1,8 +1,4 @@
 # src/models/reinforcement_learning.py
-"""
-Complete Reinforcement Learning Models for Cryptocurrency Trading
-Including DQN, PPO, A2C, SAC, and Rainbow DQN
-"""
 
 import numpy as np
 import pandas as pd
@@ -19,13 +15,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ============================================================================
-# CRYPTO TRADING ENVIRONMENT
-# ============================================================================
-
 class CryptoTradingEnv(gym.Env):
-    """Advanced cryptocurrency trading environment for RL agents"""
-    
     def __init__(self, 
                  data: pd.DataFrame,
                  initial_balance: float = 10000,
@@ -34,18 +24,7 @@ class CryptoTradingEnv(gym.Env):
                  max_position: float = 1.0,
                  lookback_window: int = 50,
                  reward_scaling: float = 1e-4):
-        """
-        Initialize trading environment
-        
-        Args:
-            data: OHLCV data with technical indicators
-            initial_balance: Starting capital
-            commission: Trading commission (0.1%)
-            slippage: Slippage percentage
-            max_position: Maximum position size (1.0 = 100% of capital)
-            lookback_window: Historical window for observations
-            reward_scaling: Scale factor for rewards
-        """
+    
         super().__init__()
         
         self.data = data
@@ -72,34 +51,27 @@ class CryptoTradingEnv(gym.Env):
         self.reset()
     
     def _get_features(self, idx: int) -> np.ndarray:
-        """Extract features for given index"""
         if idx < 0 or idx >= len(self.data):
-            return np.zeros(20)  # Return zeros for out of bounds
+            return np.zeros(20)
         
         row = self.data.iloc[idx]
         
-        # Price features
         returns = row.get('returns', 0)
         log_returns = np.log1p(returns) if returns > -1 else -1
         
-        # Technical indicators (normalized)
         rsi = (row.get('RSI', 50) - 50) / 50
         macd = row.get('MACD', 0) / row.get('close', 1)
         bb_position = (row.get('close', 0) - row.get('BB_lower', 0)) / \
                       (row.get('BB_upper', 1) - row.get('BB_lower', 0.01))
         
-        # Volume features
         volume_ratio = row.get('volume', 0) / self.data['volume'].rolling(20).mean().iloc[idx] \
                       if idx >= 20 else 1
         
-        # Volatility
         volatility = self.data['returns'].rolling(20).std().iloc[idx] if idx >= 20 else 0.02
         
-        # Market microstructure
         high_low_ratio = (row.get('high', 1) - row.get('low', 1)) / row.get('close', 1)
         close_open_ratio = (row.get('close', 1) - row.get('open', 1)) / row.get('open', 1)
         
-        # Portfolio state
         position_ratio = self.position / self.max_position
         pnl_ratio = (self.balance - self.initial_balance) / self.initial_balance
         
@@ -115,21 +87,20 @@ class CryptoTradingEnv(gym.Env):
             close_open_ratio,
             position_ratio,
             pnl_ratio,
-            self.position,  # Current position
-            self.balance / self.initial_balance,  # Normalized balance
-            self.trades_count / 100,  # Normalized trade count
-            self.win_rate,  # Current win rate
-            self.sharpe_ratio,  # Running Sharpe ratio
-            self.max_drawdown,  # Current max drawdown
-            self.holding_time / 100,  # Normalized holding time
-            row.get('SMA_20', 0) / row.get('close', 1),  # SMA ratio
-            row.get('EMA_12', 0) / row.get('close', 1),  # EMA ratio
+            self.position,
+            self.balance / self.initial_balance,
+            self.trades_count / 100,
+            self.win_rate,
+            self.sharpe_ratio,
+            self.max_drawdown,
+            self.holding_time / 100,
+            row.get('SMA_20', 0) / row.get('close', 1),
+            row.get('EMA_12', 0) / row.get('close', 1),
         ])
         
         return features
     
     def _get_observation(self) -> np.ndarray:
-        """Get current observation window"""
         observations = []
         
         for i in range(self.lookback_window):
@@ -140,7 +111,6 @@ class CryptoTradingEnv(gym.Env):
         return np.array(observations, dtype=np.float32)
     
     def reset(self, seed: Optional[int] = None) -> Tuple[np.ndarray, Dict]:
-        """Reset environment to initial state"""
         super().reset(seed=seed)
         
         self.balance = self.initial_balance
@@ -166,9 +136,6 @@ class CryptoTradingEnv(gym.Env):
         return observation, info
     
     def step(self, action: int) -> Tuple[np.ndarray, float, bool, bool, Dict]:
-        """Execute one step in the environment"""
-        
-        # Store previous balance for reward calculation
         prev_balance = self.balance
         prev_position_value = self.position * self.data.iloc[self.current_step]['close'] \
                               if self.position > 0 else 0
@@ -202,7 +169,6 @@ class CryptoTradingEnv(gym.Env):
         return observation, reward, done, truncated, info
     
     def _execute_action(self, action: int):
-        """Execute trading action"""
         current_price = self.data.iloc[self.current_step]['close']
         
         # Map action to position change
@@ -268,7 +234,6 @@ class CryptoTradingEnv(gym.Env):
         self.action_history.append(action)
     
     def _calculate_reward(self, prev_total: float, current_total: float, action: int) -> float:
-        """Calculate step reward using advanced reward shaping"""
         
         # Base reward: change in total portfolio value
         value_change = (current_total - prev_total) / prev_total
@@ -297,7 +262,6 @@ class CryptoTradingEnv(gym.Env):
         return total_reward * self.reward_scaling
     
     def _update_metrics(self):
-        """Update performance metrics"""
         
         # Win rate
         if self.trades_count > 0:
@@ -320,7 +284,6 @@ class CryptoTradingEnv(gym.Env):
             self.holding_time += 1
     
     def _get_info(self) -> Dict:
-        """Get environment info"""
         return {
             'balance': self.balance,
             'position': self.position,
@@ -334,21 +297,13 @@ class CryptoTradingEnv(gym.Env):
         }
 
 
-# ============================================================================
-# DQN AGENT
-# ============================================================================
-
 class DQNetwork(nn.Module):
-    """Deep Q-Network architecture"""
-    
     def __init__(self, input_shape: Tuple[int, int], n_actions: int, hidden_size: int = 512):
         super(DQNetwork, self).__init__()
         
         # Flatten input shape
         self.input_size = input_shape[0] * input_shape[1]
         
-        # Dueling DQN architecture
-        # Feature extraction layers
         self.feature_layer = nn.Sequential(
             nn.Linear(self.input_size, hidden_size),
             nn.ReLU(),
@@ -385,15 +340,12 @@ class DQNetwork(nn.Module):
         value = self.value_stream(features)
         advantages = self.advantage_stream(features)
         
-        # Combine to get Q-values (Dueling DQN formula)
         q_values = value + (advantages - advantages.mean(dim=1, keepdim=True))
         
         return q_values
 
 
 class PrioritizedReplayBuffer:
-    """Prioritized Experience Replay Buffer"""
-    
     def __init__(self, capacity: int, alpha: float = 0.6, beta: float = 0.4):
         self.capacity = capacity
         self.alpha = alpha  # Prioritization exponent
@@ -408,7 +360,6 @@ class PrioritizedReplayBuffer:
                                      ['state', 'action', 'reward', 'next_state', 'done'])
     
     def push(self, state, action, reward, next_state, done):
-        """Add experience to buffer"""
         max_priority = self.priorities.max() if self.buffer else 1.0
         
         if len(self.buffer) < self.capacity:
@@ -420,13 +371,11 @@ class PrioritizedReplayBuffer:
         self.position = (self.position + 1) % self.capacity
     
     def sample(self, batch_size: int):
-        """Sample batch with prioritization"""
         if len(self.buffer) == self.capacity:
             priorities = self.priorities
         else:
             priorities = self.priorities[:self.position]
         
-        # Calculate sampling probabilities
         probabilities = priorities ** self.alpha
         probabilities /= probabilities.sum()
         
@@ -453,7 +402,6 @@ class PrioritizedReplayBuffer:
         return states, actions, rewards, next_states, dones, indices, weights
     
     def update_priorities(self, indices, td_errors):
-        """Update priorities based on TD errors"""
         for idx, td_error in zip(indices, td_errors):
             priority = abs(td_error) + 1e-6
             self.priorities[idx] = priority
@@ -463,8 +411,6 @@ class PrioritizedReplayBuffer:
 
 
 class DQNAgent:
-    """Deep Q-Network Agent with advanced features"""
-    
     def __init__(self,
                  state_shape: Tuple[int, int],
                  n_actions: int,
@@ -478,23 +424,7 @@ class DQNAgent:
                  update_frequency: int = 4,
                  target_update_frequency: int = 1000,
                  device: str = 'cuda' if torch.cuda.is_available() else 'cpu'):
-        """
-        Initialize DQN agent
-        
-        Args:
-            state_shape: Shape of observation space
-            n_actions: Number of actions
-            learning_rate: Learning rate
-            gamma: Discount factor
-            epsilon_start: Initial exploration rate
-            epsilon_end: Final exploration rate
-            epsilon_decay: Epsilon decay steps
-            buffer_size: Replay buffer size
-            batch_size: Training batch size
-            update_frequency: Steps between training updates
-            target_update_frequency: Steps between target network updates
-            device: Device to use for training
-        """
+
         
         self.state_shape = state_shape
         self.n_actions = n_actions
@@ -526,7 +456,6 @@ class DQNAgent:
         self.training_losses = []
     
     def select_action(self, state: np.ndarray, training: bool = True) -> int:
-        """Select action using epsilon-greedy policy"""
         
         if training and random.random() < self.epsilon:
             return random.randrange(self.n_actions)
@@ -537,11 +466,9 @@ class DQNAgent:
             return q_values.argmax().item()
     
     def store_transition(self, state, action, reward, next_state, done):
-        """Store transition in replay buffer"""
         self.replay_buffer.push(state, action, reward, next_state, done)
     
     def train_step(self):
-        """Perform one training step"""
         
         if len(self.replay_buffer) < self.batch_size:
             return
@@ -560,7 +487,6 @@ class DQNAgent:
         # Current Q values
         current_q_values = self.q_network(states).gather(1, actions.unsqueeze(1)).squeeze(1)
         
-        # Double DQN: use online network to select action, target network to evaluate
         with torch.no_grad():
             next_actions = self.q_network(next_states).argmax(1)
             next_q_values = self.target_network(next_states).gather(1, next_actions.unsqueeze(1)).squeeze(1)
@@ -592,7 +518,6 @@ class DQNAgent:
         self.steps += 1
     
     def save(self, path: str):
-        """Save agent state"""
         torch.save({
             'q_network': self.q_network.state_dict(),
             'target_network': self.target_network.state_dict(),
@@ -602,7 +527,6 @@ class DQNAgent:
         }, path)
     
     def load(self, path: str):
-        """Load agent state"""
         checkpoint = torch.load(path, map_location=self.device)
         self.q_network.load_state_dict(checkpoint['q_network'])
         self.target_network.load_state_dict(checkpoint['target_network'])
@@ -611,25 +535,10 @@ class DQNAgent:
         self.epsilon = checkpoint['epsilon']
 
 
-# ============================================================================
-# TRAINING FUNCTION
-# ============================================================================
-
 def train_dqn(data: pd.DataFrame, 
               episodes: int = 100,
               save_path: str = 'models/dqn_crypto.pt') -> DQNAgent:
-    """
-    Train DQN agent on cryptocurrency data
-    
-    Args:
-        data: OHLCV data with technical indicators
-        episodes: Number of training episodes
-        save_path: Path to save trained model
-        
-    Returns:
-        Trained DQN agent
-    """
-    
+
     # Create environment
     env = CryptoTradingEnv(data)
     

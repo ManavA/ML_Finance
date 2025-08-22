@@ -1,7 +1,5 @@
 # src/strategies/ensemble.py
-"""
-Ensemble trading strategies that combine multiple base strategies
-"""
+
 
 import numpy as np
 import pandas as pd
@@ -10,9 +8,7 @@ from .baseline_strategies import BaseStrategy
 
 
 class AdaptiveEnsemble(BaseStrategy):
-    """
-    Dynamically weight strategies based on recent performance
-    """
+
     def __init__(self, strategies: List[BaseStrategy], lookback: int = 30):
         super().__init__("Adaptive Ensemble")
         self.strategies = strategies
@@ -21,10 +17,7 @@ class AdaptiveEnsemble(BaseStrategy):
         self.performance_history = []
     
     def update_weights(self, recent_performance: np.ndarray):
-        """
-        Update strategy weights based on recent performance
-        Uses exponential weighting of recent returns
-        """
+
         if len(recent_performance) == 0:
             return
         
@@ -41,9 +34,7 @@ class AdaptiveEnsemble(BaseStrategy):
         self.weights = exp_perf / np.sum(exp_perf)
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Combine signals from multiple strategies using current weights
-        """
+
         if not self.strategies:
             return pd.Series(index=data.index, data=0)
         
@@ -73,19 +64,14 @@ class AdaptiveEnsemble(BaseStrategy):
 
 
 class VotingEnsemble(BaseStrategy):
-    """
-    Majority voting ensemble - simple democratic approach
-    """
-    
+
     def __init__(self, strategies: List[BaseStrategy], min_votes: int = None):
         super().__init__("Voting Ensemble")
         self.strategies = strategies
         self.min_votes = min_votes or (len(strategies) // 2 + 1)
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals based on majority voting
-        """
+
         if not self.strategies:
             return pd.Series(index=data.index, data=0)
         
@@ -120,9 +106,7 @@ class VotingEnsemble(BaseStrategy):
 
 
 class StackedEnsemble(BaseStrategy):
-    """
-    Stacked ensemble using a meta-learner to combine strategies
-    """
+
     
     def __init__(self, strategies: List[BaseStrategy], meta_model=None):
         super().__init__("Stacked Ensemble")
@@ -131,9 +115,7 @@ class StackedEnsemble(BaseStrategy):
         self.is_trained = False
     
     def train_meta_model(self, data: pd.DataFrame, target_returns: pd.Series):
-        """
-        Train the meta-model on strategy outputs
-        """
+
         # Get strategy signals as features
         strategy_features = []
         feature_names = []
@@ -170,9 +152,7 @@ class StackedEnsemble(BaseStrategy):
             print(f"Meta-model trained on {len(aligned_features)} samples")
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals using trained meta-model
-        """
+
         if not self.strategies:
             return pd.Series(index=data.index, data=0)
         
@@ -210,9 +190,7 @@ class StackedEnsemble(BaseStrategy):
         return self._simple_average(strategy_features, data.index)
     
     def _simple_average(self, strategy_features: List[pd.Series], index: pd.Index) -> pd.Series:
-        """
-        Fallback method: simple average of strategy signals
-        """
+
         if not strategy_features:
             return pd.Series(index=index, data=0)
         
@@ -228,9 +206,7 @@ class StackedEnsemble(BaseStrategy):
 
 
 class RiskParityEnsemble(BaseStrategy):
-    """
-    Risk parity ensemble - weight strategies by inverse volatility
-    """
+
     
     def __init__(self, strategies: List[BaseStrategy], lookback: int = 60):
         super().__init__("Risk Parity Ensemble")
@@ -240,9 +216,7 @@ class RiskParityEnsemble(BaseStrategy):
         self.weights = np.ones(len(strategies)) / len(strategies)
     
     def update_strategy_returns(self, data: pd.DataFrame, returns: pd.Series):
-        """
-        Track returns for each strategy to calculate volatilities
-        """
+
         for i, strategy in enumerate(self.strategies):
             strategy_name = strategy.name
             
@@ -267,9 +241,7 @@ class RiskParityEnsemble(BaseStrategy):
                 print(f"Failed to update returns for {strategy_name}: {e}")
     
     def calculate_risk_parity_weights(self):
-        """
-        Calculate weights based on inverse volatility (risk parity)
-        """
+
         volatilities = []
         
         for strategy in self.strategies:
@@ -286,9 +258,7 @@ class RiskParityEnsemble(BaseStrategy):
         self.weights = inv_vol_weights / np.sum(inv_vol_weights)
     
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
-        """
-        Generate signals using risk parity weighting
-        """
+  
         if not self.strategies:
             return pd.Series(index=data.index, data=0)
         

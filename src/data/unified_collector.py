@@ -1,5 +1,4 @@
 """
-Unified Data Collector with fallback logic and caching
 """
 
 import os
@@ -19,7 +18,6 @@ from data.cmc_client import fetch_cmc_quote_latest, fetch_cmc_ohlcv_safe
 
 
 class UnifiedDataCollector:
-    """Unified interface for cryptocurrency data collection with fallback and caching"""
     
     def __init__(self, cache_dir: str = "data/cache"):
         self.cache_dir = Path(cache_dir)
@@ -38,20 +36,16 @@ class UnifiedDataCollector:
         
     def _generate_cache_key(self, symbol: str, start: str, end: str, 
                            timespan: str, source: str) -> str:
-        """Generate a unique cache key for the data request"""
         key_string = f"{source}_{symbol}_{start}_{end}_{timespan}"
         return hashlib.md5(key_string.encode()).hexdigest()
     
     def _get_cache_path(self, cache_key: str) -> Path:
-        """Get the cache file path for a given cache key"""
         return self.cache_dir / f"{cache_key}.csv"
     
     def _get_cache_metadata_path(self, cache_key: str) -> Path:
-        """Get the cache metadata file path"""
         return self.cache_dir / f"{cache_key}_meta.json"
     
     def _is_cache_valid(self, cache_key: str, max_age_hours: int = 24) -> bool:
-        """Check if cached data exists and is still valid"""
         cache_path = self._get_cache_path(cache_key)
         meta_path = self._get_cache_metadata_path(cache_key)
         
@@ -72,7 +66,6 @@ class UnifiedDataCollector:
     
     def _save_to_cache(self, data: pd.DataFrame, cache_key: str, 
                       source: str, symbol: str) -> None:
-        """Save data to cache with metadata"""
         if data.empty:
             return
         
@@ -97,7 +90,6 @@ class UnifiedDataCollector:
             json.dump(metadata, f, indent=2)
     
     def _load_from_cache(self, cache_key: str) -> Optional[pd.DataFrame]:
-        """Load data from cache if valid"""
         cache_path = self._get_cache_path(cache_key)
         
         try:
@@ -112,7 +104,6 @@ class UnifiedDataCollector:
     
     def _fetch_polygon_s3(self, symbol: str, start: str, end: str,
                           timespan: str = "hour", **kwargs) -> pd.DataFrame:
-        """Try to fetch data from Polygon S3 flat files"""
         try:
             # Lazy load S3 collector
             if self._s3_collector is None:
@@ -150,7 +141,6 @@ class UnifiedDataCollector:
     
     def _fetch_polygon(self, symbol: str, start: str, end: str, 
                       timespan: str = "hour", **kwargs) -> pd.DataFrame:
-        """Fetch data from Polygon.io"""
         try:
             # Map common timespan values to Polygon format
             timespan_map = {
@@ -183,7 +173,6 @@ class UnifiedDataCollector:
     
     def _fetch_cmc(self, symbol: str, start: str, end: str, 
                   timespan: str = "hour", **kwargs) -> pd.DataFrame:
-        """Fetch data from CoinMarketCap"""
         try:
             # CMC only supports daily historical data on paid plans
             if timespan in ['hour', 'hourly', '1h', 'minute', '1m']:
@@ -212,21 +201,7 @@ class UnifiedDataCollector:
                   source_priority: List[str] = None,
                   use_cache: bool = True,
                   cache_max_age_hours: int = 24) -> pd.DataFrame:
-        """
-        Fetch cryptocurrency data with automatic fallback and caching
-        
-        Args:
-            symbol: Trading pair symbol (e.g., 'BTCUSD', 'ETHUSD')
-            start: Start date (YYYY-MM-DD format)
-            end: End date (YYYY-MM-DD format)
-            timespan: Data frequency ('minute', 'hour', 'day')
-            source_priority: List of sources to try in order
-            use_cache: Whether to use cached data if available
-            cache_max_age_hours: Maximum age of cache in hours
-            
-        Returns:
-            DataFrame with OHLCV data
-        """
+
         # Set defaults
         if end is None:
             end = datetime.now().strftime('%Y-%m-%d')
@@ -276,15 +251,7 @@ class UnifiedDataCollector:
         return pd.DataFrame()
     
     def fetch_latest_quote(self, symbol: str) -> Optional[dict]:
-        """
-        Fetch latest price quote (real-time data)
-        
-        Args:
-            symbol: Trading pair symbol
-            
-        Returns:
-            Dictionary with latest price data or None
-        """
+
         try:
             # Clean symbol for CMC
             cmc_symbol = symbol.replace('USD', '').replace('-', '')
@@ -305,15 +272,7 @@ class UnifiedDataCollector:
         return None
     
     def clear_cache(self, older_than_hours: Optional[int] = None) -> int:
-        """
-        Clear cache files
-        
-        Args:
-            older_than_hours: Only clear files older than this many hours
-            
-        Returns:
-            Number of files deleted
-        """
+
         deleted = 0
         
         for cache_file in self.cache_dir.glob("*.csv"):

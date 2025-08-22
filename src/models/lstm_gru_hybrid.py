@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-Hybrid LSTM-GRU Model
-Combines LSTM and GRU layers for enhanced time series prediction
-"""
+
 
 import torch
 import torch.nn as nn
@@ -15,15 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class LSTMGRUHybrid(nn.Module):
-    """
-    Hybrid model combining LSTM and GRU layers
-    Can be configured in different architectures:
-    1. Parallel: LSTM and GRU process in parallel, outputs concatenated
-    2. Sequential: LSTM -> GRU or GRU -> LSTM
-    3. Stacked: Multiple alternating LSTM/GRU layers
-    4. Ensemble: Multiple LSTM+GRU models with different configs
-    """
-    
+
     def __init__(self, 
                  input_size: int,
                  hidden_size: int = 128,
@@ -31,17 +20,7 @@ class LSTMGRUHybrid(nn.Module):
                  output_size: int = 1,
                  dropout: float = 0.2,
                  architecture: str = 'parallel'):
-        """
-        Initialize hybrid LSTM-GRU model
-        
-        Args:
-            input_size: Number of input features
-            hidden_size: Hidden layer size
-            num_layers: Number of layers for each RNN type
-            output_size: Output dimension
-            dropout: Dropout rate
-            architecture: 'parallel', 'sequential', 'stacked', or 'ensemble'
-        """
+      
         super(LSTMGRUHybrid, self).__init__()
         
         self.input_size = input_size
@@ -156,15 +135,7 @@ class LSTMGRUHybrid(nn.Module):
         self.dropout = nn.Dropout(dropout)
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass through hybrid model
-        
-        Args:
-            x: Input tensor of shape (batch, seq_len, features)
-            
-        Returns:
-            Output predictions
-        """
+
         
         if self.architecture == 'parallel':
             # Process through both LSTM and GRU
@@ -233,19 +204,13 @@ class LSTMGRUHybrid(nn.Module):
 
 
 class MultiArchitectureHybrid(nn.Module):
-    """
-    Combines multiple LSTM-GRU architectures
-    Creates 3-4 different hybrid models and ensembles them
-    """
+
     
     def __init__(self,
                  input_size: int,
                  hidden_size: int = 128,
                  output_size: int = 1,
                  dropout: float = 0.2):
-        """
-        Initialize multi-architecture hybrid
-        """
         super(MultiArchitectureHybrid, self).__init__()
         
         # Create different architectures
@@ -270,9 +235,6 @@ class MultiArchitectureHybrid(nn.Module):
         )
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass through all models with attention weighting
-        """
         # Get predictions from each architecture
         parallel_out = self.parallel_model(x)
         sequential_out = self.sequential_model(x)
@@ -294,17 +256,11 @@ class MultiArchitectureHybrid(nn.Module):
 
 
 class LSTMGRUTrainer:
-    """
-    Trainer for LSTM-GRU hybrid models
-    """
     
     def __init__(self, 
                  model: nn.Module,
                  learning_rate: float = 0.001,
                  device: str = 'cuda' if torch.cuda.is_available() else 'cpu'):
-        """
-        Initialize trainer
-        """
         self.model = model.to(device)
         self.device = device
         self.optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -313,9 +269,6 @@ class LSTMGRUTrainer:
     def train_epoch(self, 
                    train_loader: torch.utils.data.DataLoader,
                    epoch: int) -> float:
-        """
-        Train for one epoch
-        """
         self.model.train()
         total_loss = 0
         
@@ -339,9 +292,6 @@ class LSTMGRUTrainer:
         return total_loss / len(train_loader)
     
     def evaluate(self, val_loader: torch.utils.data.DataLoader) -> Dict:
-        """
-        Evaluate model
-        """
         self.model.eval()
         total_loss = 0
         predictions = []
@@ -378,9 +328,6 @@ class LSTMGRUTrainer:
 
 
 def create_hybrid_models() -> Dict[str, nn.Module]:
-    """
-    Create different LSTM-GRU hybrid configurations
-    """
     models = {
         'parallel': LSTMGRUHybrid(
             input_size=100,  # Adjust based on features
@@ -410,9 +357,6 @@ def create_hybrid_models() -> Dict[str, nn.Module]:
 
 
 def demo_hybrid_models():
-    """
-    Demonstrate hybrid LSTM-GRU models
-    """
     print("="*60)
     print("LSTM-GRU HYBRID MODELS")
     print("="*60)
@@ -465,9 +409,6 @@ def demo_hybrid_models():
     print(f"Total parameters: {total_params:,}")
     print("\nEnsemble combines 3 architectures with attention weighting")
     
-    print("\n" + "="*60)
-    print("Hybrid models combine strengths of LSTM and GRU!")
-    print("="*60)
 
 
 if __name__ == "__main__":

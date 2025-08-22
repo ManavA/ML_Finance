@@ -1,7 +1,6 @@
 # src/data/sanbase_collector.py
 """
 Sanbase/Santiment API integration for on-chain and social metrics.
-Provides unique alpha through on-chain analytics.
 """
 
 import san
@@ -20,15 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 class SanbaseCollector:
-    """Collect on-chain and social metrics from Sanbase/Santiment."""
     
     def __init__(self, api_key: str):
-        """
-        Initialize Sanbase collector.
-        
-        Args:
-            api_key: Sanbase API key
-        """
         self.api_key = api_key
         san.ApiConfig.api_key = api_key
         self.cache_dir = Path('cache/sanbase')
@@ -85,19 +77,6 @@ class SanbaseCollector:
     def fetch_metric(self, slug: str, metric: str,
                     start_date: str, end_date: str,
                     interval: str = '1d') -> pd.DataFrame:
-        """
-        Fetch a single metric from Sanbase.
-        
-        Args:
-            slug: Asset slug (e.g., 'bitcoin', 'ethereum')
-            metric: Metric name
-            start_date: Start date (YYYY-MM-DD)
-            end_date: End date (YYYY-MM-DD)
-            interval: Time interval (1d, 1h, etc.)
-            
-        Returns:
-            DataFrame with metric data
-        """
         cache_key = f"{slug}_{metric}_{start_date}_{end_date}_{interval}.pkl"
         cache_path = self.cache_dir / cache_key
         
@@ -131,18 +110,6 @@ class SanbaseCollector:
     def fetch_all_metrics(self, slug: str,
                          start_date: str, end_date: str,
                          metrics: Optional[List[str]] = None) -> pd.DataFrame:
-        """
-        Fetch all available metrics for an asset.
-        
-        Args:
-            slug: Asset slug
-            start_date: Start date
-            end_date: End date
-            metrics: List of metrics to fetch (None for all)
-            
-        Returns:
-            DataFrame with all metrics
-        """
         if metrics is None:
             metrics = self.on_chain_metrics + self.social_metrics
         
@@ -166,12 +133,7 @@ class SanbaseCollector:
             return pd.DataFrame()
     
     def get_fear_greed_index(self, start_date: str, end_date: str) -> pd.DataFrame:
-        """
-        Fetch Fear & Greed Index from Santiment.
-        
-        Returns:
-            DataFrame with fear/greed values
-        """
+
         try:
             df = san.get(
                 "fear_and_greed/bitcoin",
@@ -187,18 +149,6 @@ class SanbaseCollector:
     def get_whale_transactions(self, slug: str, 
                               start_date: str, end_date: str,
                               threshold_usd: float = 100000) -> pd.DataFrame:
-        """
-        Get whale transaction data.
-        
-        Args:
-            slug: Asset slug
-            start_date: Start date
-            end_date: End date
-            threshold_usd: Minimum transaction value in USD
-            
-        Returns:
-            DataFrame with whale transactions
-        """
         try:
             df = san.get(
                 f"whale_transaction_count_100k_usd/{slug}",
@@ -213,12 +163,6 @@ class SanbaseCollector:
     
     def get_exchange_flows(self, slug: str,
                           start_date: str, end_date: str) -> pd.DataFrame:
-        """
-        Get exchange inflow/outflow data.
-        
-        Returns:
-            DataFrame with exchange flows
-        """
         metrics = ['exchange_inflow', 'exchange_outflow', 'exchange_balance']
         flows = {}
         
@@ -233,12 +177,6 @@ class SanbaseCollector:
     
     def get_social_sentiment(self, slug: str,
                             start_date: str, end_date: str) -> pd.DataFrame:
-        """
-        Get comprehensive social sentiment data.
-        
-        Returns:
-            DataFrame with social metrics
-        """
         social_metrics = [
             'social_volume_total',
             'sentiment_positive_total',
@@ -250,12 +188,7 @@ class SanbaseCollector:
     
     def get_holder_distribution(self, slug: str,
                                start_date: str, end_date: str) -> pd.DataFrame:
-        """
-        Get holder distribution metrics.
-        
-        Returns:
-            DataFrame with holder metrics
-        """
+
         holder_metrics = [
             'percent_of_total_supply_on_exchanges',
             'holders_distribution_0_to_0.1',
@@ -274,16 +207,7 @@ class SanbaseCollector:
     
     def calculate_smart_money_indicators(self, slug: str,
                                         data: pd.DataFrame) -> pd.DataFrame:
-        """
-        Calculate smart money indicators from on-chain data.
-        
-        Args:
-            slug: Asset slug
-            data: DataFrame with on-chain metrics
-            
-        Returns:
-            DataFrame with smart money indicators
-        """
+
         indicators = pd.DataFrame(index=data.index)
         
         # Network Value to Transactions Signal
@@ -331,217 +255,3 @@ class SanbaseCollector:
             )
         
         return indicators
-
-
-# src/models/on_chain_enhanced.py
-"""
-Models that incorporate on-chain metrics from Sanbase.
-"""
-
-import torch
-import torch.nn as nn
-import numpy as np
-import pandas as pd
-from typing import Dict, Any, Optional, List
-from src.models.base import BaseModel
-from src.data.sanbase_collector import SanbaseCollector
-import logging
-
-logger = logging.getLogger(__name__)
-
-
-class OnChainGRUModel(BaseModel):
-    """GRU model enhanced with on-chain metrics."""
-    
-    def __init__(self, input_size: int, output_size: int, config: Dict[str, Any]):
-        """
-        Initialize on-chain enhanced GRU model.
-        
-        Args:
-            input_size: Number of input features (including on-chain)
-            output_size: Number of output features
-            config: Model configuration
-        """
-        super().__init__(input_size, output_size, config)
-        
-        self.hidden_size = config.get('hidden_size', 256)
-        self.num_layers = config.get('num_layers', 3)
-        self.dropout = config.get('dropout', 0.2)
-        
-        # Separate processing for on-chain vs price data
-        self.on_chain_features = config.get('on_chain_features', 10)
-        self.price_features = input_size - self.on_chain_features
-        
-        # On-chain feature processor
-        self.on_chain_processor = nn.Sequential(
-            nn.Linear(self.on_chain_features, 64),
-            nn.ReLU(),
-            nn.Dropout(0.1),
-            nn.Linear(64, 32),
-            nn.ReLU()
-        )
-        
-        # Price feature processor
-        self.price_processor = nn.GRU(
-            input_size=self.price_features,
-            hidden_size=self.hidden_size // 2,
-            num_layers=2,
-            batch_first=True,
-            dropout=self.dropout if self.num_layers > 1 else 0
-        )
-        
-        # Combined processor
-        combined_size = 32 + self.hidden_size // 2
-        
-        self.combined_gru = nn.GRU(
-            input_size=combined_size,
-            hidden_size=self.hidden_size,
-            num_layers=self.num_layers,
-            batch_first=True,
-            dropout=self.dropout if self.num_layers > 1 else 0,
-            bidirectional=True
-        )
-        
-        # Attention layer
-        self.attention = nn.MultiheadAttention(
-            embed_dim=self.hidden_size * 2,
-            num_heads=8,
-            dropout=self.dropout,
-            batch_first=True
-        )
-        
-        # Output layers
-        self.output_layers = nn.Sequential(
-            nn.Linear(self.hidden_size * 2, self.hidden_size),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size, output_size)
-        )
-        
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass with on-chain data processing.
-        
-        Args:
-            x: Input tensor of shape (batch, seq_len, features)
-               Last on_chain_features dimensions are on-chain metrics
-            
-        Returns:
-            Output predictions
-        """
-        batch_size, seq_len, _ = x.shape
-        
-        # Split price and on-chain features
-        price_features = x[:, :, :self.price_features]
-        on_chain_features = x[:, :, self.price_features:]
-        
-        # Process price features with GRU
-        price_out, _ = self.price_processor(price_features)
-        
-        # Process on-chain features
-        on_chain_out = self.on_chain_processor(
-            on_chain_features.reshape(-1, self.on_chain_features)
-        )
-        on_chain_out = on_chain_out.reshape(batch_size, seq_len, -1)
-        
-        # Combine features
-        combined = torch.cat([price_out, on_chain_out], dim=-1)
-        
-        # Process with bidirectional GRU
-        gru_out, _ = self.combined_gru(combined)
-        
-        # Apply attention
-        attn_out, _ = self.attention(gru_out, gru_out, gru_out)
-        
-        # Global pooling
-        pooled = torch.mean(attn_out, dim=1)
-        
-        # Generate output
-        output = self.output_layers(pooled)
-        
-        return output
-
-
-class OnChainTransformer(BaseModel):
-    """Transformer model with on-chain metric integration."""
-    
-    def __init__(self, input_size: int, output_size: int, config: Dict[str, Any]):
-        """Initialize on-chain transformer."""
-        super().__init__(input_size, output_size, config)
-        
-        self.d_model = config.get('d_model', 256)
-        self.nhead = config.get('nhead', 8)
-        self.num_encoder_layers = config.get('num_encoder_layers', 6)
-        self.dim_feedforward = config.get('dim_feedforward', 1024)
-        self.dropout = config.get('dropout', 0.1)
-        
-        # Separate embeddings for different data types
-        self.on_chain_features = config.get('on_chain_features', 10)
-        self.price_features = input_size - self.on_chain_features
-        
-        # Feature projections
-        self.price_projection = nn.Linear(self.price_features, self.d_model // 2)
-        self.on_chain_projection = nn.Linear(self.on_chain_features, self.d_model // 2)
-        
-        # Positional encoding
-        self.pos_encoder = nn.Parameter(torch.randn(1, 500, self.d_model))
-        
-        # Cross-attention between price and on-chain
-        self.cross_attention = nn.MultiheadAttention(
-            embed_dim=self.d_model,
-            num_heads=self.nhead,
-            dropout=self.dropout,
-            batch_first=True
-        )
-        
-        # Transformer encoder
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=self.d_model,
-            nhead=self.nhead,
-            dim_feedforward=self.dim_feedforward,
-            dropout=self.dropout,
-            activation='gelu',
-            batch_first=True
-        )
-        
-        self.transformer = nn.TransformerEncoder(encoder_layer, self.num_encoder_layers)
-        
-        # Output head
-        self.output_head = nn.Sequential(
-            nn.Linear(self.d_model, self.dim_feedforward),
-            nn.GELU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.dim_feedforward, output_size)
-        )
-        
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass with cross-attention between price and on-chain data."""
-        batch_size, seq_len, _ = x.shape
-        
-        # Split features
-        price_features = x[:, :, :self.price_features]
-        on_chain_features = x[:, :, self.price_features:]
-        
-        # Project features
-        price_embed = self.price_projection(price_features)
-        on_chain_embed = self.on_chain_projection(on_chain_features)
-        
-        # Combine embeddings
-        combined_embed = torch.cat([price_embed, on_chain_embed], dim=-1)
-        
-        # Add positional encoding
-        combined_embed = combined_embed + self.pos_encoder[:, :seq_len, :]
-        
-        # Cross-attention between price and on-chain
-        attn_out, _ = self.cross_attention(
-            combined_embed, combined_embed, combined_embed
-        )
-        
-        # Transformer encoding
-        transformer_out = self.transformer(attn_out)
-        
-        # Pool and output
-        pooled = transformer_out.mean(dim=1)
-        output = self.output_head(pooled)
-        
-        return output

@@ -64,16 +64,9 @@ def _align_cols(df: pd.DataFrame, symbol: str, kind: str) -> pd.DataFrame:
 
 
 class CryptoDataClient:
-    """
-    Thin, robust wrapper over CCXT for historical downloads (OHLCV + funding).
-    Works with public REST (no API key needed). Designed for incremental updates.
-    """
 
     def __init__(self, exchange_id: str = "binance", type_hint: str = "swap", enable_rate_limit: bool = True):
-        """
-        exchange_id: 'binance', 'bybit', 'okx', ...
-        type_hint: 'spot' | 'swap' (USDT-margined perpetuals) | 'future'
-        """
+
         self.exchange_id = exchange_id
         self.type_hint = type_hint
         klass = getattr(ccxt, exchange_id)
@@ -83,10 +76,7 @@ class CryptoDataClient:
 
     # -------- Symbol helpers --------
     def resolve_market(self, base: str, quote: str = "USDT") -> str:
-        """
-        Find the unified symbol in CCXT that matches base/quote and our type_hint.
-        Returns something like 'BTC/USDT:USDT' for binance swap, or 'BTC/USDT' for spot.
-        """
+
         candidates = []
         for m, info in self.markets.items():
             if info.get("base") == base and info.get("quote") == quote:
@@ -112,9 +102,7 @@ class CryptoDataClient:
         return self.ex.fetch_ohlcv(symbol, timeframe=timeframe, since=since_ms, limit=limit)
 
     def fetch_ohlcv(self, symbol: str, timeframe: str, window: FetchWindow, limit_per_call: int = 1500) -> pd.DataFrame:
-        """
-        Pull all candles in [since_ms, until_ms). Paginates with 'since'. Robust to partial last bar.
-        """
+
         if timeframe not in TIMEFRAME_MS:
             raise ValueError(f"Unsupported timeframe {timeframe}")
         frame_ms = TIMEFRAME_MS[timeframe]
@@ -154,17 +142,13 @@ class CryptoDataClient:
     @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=2, max=30),
            retry=retry_if_exception_type((ccxt.NetworkError, ccxt.ExchangeNotAvailable)))
     def _fetch_funding_page(self, symbol: str, since_ms: Optional[int] = None, limit: int = 500):
-        """
-        Uses CCXT unified funding-rate history if supported, else raises.
-        """
+
         if not getattr(self.ex, "has", {}).get("fetchFundingRateHistory", False):
             raise NotImplementedError(f"{self.exchange_id} does not support fetchFundingRateHistory in CCXT.")
         return self.ex.fetch_funding_rate_history(symbol, since=since_ms, limit=limit)
 
     def fetch_funding_rates(self, symbol: str, window: FetchWindow) -> pd.DataFrame:
-        """
-        Funding rates over [since, until). Pagination via 'since'.
-        """
+
         rows = []
         since = int(window.since_ms)
         until = int(window.until_ms) if window.until_ms else None
@@ -204,7 +188,6 @@ class CryptoDataClient:
         df = _to_utc_index(df)
         return df
 
-    # -------- Batch helpers --------
     def fetch_universe_ohlcv(
         self, bases: List[str], quote: str, timeframe: str, start, end=None
     ) -> Dict[str, pd.DataFrame]:
@@ -233,7 +216,6 @@ class CryptoDataClient:
             out[sym] = df
         return out
 
-    # -------- Utilities --------
     @staticmethod
     def save_parquet_per_symbol(data: Dict[str, pd.DataFrame], path: str):
         path = str(path)
@@ -246,9 +228,7 @@ class CryptoDataClient:
 
     @staticmethod
     def join_as_panel(data: Dict[str, pd.DataFrame], column: str) -> pd.DataFrame:
-        """
-        Wide panel with MultiIndex columns: (symbol, column)
-        """
+
         pieces = []
         for sym, df in data.items():
             if df is None or df.empty or column not in df.columns:
@@ -263,9 +243,6 @@ class CryptoDataClient:
 
     @staticmethod
     def basic_quality(panel: pd.DataFrame, timeframe: str) -> pd.DataFrame:
-        """
-        Simple completeness score per symbol (% bars present).
-        """
         if panel.empty:
             return pd.DataFrame()
         frame_ms = TIMEFRAME_MS[timeframe]

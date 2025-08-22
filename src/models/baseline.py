@@ -1,5 +1,4 @@
 # src/models/baseline.py
-"""Baseline models for comparison with ML approaches."""
 
 import numpy as np
 import pandas as pd
@@ -19,27 +18,22 @@ logger = logging.getLogger(__name__)
 
 
 class BaselineModel(ABC):
-    """Base class for baseline models."""
     
     @abstractmethod
     def fit(self, data: pd.DataFrame):
-        """Fit the model to data."""
         pass
     
     @abstractmethod
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate predictions or signals."""
         pass
     
     @abstractmethod
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate trading signals (-1, 0, 1)."""
         pass
 
 
 
 class BuyAndHoldStrategy(BaselineModel):
-    """Buy and hold strategy."""
     
     def __init__(self):
         self.name = "Buy & Hold"
@@ -48,18 +42,15 @@ class BuyAndHoldStrategy(BaselineModel):
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Always predict current price (no change)."""
         return data['close'].values
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Always hold (buy at start, never sell)."""
         signals = np.zeros(len(data))
         signals[0] = 1  # Buy at the beginning
         return signals
 
 
 class RandomStrategy(BaselineModel):
-    """Random trading strategy - lower bound baseline."""
     
     def __init__(self, seed: int = 42, trade_probability: float = 0.1):
         self.name = "Random"
@@ -71,13 +62,11 @@ class RandomStrategy(BaselineModel):
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Random walk predictions."""
         current_prices = data['close'].values
         random_changes = np.random.randn(len(data)) * np.std(data['close'].pct_change())
         return current_prices * (1 + random_changes)
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Random buy/sell signals."""
         return np.random.choice([-1, 0, 1], size=len(data), 
                                p=[self.trade_probability/2, 
                                   1-self.trade_probability, 
@@ -85,7 +74,6 @@ class RandomStrategy(BaselineModel):
 
 
 class SMAcrossoverStrategy(BaselineModel):
-    """Simple Moving Average crossover strategy."""
     
     def __init__(self, fast_period: int = 10, slow_period: int = 30):
         self.name = f"SMA({fast_period},{slow_period})"
@@ -96,7 +84,6 @@ class SMAcrossoverStrategy(BaselineModel):
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Predict based on SMA trend."""
         sma_fast = data['close'].rolling(window=self.fast_period).mean()
         sma_slow = data['close'].rolling(window=self.slow_period).mean()
         
@@ -113,7 +100,6 @@ class SMAcrossoverStrategy(BaselineModel):
         return predictions
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate crossover signals."""
         sma_fast = data['close'].rolling(window=self.fast_period).mean()
         sma_slow = data['close'].rolling(window=self.slow_period).mean()
         
@@ -129,7 +115,6 @@ class SMAcrossoverStrategy(BaselineModel):
 
 
 class RSIStrategy(BaselineModel):
-    """RSI-based trading strategy."""
     
     def __init__(self, period: int = 14, oversold: int = 30, overbought: int = 70):
         self.name = f"RSI({period})"
@@ -141,7 +126,6 @@ class RSIStrategy(BaselineModel):
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Predict based on RSI levels."""
         rsi = talib.RSI(data['close'].values, timeperiod=self.period)
         
         predictions = data['close'].values.copy()
@@ -157,7 +141,6 @@ class RSIStrategy(BaselineModel):
         return predictions
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate RSI signals."""
         rsi = talib.RSI(data['close'].values, timeperiod=self.period)
         
         signals = np.zeros(len(data))
@@ -172,7 +155,6 @@ class RSIStrategy(BaselineModel):
 
 
 class BollingerBandsStrategy(BaselineModel):
-    """Bollinger Bands mean reversion strategy."""
     
     def __init__(self, period: int = 20, num_std: float = 2):
         self.name = f"BB({period},{num_std})"
@@ -183,7 +165,6 @@ class BollingerBandsStrategy(BaselineModel):
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Predict based on Bollinger Bands."""
         upper, middle, lower = talib.BBANDS(
             data['close'].values,
             timeperiod=self.period,
@@ -205,7 +186,6 @@ class BollingerBandsStrategy(BaselineModel):
         return predictions
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate Bollinger Bands signals."""
         upper, middle, lower = talib.BBANDS(
             data['close'].values,
             timeperiod=self.period,
@@ -227,7 +207,6 @@ class BollingerBandsStrategy(BaselineModel):
 
 
 class MACDStrategy(BaselineModel):
-    """MACD trading strategy."""
     
     def __init__(self, fast: int = 12, slow: int = 26, signal: int = 9):
         self.name = f"MACD({fast},{slow},{signal})"
@@ -239,7 +218,7 @@ class MACDStrategy(BaselineModel):
         pass
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Predict based on MACD."""
+        
         macd, signal, hist = talib.MACD(
             data['close'].values,
             fastperiod=self.fast,
@@ -260,7 +239,6 @@ class MACDStrategy(BaselineModel):
         return predictions
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate MACD signals."""
         macd, signal_line, hist = talib.MACD(
             data['close'].values,
             fastperiod=self.fast,
@@ -283,7 +261,6 @@ class MACDStrategy(BaselineModel):
 
 
 class ARIMAModel(BaselineModel):
-    """ARIMA time series model."""
     
     def __init__(self, order: Tuple[int, int, int] = (5, 1, 2)):
         self.name = f"ARIMA{order}"
@@ -292,7 +269,6 @@ class ARIMAModel(BaselineModel):
         self.last_train_size = 0
         
     def fit(self, data: pd.DataFrame):
-        """Fit ARIMA model."""
         try:
             self.model = ARIMA(data['close'].values, order=self.order)
             self.model_fit = self.model.fit()
@@ -305,7 +281,6 @@ class ARIMAModel(BaselineModel):
             self.model_fit = self.model.fit()
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate ARIMA predictions."""
         if self.model_fit is None:
             self.fit(data)
         
@@ -318,7 +293,6 @@ class ARIMAModel(BaselineModel):
             return np.full(len(data), data['close'].iloc[-1])
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on ARIMA predictions."""
         predictions = self.predict(data)
         current_prices = data['close'].values
         
@@ -334,7 +308,7 @@ class ARIMAModel(BaselineModel):
 
 
 class ProphetModel(BaselineModel):
-    """Facebook Prophet model for time series forecasting."""
+    
     
     def __init__(self, changepoint_prior_scale: float = 0.05):
         self.name = "Prophet"
@@ -342,7 +316,7 @@ class ProphetModel(BaselineModel):
         self.model = None
         
     def fit(self, data: pd.DataFrame):
-        """Fit Prophet model."""
+        
         # Prepare data for Prophet
         df_prophet = pd.DataFrame({
             'ds': data.index,
@@ -360,7 +334,7 @@ class ProphetModel(BaselineModel):
         logger.info("Prophet model fitted")
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate Prophet predictions."""
+        
         if self.model is None:
             self.fit(data)
         
@@ -371,7 +345,7 @@ class ProphetModel(BaselineModel):
         return forecast['yhat'].values
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on Prophet predictions."""
+        
         predictions = self.predict(data)
         current_prices = data['close'].values
         
@@ -388,7 +362,7 @@ class ProphetModel(BaselineModel):
 
 
 class RandomForestModel(BaselineModel):
-    """Random Forest regression model."""
+    
     
     def __init__(self, n_estimators: int = 100, max_depth: int = 10):
         self.name = f"RandomForest({n_estimators})"
@@ -398,7 +372,7 @@ class RandomForestModel(BaselineModel):
         self.feature_importance = None
         
     def fit(self, data: pd.DataFrame):
-        """Fit Random Forest model."""
+        
         X, y = self._prepare_features(data)
         
         self.model = RandomForestRegressor(
@@ -413,7 +387,7 @@ class RandomForestModel(BaselineModel):
         logger.info(f"Random Forest fitted with {self.n_estimators} trees")
     
     def _prepare_features(self, data: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
-        """Prepare features for ML models."""
+        
         features = []
         
         # Price features
@@ -437,7 +411,7 @@ class RandomForestModel(BaselineModel):
         return X[:-1], y[:-1]  # Remove last row (no target)
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate predictions."""
+        
         if self.model is None:
             self.fit(data)
         
@@ -454,7 +428,7 @@ class RandomForestModel(BaselineModel):
         return full_predictions
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals based on predictions."""
+        
         predictions = self.predict(data)
         current_prices = data['close'].values
         
@@ -470,7 +444,7 @@ class RandomForestModel(BaselineModel):
 
 
 class XGBoostModel(BaselineModel):
-    """XGBoost model for price prediction."""
+    
     
     def __init__(self, n_estimators: int = 100, max_depth: int = 6, 
                  learning_rate: float = 0.1):
@@ -481,7 +455,7 @@ class XGBoostModel(BaselineModel):
         self.model = None
         
     def fit(self, data: pd.DataFrame):
-        """Fit XGBoost model."""
+        
         X, y = self._prepare_features(data)
         
         self.model = xgb.XGBRegressor(
@@ -496,7 +470,7 @@ class XGBoostModel(BaselineModel):
         logger.info(f"XGBoost fitted with {self.n_estimators} estimators")
     
     def _prepare_features(self, data: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
-        """Prepare features for XGBoost."""
+        
         features = []
         
         # Price and volume features
@@ -527,7 +501,7 @@ class XGBoostModel(BaselineModel):
         return X[:-1], y[:-1]
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate predictions."""
+        
         if self.model is None:
             self.fit(data)
         
@@ -542,7 +516,7 @@ class XGBoostModel(BaselineModel):
         return full_predictions
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals."""
+        
         predictions = self.predict(data)
         current_prices = data['close'].values
         
@@ -561,7 +535,7 @@ class XGBoostModel(BaselineModel):
 
 
 class LightGBMModel(BaselineModel):
-    """LightGBM model for price prediction."""
+    
     
     def __init__(self, n_estimators: int = 100, num_leaves: int = 31,
                  learning_rate: float = 0.1):
@@ -572,7 +546,7 @@ class LightGBMModel(BaselineModel):
         self.model = None
         
     def fit(self, data: pd.DataFrame):
-        """Fit LightGBM model."""
+        
         X, y = self._prepare_features(data)
         
         self.model = lgb.LGBMRegressor(
@@ -588,7 +562,7 @@ class LightGBMModel(BaselineModel):
         logger.info(f"LightGBM fitted with {self.n_estimators} estimators")
     
     def _prepare_features(self, data: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
-        """Prepare features for LightGBM."""
+        
         # Similar to XGBoost but with some additional features
         features = []
         
@@ -625,7 +599,7 @@ class LightGBMModel(BaselineModel):
         return X[:-1], y[:-1]
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate predictions."""
+        
         if self.model is None:
             self.fit(data)
         
@@ -640,7 +614,7 @@ class LightGBMModel(BaselineModel):
         return full_predictions
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate signals."""
+        
         predictions = self.predict(data)
         current_prices = data['close'].values
         
@@ -660,7 +634,7 @@ class LightGBMModel(BaselineModel):
 
 
 class EnsembleBaselineModel(BaselineModel):
-    """Ensemble of multiple baseline models."""
+    
     
     def __init__(self, models: Optional[List[BaselineModel]] = None):
         self.name = "Ensemble"
@@ -681,7 +655,7 @@ class EnsembleBaselineModel(BaselineModel):
         self.weights = None
         
     def fit(self, data: pd.DataFrame):
-        """Fit all models in ensemble."""
+        
         for model in self.models:
             try:
                 model.fit(data)
@@ -690,7 +664,7 @@ class EnsembleBaselineModel(BaselineModel):
                 logger.error(f"Failed to fit {model.name}: {e}")
     
     def predict(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate ensemble predictions."""
+        
         predictions = []
         
         for model in self.models:
@@ -705,7 +679,7 @@ class EnsembleBaselineModel(BaselineModel):
         return np.mean(predictions, axis=0)
     
     def get_signals(self, data: pd.DataFrame) -> np.ndarray:
-        """Generate ensemble signals using voting."""
+        
         all_signals = []
         
         for model in self.models:

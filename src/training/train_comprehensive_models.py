@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-COMPREHENSIVE MODEL TRAINING
-"""
+
 
 import sys
 import os
@@ -20,10 +18,6 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import mean_squared_error
 import xgboost as xgb
 import lightgbm as lgb
-
-print("=" * 60)
-print("COMPREHENSIVE MODEL TRAINING")
-print("=" * 60)
 
 def load_full_dataset():
     print("\nLoading FULL dataset...")
@@ -410,14 +404,7 @@ if __name__ == "__main__":
     
     print("\n" + "="*60)
     print("COMPREHENSIVE TRAINING COMPLETE!")
-    print("="*60)
-    print("\nAll models have been trained with:")
-    print("  [+] Full dataset (158K+ records from cache)")
-    print("  [+] 1000+ estimators for ML models")
-    print("  [-] RL agents deferred for separate training")
-    print("  [+] Proper hyperparameter settings")
-    print("  [+] Advanced feature engineering (85 features)")
-    print("  [+] Time-series aware validation")
+
     
     print(f"\nFinal Training Status:")
     print(f"  ML Models: XGBoost ({ml_models['xgboost'].n_estimators} trees), LightGBM ({ml_models['lightgbm'].best_iteration} trees)")

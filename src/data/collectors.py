@@ -16,21 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 class CryptoDataCollector:
-    """Collects cryptocurrency data from various exchanges using CCXT."""
+    
     
     def __init__(self, exchange_name: str = 'binance', 
                  api_key: Optional[str] = None,
                  api_secret: Optional[str] = None,
                  testnet: bool = False):
-        """
-        Initialize data collector.
         
-        Args:
-            exchange_name: Name of the exchange (binance, coinbase, etc.)
-            api_key: API key for authenticated requests
-            api_secret: API secret for authenticated requests
-            testnet: Whether to use testnet
-        """
         self.exchange_name = exchange_name
         self.exchange = self._init_exchange(exchange_name, api_key, api_secret, testnet)
         self.cache_dir = Path('cache')
@@ -38,7 +30,7 @@ class CryptoDataCollector:
         
     def _init_exchange(self, exchange_name: str, api_key: str, 
                       api_secret: str, testnet: bool) -> ccxt.Exchange:
-        """Initialize CCXT exchange."""
+        
         exchange_class = getattr(ccxt, exchange_name)
         
         config = {
@@ -62,19 +54,7 @@ class CryptoDataCollector:
                    start_date: Optional[str] = None,
                    end_date: Optional[str] = None,
                    limit: int = 1000) -> pd.DataFrame:
-        """
-        Fetch OHLCV data for a symbol.
         
-        Args:
-            symbol: Trading pair symbol (e.g., 'BTC/USDT')
-            timeframe: Timeframe (1m, 5m, 15m, 30m, 1h, 4h, 1d)
-            start_date: Start date in format 'YYYY-MM-DD'
-            end_date: End date in format 'YYYY-MM-DD'
-            limit: Maximum number of candles per request
-            
-        Returns:
-            DataFrame with OHLCV data
-        """
         cache_key = f"{self.exchange_name}_{symbol.replace('/', '_')}_{timeframe}_{start_date}_{end_date}.pkl"
         cache_path = self.cache_dir / cache_key
         
@@ -145,7 +125,7 @@ class CryptoDataCollector:
         return df
     
     def fetch_multiple_symbols(self, symbols: List[str], **kwargs) -> Dict[str, pd.DataFrame]:
-        """Fetch data for multiple symbols."""
+        
         data = {}
         for symbol in tqdm(symbols, desc="Fetching symbols"):
             try:
@@ -155,7 +135,7 @@ class CryptoDataCollector:
         return data
     
     def fetch_multiple_symbols_parallel(self, symbols: List[str], max_workers: int = 5, **kwargs) -> Dict[str, pd.DataFrame]:
-        """Fetch data for multiple symbols in parallel."""
+        
         data = {}
         
         def fetch_single_symbol(symbol):
@@ -177,7 +157,7 @@ class CryptoDataCollector:
         return data
     
     def fetch_order_book(self, symbol: str, limit: int = 100) -> Dict:
-        """Fetch order book data."""
+        
         try:
             order_book = self.exchange.fetch_order_book(symbol, limit)
             return order_book
@@ -186,7 +166,7 @@ class CryptoDataCollector:
             return {}
     
     def fetch_trades(self, symbol: str, limit: int = 1000) -> pd.DataFrame:
-        """Fetch recent trades."""
+        
         try:
             trades = self.exchange.fetch_trades(symbol, limit=limit)
             df = pd.DataFrame(trades)
@@ -210,26 +190,19 @@ logger = logging.getLogger(__name__)
 
 
 class DataPreprocessor:
-    """Preprocesses cryptocurrency data for ML models."""
+    
     
     def __init__(self, sequence_length: int = 168, 
                  prediction_horizon: int = 24,
                  feature_config: Optional[Dict] = None):
-        """
-        Initialize preprocessor.
         
-        Args:
-            sequence_length: Length of input sequences
-            prediction_horizon: How many steps ahead to predict
-            feature_config: Configuration for feature engineering
-        """
         self.sequence_length = sequence_length
         self.prediction_horizon = prediction_horizon
         self.feature_config = feature_config or {}
         self.scalers = {}
         
     def add_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add technical indicators to the dataframe."""
+        
         df = df.copy()
         
         # Trend indicators
@@ -278,16 +251,7 @@ class DataPreprocessor:
     
     def create_sequences(self, data: np.ndarray, 
                         targets: Optional[np.ndarray] = None) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Create sequences for time series prediction.
         
-        Args:
-            data: Input data array
-            targets: Target values (if None, uses closing prices)
-            
-        Returns:
-            Tuple of (sequences, targets)
-        """
         sequences = []
         target_values = []
         
@@ -308,17 +272,7 @@ class DataPreprocessor:
     def scale_data(self, data: pd.DataFrame, 
                   scaler_type: str = 'standard',
                   fit: bool = True) -> np.ndarray:
-        """
-        Scale the data using specified scaler.
         
-        Args:
-            data: Data to scale
-            scaler_type: Type of scaler ('standard', 'robust')
-            fit: Whether to fit the scaler
-            
-        Returns:
-            Scaled data
-        """
         if scaler_type not in self.scalers and fit:
             if scaler_type == 'standard':
                 self.scalers[scaler_type] = StandardScaler()
@@ -337,15 +291,7 @@ class DataPreprocessor:
         return scaled_data
     
     def prepare_data(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Complete preprocessing pipeline.
         
-        Args:
-            df: Raw OHLCV dataframe
-            
-        Returns:
-            Tuple of (features, targets)
-        """
         # Add technical indicators
         if self.feature_config.get('technical_indicators', True):
             df = self.add_technical_indicators(df)
@@ -363,7 +309,7 @@ class DataPreprocessor:
         return X, y
     
     def _select_features(self, df: pd.DataFrame) -> List[str]:
-        """Select features based on configuration."""
+        
         features = []
         
         if self.feature_config.get('price', True):
@@ -382,7 +328,7 @@ class DataPreprocessor:
         return features
     
     def inverse_transform_predictions(self, predictions: np.ndarray) -> np.ndarray:
-        """Inverse transform scaled predictions."""
+        
         if 'standard' in self.scalers:
             # Assuming predictions are for closing price (index 3)
             # Create dummy array with same shape as original features
@@ -404,18 +350,11 @@ logger = logging.getLogger(__name__)
 
 
 class CryptoDataset(Dataset):
-    """PyTorch dataset for cryptocurrency time series."""
+    
     
     def __init__(self, features: np.ndarray, targets: np.ndarray,
                  transform: Optional = None):
-        """
-        Initialize dataset.
         
-        Args:
-            features: Input features array
-            targets: Target values array
-            transform: Optional transform to apply
-        """
         self.features = torch.FloatTensor(features)
         self.targets = torch.FloatTensor(targets)
         self.transform = transform
@@ -438,19 +377,7 @@ def create_data_loaders(X_train: np.ndarray, y_train: np.ndarray,
                        X_test: np.ndarray, y_test: np.ndarray,
                        batch_size: int = 32,
                        num_workers: int = 4) -> Tuple[DataLoader, DataLoader, DataLoader]:
-    """
-    Create PyTorch data loaders.
     
-    Args:
-        X_train, y_train: Training data
-        X_val, y_val: Validation data
-        X_test, y_test: Test data
-        batch_size: Batch size for training
-        num_workers: Number of workers for data loading
-        
-    Returns:
-        Tuple of (train_loader, val_loader, test_loader)
-    """
     train_dataset = CryptoDataset(X_train, y_train)
     val_dataset = CryptoDataset(X_val, y_val)
     test_dataset = CryptoDataset(X_test, y_test)

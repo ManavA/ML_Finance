@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-ML models for cryptocurrency trading research
-Implements LSTM, GRU, Transformer, and traditional models
-"""
+
 
 import torch
 import torch.nn as nn
@@ -28,7 +25,6 @@ else:
     logger.info("Using CPU")
 
 class TimeSeriesDataset(Dataset):
-    """PyTorch dataset for time series data"""
     
     def __init__(self, X: np.ndarray, y: np.ndarray):
         self.X = torch.FloatTensor(X)
@@ -41,7 +37,6 @@ class TimeSeriesDataset(Dataset):
         return self.X[idx], self.y[idx]
 
 class LSTMModel(nn.Module):
-    """LSTM model for time series prediction"""
     
     def __init__(self, 
                  input_size: int,
@@ -84,7 +79,6 @@ class LSTMModel(nn.Module):
         return out
 
 class GRUModel(nn.Module):
-    """GRU model for time series prediction"""
     
     def __init__(self,
                  input_size: int,
@@ -127,7 +121,6 @@ class GRUModel(nn.Module):
         return out
 
 class TransformerModel(nn.Module):
-    """Transformer model for time series prediction"""
     
     def __init__(self,
                  input_size: int,
@@ -182,7 +175,6 @@ class TransformerModel(nn.Module):
         return out
 
 class MLModelTrainer:
-    """Trainer for ML models"""
     
     def __init__(self, 
                  model_type: str = 'lstm',
@@ -191,17 +183,7 @@ class MLModelTrainer:
                  learning_rate: float = 0.001,
                  epochs: int = 50,
                  early_stopping_patience: int = 10):
-        """
-        Initialize ML model trainer
-        
-        Args:
-            model_type: Type of model ('lstm', 'gru', 'transformer', 'rf', 'gb')
-            sequence_length: Length of input sequences for RNNs
-            batch_size: Batch size for training
-            learning_rate: Learning rate
-            epochs: Number of training epochs
-            early_stopping_patience: Patience for early stopping
-        """
+   
         self.model_type = model_type.lower()
         self.sequence_length = sequence_length
         self.batch_size = batch_size
@@ -215,17 +197,7 @@ class MLModelTrainer:
     def prepare_sequences(self, data: pd.DataFrame, 
                          feature_cols: List[str],
                          target_col: str) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Prepare sequences for RNN models
-        
-        Args:
-            data: DataFrame with features and target
-            feature_cols: List of feature column names
-            target_col: Name of target column
-            
-        Returns:
-            Tuple of (X_sequences, y_sequences)
-        """
+  
         X = data[feature_cols].values
         y = data[target_col].values
         
@@ -243,18 +215,7 @@ class MLModelTrainer:
                         val_data: pd.DataFrame,
                         feature_cols: List[str],
                         target_col: str) -> nn.Module:
-        """
-        Train deep learning model (LSTM, GRU, Transformer)
-        
-        Args:
-            train_data: Training data
-            val_data: Validation data
-            feature_cols: Feature column names
-            target_col: Target column name
-            
-        Returns:
-            Trained model
-        """
+
         # Prepare sequences
         X_train, y_train = self.prepare_sequences(train_data, feature_cols, target_col)
         X_val, y_val = self.prepare_sequences(val_data, feature_cols, target_col)
@@ -345,18 +306,7 @@ class MLModelTrainer:
                               val_data: pd.DataFrame,
                               feature_cols: List[str],
                               target_col: str):
-        """
-        Train traditional ML model (Random Forest, Gradient Boosting)
-        
-        Args:
-            train_data: Training data
-            val_data: Validation data
-            feature_cols: Feature column names
-            target_col: Target column name
-            
-        Returns:
-            Trained model
-        """
+
         X_train = train_data[feature_cols].values
         y_train = train_data[target_col].values
         X_val = val_data[feature_cols].values
@@ -395,16 +345,7 @@ class MLModelTrainer:
         return model
     
     def predict(self, test_data: pd.DataFrame, feature_cols: List[str]) -> np.ndarray:
-        """
-        Make predictions on test data
-        
-        Args:
-            test_data: Test data
-            feature_cols: Feature column names
-            
-        Returns:
-            Array of predictions
-        """
+
         if self.model is None:
             raise ValueError("Model not trained yet")
         

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 Advanced backtesting framework with comprehensive metrics and analysis
-Includes portfolio optimization, risk management, and regime detection
 """
 
 import pandas as pd
@@ -19,7 +18,6 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class AdvancedMetrics:
-    """Extended performance metrics for strategy evaluation"""
     # Basic metrics
     total_return: float
     annualized_return: float
@@ -70,17 +68,12 @@ class AdvancedMetrics:
 
 
 class MarketRegimeDetector:
-    """Detect market regimes for conditional analysis"""
     
     def __init__(self, lookback_period: int = 20):
         self.lookback_period = lookback_period
         
     def identify_regimes(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        Identify market regimes based on various indicators
-        
-        Returns DataFrame with regime labels
-        """
+
         regimes = pd.DataFrame(index=data.index)
         
         # Price-based regimes
@@ -114,7 +107,6 @@ class MarketRegimeDetector:
         return regimes
     
     def _calculate_stress_indicator(self, data: pd.DataFrame) -> pd.Series:
-        """Calculate market stress indicator"""
         returns = data['close'].pct_change()
         
         # Components of stress
@@ -134,7 +126,6 @@ class MarketRegimeDetector:
 
 
 class PortfolioOptimizer:
-    """Portfolio optimization for multi-asset strategies"""
     
     def __init__(self, risk_free_rate: float = 0.02):
         self.risk_free_rate = risk_free_rate
@@ -145,17 +136,7 @@ class PortfolioOptimizer:
         method: str = 'sharpe',
         constraints: Optional[Dict] = None
     ) -> np.ndarray:
-        """
-        Optimize portfolio weights using various methods
-        
-        Args:
-            returns: DataFrame of asset returns
-            method: Optimization method ('sharpe', 'min_vol', 'risk_parity')
-            constraints: Weight constraints
-            
-        Returns:
-            Optimal weights array
-        """
+
         n_assets = len(returns.columns)
         
         if method == 'equal_weight':
@@ -180,7 +161,6 @@ class PortfolioOptimizer:
         cov_matrix: pd.DataFrame,
         constraints: Optional[Dict] = None
     ) -> np.ndarray:
-        """Maximize Sharpe ratio"""
         n = len(mean_returns)
         
         def neg_sharpe(weights):
@@ -210,7 +190,6 @@ class PortfolioOptimizer:
         cov_matrix: pd.DataFrame,
         constraints: Optional[Dict] = None
     ) -> np.ndarray:
-        """Minimize portfolio volatility"""
         n = len(cov_matrix)
         
         def portfolio_vol(weights):
@@ -225,7 +204,6 @@ class PortfolioOptimizer:
         return result.x
     
     def _risk_parity(self, cov_matrix: pd.DataFrame) -> np.ndarray:
-        """Risk parity portfolio allocation"""
         n = len(cov_matrix)
         
         def risk_contribution(weights):
@@ -247,10 +225,7 @@ class PortfolioOptimizer:
 
 
 class AdvancedBacktester:
-    """
-    Advanced backtesting engine with comprehensive analysis
-    """
-    
+
     def __init__(
         self,
         commission: float = 0.001,
@@ -259,16 +234,7 @@ class AdvancedBacktester:
         risk_free_rate: float = 0.02,
         benchmark: Optional[pd.Series] = None
     ):
-        """
-        Initialize advanced backtester
-        
-        Args:
-            commission: Trading commission rate
-            slippage: Slippage rate
-            initial_capital: Starting capital
-            risk_free_rate: Risk-free rate for Sharpe calculation
-            benchmark: Benchmark returns for relative metrics
-        """
+
         self.commission = commission
         self.slippage = slippage
         self.initial_capital = initial_capital
@@ -286,19 +252,7 @@ class AdvancedBacktester:
         analyze_regimes: bool = True,
         calculate_rolling_metrics: bool = True
     ) -> AdvancedMetrics:
-        """
-        Run comprehensive backtest with advanced metrics
-        
-        Args:
-            data: OHLCV data
-            signals: Trading signals (-1, 0, 1) or portfolio weights
-            symbol: Asset symbol
-            analyze_regimes: Whether to analyze performance by regime
-            calculate_rolling_metrics: Whether to calculate rolling metrics
-            
-        Returns:
-            AdvancedMetrics object with comprehensive results
-        """
+
         # Prepare data
         prices = data['close'].values
         returns = pd.Series(prices).pct_change().fillna(0)
@@ -359,7 +313,6 @@ class AdvancedBacktester:
         returns: pd.Series, 
         signals: np.ndarray
     ) -> pd.Series:
-        """Calculate returns accounting for transaction costs"""
         # Align signals with returns
         if len(signals) == len(returns) - 1:
             signals = np.concatenate([[0], signals])
@@ -384,7 +337,6 @@ class AdvancedBacktester:
         data: pd.DataFrame, 
         weights: pd.DataFrame
     ) -> pd.Series:
-        """Calculate portfolio returns for multi-asset strategies"""
         # Implementation for multi-asset portfolios
         portfolio_returns = pd.Series(index=data.index, dtype=float)
         
@@ -399,7 +351,6 @@ class AdvancedBacktester:
         return portfolio_returns
     
     def _calculate_basic_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate basic performance metrics"""
         total_return = (1 + returns).prod() - 1
         days = len(returns)
         years = days / 252
@@ -424,7 +375,6 @@ class AdvancedBacktester:
         }
     
     def _calculate_risk_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate risk metrics"""
         cumulative = (1 + returns).cumprod()
         
         # Drawdown analysis
@@ -464,7 +414,6 @@ class AdvancedBacktester:
         }
     
     def _calculate_trading_metrics(self, returns: pd.Series, signals: np.ndarray) -> Dict:
-        """Calculate trading-specific metrics"""
         # Identify trades
         if len(signals.shape) > 1:
             # Multi-asset - simplified for now
@@ -514,7 +463,6 @@ class AdvancedBacktester:
         }
     
     def _calculate_statistical_metrics(self, returns: pd.Series) -> Dict:
-        """Calculate statistical metrics"""
         skewness = returns.skew()
         kurtosis = returns.kurtosis()
         
@@ -543,7 +491,6 @@ class AdvancedBacktester:
         }
     
     def _analyze_by_regime(self, returns: pd.Series, regimes: pd.DataFrame) -> Dict:
-        """Analyze performance by market regime"""
         regime_returns = {}
         
         # Trend regimes
@@ -565,7 +512,6 @@ class AdvancedBacktester:
         return regime_returns
     
     def _calculate_benchmark_metrics(self, returns: pd.Series, benchmark: pd.Series) -> Dict:
-        """Calculate metrics relative to benchmark"""
         # Align indices
         aligned = pd.DataFrame({'returns': returns, 'benchmark': benchmark}).dropna()
         
@@ -600,7 +546,6 @@ class AdvancedBacktester:
         }
     
     def _calculate_monthly_returns(self, returns: pd.Series) -> List[float]:
-        """Calculate monthly returns"""
         if not isinstance(returns.index, pd.DatetimeIndex):
             # Create datetime index if not present
             returns.index = pd.date_range(end=datetime.now(), periods=len(returns), freq='D')
@@ -609,7 +554,6 @@ class AdvancedBacktester:
         return (monthly * 100).tolist()
     
     def _calculate_rolling_sharpe(self, returns: pd.Series, window: int = 60) -> List[float]:
-        """Calculate rolling Sharpe ratio"""
         rolling_mean = returns.rolling(window).mean() * 252
         rolling_std = returns.rolling(window).std() * np.sqrt(252)
         rolling_sharpe = (rolling_mean - self.risk_free_rate) / rolling_std
@@ -617,7 +561,6 @@ class AdvancedBacktester:
         return rolling_sharpe.fillna(0).tolist()
     
     def _calculate_underwater_curve(self, returns: pd.Series) -> List[float]:
-        """Calculate underwater curve (drawdown over time)"""
         cumulative = (1 + returns).cumprod()
         running_max = cumulative.expanding().max()
         underwater = ((cumulative - running_max) / running_max * 100)
@@ -630,17 +573,7 @@ class AdvancedBacktester:
         strategies: Dict[str, np.ndarray],
         create_report: bool = True
     ) -> pd.DataFrame:
-        """
-        Compare multiple strategies
-        
-        Args:
-            data: OHLCV data
-            strategies: Dictionary of strategy names and signals
-            create_report: Whether to create detailed report
-            
-        Returns:
-            DataFrame with comparison metrics
-        """
+
         results = []
         
         for name, signals in strategies.items():
@@ -665,7 +598,6 @@ class AdvancedBacktester:
         return comparison_df
     
     def _create_comparison_report(self, comparison_df: pd.DataFrame):
-        """Create detailed comparison report"""
         print("\n" + "="*60)
         print("STRATEGY COMPARISON REPORT")
         print("="*60)
@@ -682,15 +614,7 @@ class AdvancedBacktester:
 
 
 def main():
-    """Test advanced backtester"""
     print("Advanced Backtester Module Loaded")
-    print("Features:")
-    print("  - Comprehensive metrics (30+ indicators)")
-    print("  - Market regime detection")
-    print("  - Portfolio optimization")
-    print("  - Multi-asset support")
-    print("  - Rolling metrics calculation")
-    print("  - Strategy comparison framework")
     
 if __name__ == "__main__":
     main()

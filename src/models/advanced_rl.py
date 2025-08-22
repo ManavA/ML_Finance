@@ -4,7 +4,6 @@ import gymnasium as gym
 import numpy as np
 
 class CryptoTradingEnv(gym.Env):
-    """Custom environment for crypto trading"""
     def __init__(self, data, initial_balance=10000):
         super().__init__()
         self.data = data
@@ -18,7 +17,7 @@ class CryptoTradingEnv(gym.Env):
         )
     
     def get_features(self):
-        """Extract features from current state"""
+        
         # Implementation needed
         return np.array([0.0] * 10)  # Placeholder
     

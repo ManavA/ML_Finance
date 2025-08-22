@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 Smart imputation strategies for financial ML features
-Handles missing data intelligently based on feature type
 """
 
 import pandas as pd
@@ -12,25 +11,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 class SmartImputer:
-    """
-    Intelligent imputation for mixed-frequency financial data
-    Different strategies for different feature types
-    """
-    
+
     def __init__(self):
         self.imputation_stats = {}
         
     def impute_features(self, df: pd.DataFrame, feature_metadata: Dict = None) -> pd.DataFrame:
-        """
-        Smart imputation based on feature characteristics
-        
-        Args:
-            df: DataFrame with features
-            feature_metadata: Dictionary describing feature types
-            
-        Returns:
-            DataFrame with intelligent imputation
-        """
         
         df = df.copy()
         
@@ -65,9 +50,7 @@ class SmartImputer:
         return df
     
     def _classify_features(self, df: pd.DataFrame) -> Dict[str, List[str]]:
-        """
-        Automatically classify features by type
-        """
+
         feature_types = {
             'price': [],
             'volume': [],
@@ -102,10 +85,7 @@ class SmartImputer:
         return feature_types
     
     def _create_missing_indicators(self, df: pd.DataFrame, feature_metadata: Dict) -> pd.DataFrame:
-        """
-        Create binary indicators for missing data patterns
-        These can be informative features themselves
-        """
+
         missing_indicators = pd.DataFrame(index=df.index)
         
         # Indicator for any missing macro data
@@ -131,10 +111,7 @@ class SmartImputer:
         return missing_indicators
     
     def _impute_price_features(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
-        """
-        Impute price features - usually should not have missing values
-        If missing, use forward fill then backward fill
-        """
+
         for col in columns:
             if col in df.columns:
                 if df[col].isna().any():
@@ -149,10 +126,7 @@ class SmartImputer:
         return df
     
     def _impute_volume_features(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
-        """
-        Impute volume features - use median for missing values
-        Zero volume is valid, so only fill true NaN
-        """
+
         for col in columns:
             if col in df.columns:
                 if df[col].isna().any():
@@ -165,10 +139,7 @@ class SmartImputer:
         return df
     
     def _impute_technical_features(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
-        """
-        Technical indicators - DO NOT impute during warm-up period
-        After warm-up, use forward fill only
-        """
+
         for col in columns:
             if col in df.columns:
                 # Identify warm-up period (first non-NaN)
@@ -183,10 +154,7 @@ class SmartImputer:
         return df
     
     def _impute_macro_features(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
-        """
-        Macro features - forward fill aggressively
-        Economic data updates infrequently but remains valid
-        """
+
         for col in columns:
             if col in df.columns:
                 if df[col].isna().any():
@@ -210,9 +178,7 @@ class SmartImputer:
         return df
     
     def _impute_volatility_features(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
-        """
-        Volatility features - use expanding window if not enough data
-        """
+
         for col in columns:
             if col in df.columns:
                 if df[col].isna().any():
@@ -229,9 +195,7 @@ class SmartImputer:
         return df
     
     def _impute_regime_features(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
-        """
-        Regime features - forward fill or use mode
-        """
+
         for col in columns:
             if col in df.columns:
                 if df[col].isna().any():
@@ -247,9 +211,7 @@ class SmartImputer:
         return df
     
     def _log_imputation_stats(self, df: pd.DataFrame):
-        """
-        Log statistics about imputation
-        """
+
         total_missing = df.isna().sum().sum()
         total_cells = df.shape[0] * df.shape[1]
         
@@ -267,9 +229,7 @@ class SmartImputer:
                 logger.warning(f"  {col}: {missing}/{df.shape[0]} ({missing/df.shape[0]*100:.1f}%)")
     
     def get_imputation_report(self, df_before: pd.DataFrame, df_after: pd.DataFrame) -> pd.DataFrame:
-        """
-        Generate detailed imputation report
-        """
+
         report = []
         
         for col in df_before.columns:
@@ -291,16 +251,10 @@ class SmartImputer:
 
 # Model-specific handling
 class MissingValueHandler:
-    """
-    Handle missing values based on model type
-    """
-    
+
     @staticmethod
     def prepare_for_xgboost(X: pd.DataFrame) -> pd.DataFrame:
-        """
-        XGBoost handles missing values natively
-        Just ensure numeric types
-        """
+
         X_prepared = X.copy()
         
         # Convert categoricals to numeric
@@ -312,10 +266,7 @@ class MissingValueHandler:
     
     @staticmethod
     def prepare_for_sklearn(X: pd.DataFrame, imputer_type: str = 'smart') -> pd.DataFrame:
-        """
-        SKLearn models need complete data
-        Use smart imputation
-        """
+
         if imputer_type == 'smart':
             imputer = SmartImputer()
             X_prepared = imputer.impute_features(X)
@@ -334,10 +285,7 @@ class MissingValueHandler:
     
     @staticmethod
     def prepare_for_neural_net(X: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """
-        Neural networks need normalized complete data
-        Also return missingness mask
-        """
+ 
         # Create missingness mask
         missing_mask = X.isna().astype(float)
         
@@ -361,11 +309,9 @@ class MissingValueHandler:
 
 
 def demonstrate_smart_imputation():
-    """
-    Demonstrate smart imputation strategies
-    """
+
     print("="*60)
-    print("SMART IMPUTATION STRATEGIES FOR FINANCIAL ML")
+    print("SMART IMPUTATION STRATEGIES")
     print("="*60)
     
     # Create sample data with realistic missing patterns
@@ -454,18 +400,13 @@ def demonstrate_smart_imputation():
     X_sklearn = MissingValueHandler.prepare_for_sklearn(market_data)
     print(f"\nSKLearn preparation:")
     print(f"  - All NaN imputed: {X_sklearn.isna().sum().sum()} missing cells")
-    print(f"  - Ready for Random Forest, SVM, etc.")
     
     # Neural Network
     X_nn, mask = MissingValueHandler.prepare_for_neural_net(market_data)
     print(f"\nNeural Network preparation:")
     print(f"  - Data normalized and imputed")
     print(f"  - Missingness mask shape: {mask.shape}")
-    print(f"  - Can use mask as additional input")
-    
-    print("\n" + "="*60)
-    print("Smart imputation preserves information while handling missing data!")
-    print("="*60)
+
 
 
 if __name__ == "__main__":

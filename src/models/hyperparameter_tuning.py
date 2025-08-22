@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-Hyperparameter tuning framework for ML models
-Includes Bayesian optimization, grid search, and random search
-"""
+
 
 import pandas as pd
 import numpy as np
@@ -43,15 +40,12 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class HyperparameterSpace:
-    """Define hyperparameter search space"""
     name: str
     param_space: Dict[str, Any]
     param_type: str  # 'continuous', 'discrete', 'categorical'
     
 class BayesianOptimizer:
-    """
-    Bayesian optimization for hyperparameter tuning using Optuna
-    """
+
     
     def __init__(
         self,
@@ -62,17 +56,7 @@ class BayesianOptimizer:
         study_name: Optional[str] = None,
         storage: Optional[str] = None
     ):
-        """
-        Initialize Bayesian optimizer
-        
-        Args:
-            model_type: Type of model to optimize
-            n_trials: Number of optimization trials
-            n_jobs: Number of parallel jobs
-            seed: Random seed
-            study_name: Name for Optuna study
-            storage: Database URL for distributed optimization
-        """
+
         if not OPTUNA_AVAILABLE:
             raise ImportError("Optuna is required for Bayesian optimization")
             
@@ -97,21 +81,7 @@ class BayesianOptimizer:
         direction: str = 'maximize',
         callbacks: Optional[List[Callable]] = None
     ) -> Dict:
-        """
-        Run Bayesian optimization
-        
-        Args:
-            X_train: Training features
-            y_train: Training targets
-            X_val: Validation features
-            y_val: Validation targets
-            objective_metric: Metric to optimize
-            direction: 'maximize' or 'minimize'
-            callbacks: List of callback functions
-            
-        Returns:
-            Best parameters found
-        """
+
         def objective(trial):
             # Get hyperparameters based on model type
             params = self._get_trial_params(trial, self.model_type)
@@ -159,7 +129,6 @@ class BayesianOptimizer:
         return self.best_params
     
     def _get_trial_params(self, trial, model_type: str) -> Dict:
-        """Get hyperparameters for trial based on model type"""
         
         if model_type == 'rf':
             return {
@@ -232,7 +201,6 @@ class BayesianOptimizer:
             raise ValueError(f"Unknown model type: {model_type}")
     
     def _create_model(self, model_type: str, params: Dict):
-        """Create model with given parameters"""
         # Simplified model creation - in practice, import from models module
         class MockMLModelTrainer:
             def __init__(self, model_type):
@@ -255,7 +223,7 @@ class BayesianOptimizer:
         y_val: pd.Series,
         metric: str
     ) -> float:
-        """Evaluate model and return score"""
+        
         # Simplified evaluation - in practice, train the model
         predictions = model.predict(X_val, X_val.columns.tolist())
         
@@ -272,7 +240,7 @@ class BayesianOptimizer:
             raise ValueError(f"Unknown metric: {metric}")
     
     def get_importance(self) -> pd.DataFrame:
-        """Get parameter importance from study"""
+        
         if self.study is None:
             raise ValueError("No study available. Run optimize first.")
         
@@ -286,7 +254,6 @@ class BayesianOptimizer:
         return importance_df
     
     def visualize_optimization(self):
-        """Create optimization visualizations"""
         if self.study is None:
             raise ValueError("No study available. Run optimize first.")
         
@@ -314,10 +281,7 @@ class BayesianOptimizer:
 
 
 class GridSearchOptimizer:
-    """
-    Grid search optimization for hyperparameter tuning
-    """
-    
+
     def __init__(
         self,
         model_type: str,
@@ -326,16 +290,7 @@ class GridSearchOptimizer:
         scoring: str = 'neg_mean_squared_error',
         n_jobs: int = -1
     ):
-        """
-        Initialize grid search optimizer
-        
-        Args:
-            model_type: Type of model to optimize
-            param_grid: Parameter grid to search
-            cv_splits: Number of cross-validation splits
-            scoring: Scoring metric
-            n_jobs: Number of parallel jobs
-        """
+
         self.model_type = model_type
         self.param_grid = param_grid
         self.cv_splits = cv_splits
@@ -352,17 +307,7 @@ class GridSearchOptimizer:
         y_train: pd.Series,
         use_time_series_cv: bool = True
     ) -> Dict:
-        """
-        Run grid search optimization
-        
-        Args:
-            X_train: Training features
-            y_train: Training targets
-            use_time_series_cv: Whether to use time series cross-validation
-            
-        Returns:
-            Best parameters found
-        """
+
         # Create base model
         base_model = self._get_base_model(self.model_type)
         
@@ -394,7 +339,6 @@ class GridSearchOptimizer:
         return self.best_params
     
     def _get_base_model(self, model_type: str):
-        """Get base model for grid search"""
         from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
         
         if model_type == 'rf':
@@ -405,7 +349,6 @@ class GridSearchOptimizer:
             raise ValueError(f"Unknown model type: {model_type}")
     
     def get_cv_results(self) -> pd.DataFrame:
-        """Get cross-validation results"""
         if self.grid_search is None:
             raise ValueError("No grid search results. Run optimize first.")
         
@@ -413,9 +356,7 @@ class GridSearchOptimizer:
 
 
 class AutoML:
-    """
-    Automated machine learning pipeline
-    """
+
     
     def __init__(
         self,
@@ -424,15 +365,7 @@ class AutoML:
         time_budget: int = 3600,
         n_jobs: int = -1
     ):
-        """
-        Initialize AutoML
-        
-        Args:
-            models: List of models to try
-            optimization_method: 'bayesian', 'grid', or 'random'
-            time_budget: Time budget in seconds
-            n_jobs: Number of parallel jobs
-        """
+
         self.models = models or ['rf', 'gb']  # Simplified model list
         self.optimization_method = optimization_method
         self.time_budget = time_budget
@@ -451,16 +384,7 @@ class AutoML:
         y_val: pd.Series,
         objective_metric: str = 'sharpe_ratio'
     ):
-        """
-        Fit AutoML pipeline
-        
-        Args:
-            X_train: Training features
-            y_train: Training targets
-            X_val: Validation features
-            y_val: Validation targets
-            objective_metric: Metric to optimize
-        """
+
         start_time = time.time()
         
         for model_type in self.models:
@@ -521,7 +445,6 @@ class AutoML:
         logger.info(f"Best score: {self.best_score}")
     
     def predict(self, X: pd.DataFrame) -> np.ndarray:
-        """Make predictions with best model"""
         if self.best_model is None:
             raise ValueError("No model fitted. Run fit first.")
         
@@ -529,13 +452,11 @@ class AutoML:
         return np.random.random(len(X)) - 0.5
     
     def get_leaderboard(self) -> pd.DataFrame:
-        """Get model leaderboard"""
         leaderboard = pd.DataFrame(self.results)
         leaderboard = leaderboard.sort_values('score', ascending=False)
         return leaderboard
     
     def save_results(self, filepath: str):
-        """Save AutoML results"""
         results = {
             'best_model': self.best_model,
             'best_params': self.best_params,
@@ -550,18 +471,12 @@ class AutoML:
 
 
 def main():
-    """Test hyperparameter tuning module"""
     print("Hyperparameter Tuning Module Loaded")
     print("Features:")
     if OPTUNA_AVAILABLE:
         print("  - Bayesian optimization with Optuna")
     else:
         print("  - Bayesian optimization (requires Optuna)")
-    print("  - Grid search optimization")
-    print("  - AutoML pipeline")
-    print("  - Parameter importance analysis")
-    print("  - Convergence analysis")
-    print("  - Support for all model types")
     
 if __name__ == "__main__":
     main()

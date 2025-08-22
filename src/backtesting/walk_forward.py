@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class WalkForwardSplit:
-    """Configuration for a single walk-forward split"""
     fold: int
     train_start: str
     train_end: str
@@ -38,7 +37,6 @@ class WalkForwardSplit:
 
 @dataclass
 class BacktestResults:
-    """Results from a single backtest"""
     fold: int
     symbol: str
     model_name: str
@@ -50,7 +48,6 @@ class BacktestResults:
     timestamps: pd.DatetimeIndex
     
     def calculate_metrics(self) -> Dict[str, float]:
-        """Calculate comprehensive performance metrics"""
         # Basic returns metrics
         total_return = (self.equity_curve[-1] / self.equity_curve[0] - 1) * 100
         
@@ -95,9 +92,7 @@ class BacktestResults:
         }
 
 class WalkForwardBacktester:
-    """
-    Walk-forward backtesting framework for comparing ML models vs traditional strategies
-    """
+
     
     def __init__(self, 
                  train_months: int = 12,
@@ -106,17 +101,7 @@ class WalkForwardBacktester:
                  step_months: int = 3,
                  commission: float = 0.001,
                  slippage: float = 0.0005):
-        """
-        Initialize walk-forward backtester
-        
-        Args:
-            train_months: Training period length
-            val_months: Validation period length
-            test_months: Test period length
-            step_months: Step size for rolling window
-            commission: Trading commission (0.1% default)
-            slippage: Slippage factor (0.05% default)
-        """
+
         self.train_months = train_months
         self.val_months = val_months
         self.test_months = test_months
@@ -128,16 +113,7 @@ class WalkForwardBacktester:
     def create_walk_forward_splits(self, 
                                  start_date: str,
                                  end_date: str) -> List[WalkForwardSplit]:
-        """
-        Create walk-forward splits for chronological cross-validation
-        
-        Args:
-            start_date: Start date of data (YYYY-MM-DD)
-            end_date: End date of data (YYYY-MM-DD)
-            
-        Returns:
-            List of WalkForwardSplit objects
-        """
+
         splits = []
         
         start = pd.to_datetime(start_date)
@@ -177,16 +153,7 @@ class WalkForwardBacktester:
     def split_data(self, 
                   data: pd.DataFrame,
                   split: WalkForwardSplit) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-        """
-        Split data according to walk-forward split
-        
-        Args:
-            data: Full dataset
-            split: WalkForwardSplit configuration
-            
-        Returns:
-            Tuple of (train_data, val_data, test_data)
-        """
+
         # Ensure timestamp column exists and is datetime
         if 'timestamp' in data.columns:
             data['timestamp'] = pd.to_datetime(data['timestamp'])
@@ -214,20 +181,7 @@ class WalkForwardBacktester:
                          model_name: str,
                          fold: int,
                          position_sizing: str = 'fixed') -> BacktestResults:
-        """
-        Backtest a strategy based on predictions
-        
-        Args:
-            data: Test data with prices
-            predictions: Model predictions (can be returns, directions, or probabilities)
-            symbol: Asset symbol
-            model_name: Name of the model/strategy
-            fold: Fold number
-            position_sizing: Position sizing method ('fixed', 'kelly', 'risk_parity')
-            
-        Returns:
-            BacktestResults object
-        """
+
         # Ensure we have price data
         if 'close' not in data.columns:
             raise ValueError("Data must contain 'close' column")
@@ -289,16 +243,7 @@ class WalkForwardBacktester:
     def predictions_to_positions(self, 
                                 predictions: np.ndarray,
                                 method: str = 'fixed') -> np.ndarray:
-        """
-        Convert model predictions to trading positions
-        
-        Args:
-            predictions: Model predictions
-            method: Position sizing method
-            
-        Returns:
-            Array of positions (-1, 0, 1 for short, flat, long)
-        """
+
         if method == 'fixed':
             # Simple threshold-based positions
             if predictions.ndim == 1:
@@ -349,20 +294,7 @@ class WalkForwardBacktester:
                                  symbol: str,
                                  model_name: str,
                                  splits: Optional[List[WalkForwardSplit]] = None) -> pd.DataFrame:
-        """
-        Run complete walk-forward backtest for a model
-        
-        Args:
-            data: Full dataset with features
-            model_fn: Function that trains model and returns predictions
-                     Signature: model_fn(train_data, val_data, test_data) -> predictions
-            symbol: Asset symbol
-            model_name: Model name
-            splits: Optional pre-defined splits
-            
-        Returns:
-            DataFrame with aggregated results
-        """
+
         if splits is None:
             # Create default splits
             start_date = data['timestamp'].min() if 'timestamp' in data.columns else data.index.min()
@@ -441,17 +373,7 @@ class WalkForwardBacktester:
     def compare_models(self, models: Dict[str, Callable],
                        data: pd.DataFrame,
                        symbol: str) -> pd.DataFrame:
-        """
-        Compare multiple models using walk-forward validation
-        
-        Args:
-            models: Dictionary of model_name -> model_function
-            data: Full dataset
-            symbol: Asset symbol
-            
-        Returns:
-            DataFrame comparing all models
-        """
+
         all_results = []
         
         # Create splits once for consistency
@@ -474,13 +396,11 @@ class WalkForwardBacktester:
             return pd.DataFrame()
     
     def save_results(self, filepath: str):
-        """Save backtest results to file"""
         with open(filepath, 'wb') as f:
             pickle.dump(self.results, f)
         logger.info(f"Results saved to {filepath}")
     
     def load_results(self, filepath: str):
-        """Load backtest results from file"""
         with open(filepath, 'rb') as f:
             self.results = pickle.load(f)
         logger.info(f"Loaded {len(self.results)} results from {filepath}")

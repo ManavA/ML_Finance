@@ -1,7 +1,5 @@
 # src/analysis/visualizer.py
-"""
-Visualization tools for strategy analysis.
-"""
+
 
 import pandas as pd
 import numpy as np
